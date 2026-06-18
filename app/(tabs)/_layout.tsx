@@ -66,4 +66,4 @@ export default function TabLayout() {
       />
     </Tabs>
   );
-}  // isalah hbil 
+}  
