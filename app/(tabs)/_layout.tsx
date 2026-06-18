@@ -19,6 +19,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
+       
     <Tabs
       screenOptions={{
        tabBarActiveTintColor: colorScheme === 'dark' ? '#808080' : '#000000',
