@@ -1,8 +1,13 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link, Tabs } from "expo-router";
+ import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Tabs } from "expo-router";
 import React from "react";
-import { Pressable } from "react-native";
 import { BlurView } from 'expo-blur';
+
+
+
+
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -22,20 +27,33 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colorScheme === "dark" ? "#808080" : "#000000",
-        tabBarInactiveTintColor: colorScheme === "dark" ? "#808080" : "#000000",
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarInactiveTintColor: colorScheme === 'dark' ? '#8e8e93' : '#8e8e93',
+        tabBarActiveBackgroundColor: colorScheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 0,
+          height: 100,
+          paddingBottom: 8,
+          paddingTop: 8,
+          borderTopWidth: 0,
+          backgroundColor: colorScheme === 'dark' ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.95)',
+        },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
-      
-         tabBarBackground: () => (
-      <BlurView
-        tint={colorScheme === "dark" ? "dark" : "light"} // frosted look
-        intensity={50} // adjust blur strength (0–100)
-        style={{ flex: 1 }}
-      />
-    ),
-
+        tabBarBackground: () => (
+          <BlurView
+            tint={colorScheme === 'dark' ? 'dark' : 'light'} // frosted look
+            intensity={50} // adjust blur strength (0–100)
+            style={{ flex: 1 }}
+          />
+        ),
       }}
     >
      <Tabs.Screen
