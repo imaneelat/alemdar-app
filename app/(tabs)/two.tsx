@@ -45,7 +45,7 @@ export default function SearchScreen() {
             styles.searchBar,
             { color: colorScheme === 'dark' ? '#fff' : '#000' },
           ]}
-          placeholder="Search services..."
+          placeholder="Search items ..."
           placeholderTextColor={colorScheme === 'dark' ? '#888' : '#555'}
           value={query}
           onChangeText={handleSearch}

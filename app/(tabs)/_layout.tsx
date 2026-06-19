@@ -21,10 +21,37 @@ export default function TabLayout() {
 
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: colorScheme === 'dark' ? '#808080' : '#000000',
-          tabBarInactiveTintColor: colorScheme === 'dark' ? '#808080' : '#000000',
-          headerShown: useClientOnlyValue(false, true),
-        }}
+  headerShown: useClientOnlyValue(false, true),
+
+  tabBarActiveTintColor:
+    colorScheme === "dark" ? "#18008da5" : "#18008da5",
+
+  tabBarInactiveTintColor:
+    colorScheme === "dark" ? "#FFFFFF" : "#555555",
+
+  tabBarStyle: {
+    position: "absolute",
+     marginBottom: 0,
+     marginHorizontal :10,
+     borderTopWidth:0,
+    left: 20,
+    right: 20,
+    height: 70,
+     // Background color
+  backgroundColor:
+    colorScheme === "dark"
+      ? "#3A3A3A"   // Dark grey
+      : "#D9D9D9",  // Light grey
+    borderRadius: 30,
+    
+    elevation: 0,
+  },
+
+  tabBarLabelStyle: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+}}
       >
         <Tabs.Screen
           name="index"
