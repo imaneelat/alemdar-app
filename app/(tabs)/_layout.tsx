@@ -21,7 +21,7 @@ export default function TabLayout() {
 
       <Tabs
         screenOptions={{
-  headerShown: useClientOnlyValue(false, true),
+  headerShown: false,
 
   tabBarActiveTintColor:
     colorScheme === "dark" ? "#18008da5" : "#18008da5",
@@ -31,20 +31,24 @@ export default function TabLayout() {
 
   tabBarStyle: {
     position: "absolute",
-     marginBottom: 0,
+     marginBottom: 30,
      marginHorizontal :10,
      borderTopWidth:0,
-    left: 20,
-    right: 20,
-    height: 70,
-     // Background color
-  backgroundColor:
-    colorScheme === "dark"
+     left: 40,
+     right: 40,
+     height: 70,
+     backgroundColor:
+      colorScheme === "dark"
       ? "#3A3A3A"   // Dark grey
       : "#D9D9D9",  // Light grey
     borderRadius: 30,
-    
-    elevation: 0,
+     elevation: 0, // android shadow
+     shadowColor: '#000', // ios shadow
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.12,
+      shadowRadius: 5,
+
+
   },
 
   tabBarLabelStyle: {

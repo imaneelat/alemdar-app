@@ -1,27 +1,62 @@
-import { View, TextInput, StyleSheet, FlatList, Text, useColorScheme } from 'react-native';
-import { useState } from 'react';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  Text,
+  useColorScheme,
+} from 'react-native';
+import { useState, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function SearchScreen() {
   const colorScheme = useColorScheme();
+
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<string[]>([]);
 
- const data = ['Solar', 'Electronics', 'Arduino', 'Sound','Chargers','Adapters','Lamps','Filaments','TV remotes' ,'Mexxsun','Fans','electric','SprayGum','Screwdrivers'];
+  const inputRef = useRef<TextInput>(null);
+
+  const data = [
+    'Solar',
+    'Electronics',
+    'Arduino',
+    'Sound',
+    'Chargers',
+    'Adapters',
+    'Lamps',
+    'Filaments',
+    'TV remotes',
+    'Mexxsun',
+    'Fans',
+    'electric',
+    'SprayGum',
+    'Screwdrivers',
+  ];
 
   const handleSearch = (text: string) => {
     setQuery(text);
-    const filtered = data.filter(item =>
+    const filtered = data.filter((item) =>
       item.toLowerCase().includes(text.toLowerCase())
     );
     setResults(filtered);
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      // Small delay helps ensure the keyboard opens properly
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }, [])
+  );
+
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor: colorScheme === 'dark' ? '#000' : '#fff' }
+        { backgroundColor: colorScheme === 'dark' ? '#000' : '#fff' },
       ]}
     >
       {/* Search bar with icon */}
@@ -40,7 +75,9 @@ export default function SearchScreen() {
           color={colorScheme === 'dark' ? '#888' : '#555'}
           style={{ marginRight: 8 }}
         />
+
         <TextInput
+          ref={inputRef}
           style={[
             styles.searchBar,
             { color: colorScheme === 'dark' ? '#fff' : '#000' },
@@ -49,7 +86,6 @@ export default function SearchScreen() {
           placeholderTextColor={colorScheme === 'dark' ? '#888' : '#555'}
           value={query}
           onChangeText={handleSearch}
-          autoFocus={true}
         />
       </View>
 
@@ -83,7 +119,11 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -93,6 +133,7 @@ const styles = StyleSheet.create({
     height: 45,
     marginBottom: 20,
   },
+
   searchBar: {
     flex: 1,
     fontSize: 16,
