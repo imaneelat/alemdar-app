@@ -10,28 +10,39 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
 const categories = [
-  '☀️ Solar', '💡 Lamps', '🔌 Adapters',
-  '🔋 Chargers', '📺 TV Remotes', '🌬️ Fans', '🆕 New Arrivals'
+  { id: '1', name: 'Solar', icon: '☀️', description: 'Panels & inverters' },
+  { id: '2', name: 'Electronics', icon: '💻', description: 'Daily essentials' },
+  { id: '3', name: 'Arduino', icon: '🔧', description: 'Boards & modules' },
+  { id: '4', name: 'Sound', icon: '🔊', description: 'Speakers & mixers' },
+  { id: '5', name: 'Batteries', icon: '🔋', description: 'Power storage' },
+  { id: '6', name: 'Chargers', icon: '⚡', description: 'Power adapters' },
+  { id: '7', name: 'Adapters', icon: '🔌', description: 'Converters' },
+  { id: '8', name: 'Lamps', icon: '💡', description: 'Lighting' },
+  { id: '9', name: 'Mexxsun', icon: '🌞', description: 'Energy products' },
+  { id: '10', name: 'Filament', icon: '🖨️', description: '3D printing' },
+  { id: '11', name: 'TV Remotes', icon: '📺', description: 'Remote controls' },
+  { id: '12', name: 'Fans', icon: '🌀', description: 'Cooling systems' },
+  { id: '13', name: 'Electrical', icon: '🔌', description: 'Electrical tools' },
+  { id: '14', name: 'Screwdrivers', icon: '🔩', description: 'Hand tools' },
+  { id: '15', name: 'Spray & Gum', icon: '🧴', description: 'Spray & adhesive' },
 ];
 
 const products = [
-  { name: 'Mexxsun Solar Panel',  price: '850 TL' },
-  { name: 'TV Remote',           price: '267 TL'  },
-  { name: 'Fan',                 price: '1500 TL'  },
+  { name: 'Mexxsun Solar Panel', price: '850 TL' },
+  { name: 'TV Remote', price: '267 TL' },
+  { name: 'Fan', price: '1500 TL' },
 ];
 
 export default function TabOneScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const bg          = isDark ? '#000'                    : '#f2f2f7';
-  const cardBg      = isDark ? '#1c1c1e'                 : '#ffffff';
-  const textColor   = isDark ? '#ffffff'                 : '#000000';
-  const subText     = isDark ? 'rgba(255,255,255,0.5)'   : 'rgba(0,0,0,0.4)';
-  const pillBg      = isDark ? '#2B2B2B'                 : '#E5E5E5';
-  const pillBorder  = isDark ? '#444'                    : '#D0D0D0';
-  const heroBg      = isDark ? '#0d1b0d'                 : '#e8f5e9';
-  const heroImgBg   = isDark ? '#1a2e1a'                 : '#c8e6c9';
+  const bg = isDark ? '#000' : '#f2f2f7';
+  const cardBg = isDark ? '#1c1c1e' : '#ffffff';
+  const textColor = isDark ? '#ffffff' : '#000000';
+  const subText = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
+  const heroBg = isDark ? '#0d1b0d' : '#e8f5e9';
+  const heroImgBg = isDark ? '#1a2e1a' : '#c8e6c9';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bg }]}>
@@ -53,18 +64,26 @@ export default function TabOneScreen() {
           <Ionicons name="cart-outline" size={26} color={textColor} />
         </View>
 
-        {/* Categories */}
+        {/* Categories - Horizontal Squares */}
+        <Text style={[styles.categoriesTitle, { color: textColor }]}>
+          Categories
+        </Text>
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesContainer}
+          contentContainerStyle={styles.categoriesScrollContainer}
         >
           {categories.map((cat) => (
-            <TouchableOpacity
-              key={cat}
-              style={[styles.categoryButton, { backgroundColor: pillBg, borderColor: pillBorder }]}
-            >
-              <Text style={[styles.categoryText, { color: textColor }]}>{cat}</Text>
+            <TouchableOpacity key={cat.id} style={[styles.categorySquare, { 
+              backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
+              borderColor: isDark ? '#333' : '#e0e0e0',
+            }]}>
+              <View style={styles.categorySquareIcon}>
+                <Text style={styles.categorySquareEmoji}>{cat.icon}</Text>
+              </View>
+              <Text style={[styles.categorySquareName, { color: textColor }]}>{cat.name}</Text>
+              <Text style={[styles.categorySquareDescription, { color: subText }]}>{cat.description}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -72,10 +91,10 @@ export default function TabOneScreen() {
         {/* Hero Banner */}
         <View style={[styles.heroBanner, { backgroundColor: heroBg }]}>
           <View style={[styles.heroImageBox, { backgroundColor: heroImgBg }]}>
-            <Text style={{ fontSize: 100 }}></Text>
+            <Text style={{ fontSize: 100 }}>☀️</Text>
           </View>
           <View style={[styles.heroInfo, { backgroundColor: heroBg }]}>
-            <Text style={[styles.heroBadge, { color: '#f5a623' }]}> New Arrival</Text>
+            <Text style={[styles.heroBadge, { color: '#f5a623' }]}>New Arrival</Text>
             <Text style={[styles.heroTitle, { color: textColor }]}>Mexxsun Solar Panel</Text>
             <Text style={[styles.heroSub, { color: subText }]}>200W Monocrystalline • Best Seller</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, backgroundColor: 'transparent' }}>
@@ -112,7 +131,7 @@ export default function TabOneScreen() {
           {products.map((p) => (
             <View key={p.name} style={[styles.productCard, { backgroundColor: cardBg }]}>
               <View style={[styles.productImageBox, { backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0' }]}>
-                <Text style={{ fontSize: 40 }}></Text>
+                <Text style={{ fontSize: 40 }}>📦</Text>
               </View>
               <Text style={[styles.productName, { color: textColor }]}>{p.name}</Text>
               <Text style={[styles.productPrice]}>{p.price}</Text>
@@ -158,26 +177,68 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginBottom: 4,
   },
-  logoImage:  { width: 36, height: 36, borderRadius: 8 },
-  logo:       { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
-  logoSub:    { fontSize: 10, marginTop: 1 },
+  logoImage: { width: 36, height: 36, borderRadius: 8 },
+  logo: { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
+  logoSub: { fontSize: 10, marginTop: 1 },
 
-  categoriesContainer: { paddingHorizontal: 16, paddingVertical: 10, gap: 10 },
-  categoryButton: {
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+  // Categories Styles
+  categoriesTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    marginBottom: 12,
   },
-  categoryText: { fontSize: 13, fontWeight: '600' },
+  categoriesScrollContainer: {
+    paddingHorizontal: 16,
+    paddingRight: 32,
+    gap: 12,
+  },
+  categorySquare: {
+    width: 140,
+    height: 160,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  categorySquareIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    backgroundColor: '#113470',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  categorySquareEmoji: {
+    fontSize: 28,
+  },
+  categorySquareName: {
+    fontSize: 14,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  categorySquareDescription: {
+    fontSize: 10,
+    textAlign: 'center',
+  },
 
-  heroBanner:   { margin: 16, borderRadius: 16, overflow: 'hidden' },
+  heroBanner: { margin: 16, borderRadius: 16, overflow: 'hidden' },
   heroImageBox: { height: 200, alignItems: 'center', justifyContent: 'center' },
-  heroInfo:     { padding: 16 },
-  heroBadge:    { fontSize: 11, fontWeight: '700', marginBottom: 4 },
-  heroTitle:    { fontSize: 20, fontWeight: '800' },
-  heroSub:      { fontSize: 12, marginTop: 2 },
-  heroBtn:      { borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 },
+  heroInfo: { padding: 16 },
+  heroBadge: { fontSize: 11, fontWeight: '700', marginBottom: 4 },
+  heroTitle: { fontSize: 20, fontWeight: '800' },
+  heroSub: { fontSize: 12, marginTop: 2 },
+  heroBtn: { borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 },
 
   sectionTitle: {
     fontSize: 18,
@@ -205,10 +266,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 8,
   },
-  productName:  { fontSize: 12, fontWeight: '600', marginBottom: 4 },
+  productName: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
   productPrice: { fontSize: 14, fontWeight: '800', color: '#f5a623', marginBottom: 8 },
-  addBtn:       { backgroundColor: '#1a3a6b', borderRadius: 8, padding: 7, alignItems: 'center' },
-  addBtnText:   { color: '#fff', fontSize: 11, fontWeight: '700' },
+  addBtn: { backgroundColor: '#1a3a6b', borderRadius: 8, padding: 7, alignItems: 'center' },
+  addBtnText: { color: '#fff', fontSize: 11, fontWeight: '700' },
 
   repairBanner: {
     flexDirection: 'row',
@@ -220,9 +281,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 30,
   },
-  repairTitle:  { fontSize: 13, fontWeight: '700' },
-  repairSub:    { fontSize: 11, marginTop: 2 },
-  callBtn:      { backgroundColor: '#f5a623', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7 },
-  callBtnText:  { color: '#000', fontWeight: '700', fontSize: 12 },
+  repairTitle: { fontSize: 13, fontWeight: '700' },
+  repairSub: { fontSize: 11, marginTop: 2 },
+  callBtn: { backgroundColor: '#f5a623', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7 },
+  callBtnText: { color: '#000', fontWeight: '700', fontSize: 12 },
 });
-
