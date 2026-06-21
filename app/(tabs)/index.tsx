@@ -4,10 +4,44 @@ import {
   TouchableOpacity,
   useColorScheme,
   Image,
+  FlatList,
+  Dimensions,
+  View as RNView,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useState, useRef, useEffect } from 'react';
+
+const { width: screenWidth } = Dimensions.get('window');
+
+// Carousel Data
+const carouselData = [
+  {
+    id: '1',
+    title: 'TOMMATECH',
+    subtitle: 'GERMAN-based company',
+    description: 'Power Everywhere, Every Day',
+    product: 'XS-500-F',
+    bgColor: '#113470',
+  },
+  {
+    id: '2',
+    title: 'Alemdar Teknik',
+    subtitle: 'Robotics, Electronics & Software Lab',
+    description: 'Development · Prototyping · Engineering Solutions',
+    product: '',
+    bgColor: '#1a5276',
+  },
+  {
+    id: '3',
+    title: 'TOMMATECH',
+    subtitle: 'GERMAN-BASED COMPANY',
+    description: 'Quality Engineering Solutions',
+    product: '',
+    bgColor: '#0e65e7',
+  },
+];
 
 const categories = [
   { id: '1', name: 'Solar', icon: '☀️', description: 'Panels & inverters' },
@@ -36,13 +70,65 @@ const products = [
 export default function TabOneScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
 
   const bg = isDark ? '#000' : '#f2f2f7';
   const cardBg = isDark ? '#1c1c1e' : '#ffffff';
   const textColor = isDark ? '#ffffff' : '#000000';
   const subText = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
-  const heroBg = isDark ? '#0d1b0d' : '#e8f5e9';
-  const heroImgBg = isDark ? '#1a2e1a' : '#c8e6c9';
+
+  // Auto-scroll effect
+  useEffect(() => {
+    let interval = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % carouselData.length;
+      flatListRef.current?.scrollToIndex({
+        index: nextIndex,
+        animated: true,
+      });
+      setCurrentIndex(nextIndex);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex]);
+
+  const handleScroll = (event: any) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+    setCurrentIndex(index);
+  };
+
+  const renderCarouselItem = ({ item }: { item: typeof carouselData[0] }) => (
+    <View style={[styles.carouselSlide, { width: screenWidth, backgroundColor: item.bgColor }]}>
+      <RNView style={styles.carouselContent}>
+        {/* Brand Section */}
+        <RNView style={styles.carouselBrand}>
+          <Text style={styles.carouselBrandTitle}>{item.title}</Text>
+          {item.subtitle && (
+            <Text style={styles.carouselBrandSub}>{item.subtitle}</Text>
+          )}
+        </RNView>
+
+        {/* Product/Description Section */}
+        <RNView style={styles.carouselInfo}>
+          {item.description && (
+            <Text style={styles.carouselDescription}>{item.description}</Text>
+          )}
+          {item.product && (
+            <RNView style={styles.carouselProduct}>
+              <Text style={styles.carouselProductLabel}>Product</Text>
+              <Text style={styles.carouselProductName}>{item.product}</Text>
+            </RNView>
+          )}
+        </RNView>
+
+        {/* CTA Button */}
+        <TouchableOpacity style={styles.carouselButton}>
+          <Text style={styles.carouselButtonText}>View Details</Text>
+          <Ionicons name="arrow-forward" size={18} color="#fff" />
+        </TouchableOpacity>
+      </RNView>
+    </View>
+  );
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bg }]}>
@@ -58,13 +144,13 @@ export default function TabOneScreen() {
             />
             <View style={{ backgroundColor: 'transparent' }}>
               <Text style={[styles.logo, { color: textColor }]}>Alemdar Teknik</Text>
-              <Text style={[styles.logoSub, { color: subText }]}>Lefkoşa, KKTC</Text>
+              <Text style={[styles.logoSub, { color: subText }]}>Nicosia, TRNC</Text>
             </View>
           </View>
           <Ionicons name="cart-outline" size={26} color={textColor} />
         </View>
 
-        {/* Categories - Horizontal Squares */}
+        {/* Categories - NOW ABOVE CAROUSEL */}
         <Text style={[styles.categoriesTitle, { color: textColor }]}>
           Categories
         </Text>
@@ -88,35 +174,40 @@ export default function TabOneScreen() {
           ))}
         </ScrollView>
 
-        {/* Hero Banner */}
-        <View style={[styles.heroBanner, { backgroundColor: heroBg }]}>
-          <View style={[styles.heroImageBox, { backgroundColor: heroImgBg }]}>
-            <Text style={{ fontSize: 100 }}>☀️</Text>
-          </View>
-          <View style={[styles.heroInfo, { backgroundColor: heroBg }]}>
-            <Text style={[styles.heroBadge, { color: '#f5a623' }]}>New Arrival</Text>
-            <Text style={[styles.heroTitle, { color: textColor }]}>Mexxsun Solar Panel</Text>
-            <Text style={[styles.heroSub, { color: subText }]}>200W Monocrystalline • Best Seller</Text>
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, backgroundColor: 'transparent' }}>
-              <TouchableOpacity style={[styles.heroBtn, {
-                backgroundColor: isDark ? '#fff' : '#1a3a6b',
-                flex: 1, alignItems: 'center',
-              }]}>
-                <Text style={{ color: isDark ? '#000' : '#fff', fontWeight: '700', fontSize: 13 }}>
-                  🛒 Add to Cart
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.heroBtn, {
-                backgroundColor: 'transparent',
-                borderWidth: 1,
-                borderColor: isDark ? '#fff' : '#1a3a6b',
-                flex: 1, alignItems: 'center',
-              }]}>
-                <Text style={{ color: isDark ? '#fff' : '#1a3a6b', fontWeight: '700', fontSize: 13 }}>
-                  More info
-                </Text>
-              </TouchableOpacity>
-            </View>
+        {/* Carousel - NOW BELOW CATEGORIES */}
+        <View style={styles.carouselContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={carouselData}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            keyExtractor={(item) => item.id}
+            renderItem={renderCarouselItem}
+            getItemLayout={(data, index) => ({
+              length: screenWidth,
+              offset: screenWidth * index,
+              index,
+            })}
+          />
+          
+          {/* Dot indicators */}
+          <View style={styles.dotContainer}>
+            {carouselData.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  { 
+                    backgroundColor: index === currentIndex ? '#113470' : 
+                    isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)',
+                    width: index === currentIndex ? 24 : 8,
+                  }
+                ]}
+              />
+            ))}
           </View>
         </View>
 
@@ -185,7 +276,7 @@ const styles = StyleSheet.create({
   categoriesTitle: {
     fontSize: 18,
     fontWeight: '700',
-    paddingTop: 16,
+    paddingTop: 8,
     paddingHorizontal: 16,
     marginBottom: 12,
   },
@@ -232,13 +323,89 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  heroBanner: { margin: 16, borderRadius: 16, overflow: 'hidden' },
-  heroImageBox: { height: 200, alignItems: 'center', justifyContent: 'center' },
-  heroInfo: { padding: 16 },
-  heroBadge: { fontSize: 11, fontWeight: '700', marginBottom: 4 },
-  heroTitle: { fontSize: 20, fontWeight: '800' },
-  heroSub: { fontSize: 12, marginTop: 2 },
-  heroBtn: { borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 },
+  // Carousel Styles
+  carouselContainer: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  carouselSlide: {
+    height: 280,
+    padding: 24,
+    justifyContent: 'center',
+  },
+  carouselContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  carouselBrand: {
+    marginBottom: 16,
+  },
+  carouselBrandTitle: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: 1,
+  },
+  carouselBrandSub: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 2,
+    letterSpacing: 2,
+  },
+  carouselInfo: {
+    marginBottom: 20,
+  },
+  carouselDescription: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: 'rgba(255,255,255,0.9)',
+    lineHeight: 24,
+  },
+  carouselProduct: {
+    marginTop: 8,
+  },
+  carouselProductLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  carouselProductName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#fff',
+    marginTop: 2,
+  },
+  carouselButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  carouselButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  dotContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 12,
+    gap: 8,
+  },
+  dot: {
+    height: 8,
+    borderRadius: 4,
+  },
 
   sectionTitle: {
     fontSize: 18,
