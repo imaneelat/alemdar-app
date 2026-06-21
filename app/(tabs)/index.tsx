@@ -135,20 +135,20 @@ export default function TabOneScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
 
         {/* Header */}
-        <View style={[styles.header, { backgroundColor: bg }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'transparent' }}>
-            <Image
-              source={{ uri: 'https://alemdarteknik.com/wp-content/uploads/2021/01/alemdar-logo.png' }}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-            <View style={{ backgroundColor: 'transparent' }}>
-              <Text style={[styles.logo, { color: textColor }]}>Alemdar Teknik</Text>
-              <Text style={[styles.logoSub, { color: subText }]}>Nicosia, TRNC</Text>
-            </View>
-          </View>
-          <Ionicons name="cart-outline" size={26} color={textColor} />
-        </View>
+       <View style={[styles.header, { backgroundColor: '#1a3a6b' }]}>
+         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'transparent' }}>
+           <Image
+             source={{ uri: 'https://alemdarteknik.com/wp-content/uploads/2021/01/alemdar-logo.png' }}
+             style={styles.logoImage}
+             resizeMode="contain"
+           />
+           <View style={{ backgroundColor: 'transparent' }}>
+             <Text style={[styles.logo, { color: '#ffffff' }]}>Alemdar Teknik</Text>
+             <Text style={[styles.logoSub, { color: 'rgba(255,255,255,0.6)' }]}>Lefkoşa, KKTC</Text>
+           </View>
+         </View>
+         <Ionicons name="cart-outline" size={26} color="#ffffff" />
+       </View>
 
         {/* Categories - NOW ABOVE CAROUSEL */}
         <Text style={[styles.categoriesTitle, { color: textColor }]}>
