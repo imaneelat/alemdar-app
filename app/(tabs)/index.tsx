@@ -15,9 +15,9 @@ const categories = [
 ];
 
 const products = [
-  { name: 'Mexxsun Solar Panel', emoji: '☀️', price: '850 TL' },
-  { name: 'TV Remote',           emoji: '📺', price: '267 TL'  },
-  { name: 'Fan',                 emoji: '🌬️', price: '1500 TL'  },
+  { name: 'Mexxsun Solar Panel',  price: '850 TL' },
+  { name: 'TV Remote',           price: '267 TL'  },
+  { name: 'Fan',                 price: '1500 TL'  },
 ];
 
 export default function TabOneScreen() {
@@ -112,7 +112,7 @@ export default function TabOneScreen() {
           {products.map((p) => (
             <View key={p.name} style={[styles.productCard, { backgroundColor: cardBg }]}>
               <View style={[styles.productImageBox, { backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0' }]}>
-                <Text style={{ fontSize: 40 }}>{p.emoji}</Text>
+                <Text style={{ fontSize: 40 }}></Text>
               </View>
               <Text style={[styles.productName, { color: textColor }]}>{p.name}</Text>
               <Text style={[styles.productPrice]}>{p.price}</Text>
