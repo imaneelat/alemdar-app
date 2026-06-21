@@ -120,9 +120,10 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-  },
+  flex: 1,
+  paddingHorizontal: 20,
+  paddingTop: 60,
+},
 
   searchContainer: {
     flexDirection: 'row',
