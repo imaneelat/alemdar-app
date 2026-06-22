@@ -1,129 +1,104 @@
 import {
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  useColorScheme,
-  Image,
-  FlatList,
-  Dimensions,
-  View as RNView,
+  StyleSheet, ScrollView, TouchableOpacity, useColorScheme,
+  Image, FlatList, Dimensions, View as RNView,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useRef, useEffect } from 'react';
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: W } = Dimensions.get('window');
 
-// Carousel Data
 const carouselData = [
-  {
-    id: '1',
-    title: 'TOMMATECH',
-    subtitle: 'GERMAN-based company',
-    description: 'Power Everywhere, Every Day',
-    product: 'XS-500-F',
-    bgColor: '#113470',
-  },
-  {
-    id: '2',
-    title: 'Alemdar Teknik',
-    subtitle: 'Robotics, Electronics & Software Lab',
-    description: 'Development · Prototyping · Engineering Solutions',
-    product: '',
-    bgColor: '#1a5276',
-  },
-  {
-    id: '3',
-    title: 'TOMMATECH',
-    subtitle: 'GERMAN-BASED COMPANY',
-    description: 'Quality Engineering Solutions',
-    product: '',
-    bgColor: '#0e65e7',
-  },
+  { id: '1', title: 'TOMMATECH', subtitle: 'GERMAN-based company', description: 'Power Everywhere, Every Day', product: 'XS-500-F', bgColor: '#113470' },
+  { id: '2', title: 'Alemdar Teknik', subtitle: 'Robotics, Electronics & Software Lab', description: 'Development · Prototyping · Engineering Solutions', product: '', bgColor: '#1a5276' },
+  { id: '3', title: 'TOMMATECH', subtitle: 'GERMAN-BASED COMPANY', description: 'Quality Engineering Solutions', product: '', bgColor: '#0e65e7' },
 ];
 
 const categories = [
-  { id: '1', name: 'Solar', icon: '☀️', description: 'Panels & inverters' },
-  { id: '2', name: 'Electronics', icon: '💻', description: 'Daily essentials' },
-  { id: '3', name: 'Arduino', icon: '🔧', description: 'Boards & modules' },
-  { id: '4', name: 'Sound', icon: '🔊', description: 'Speakers & mixers' },
-  { id: '5', name: 'Batteries', icon: '🔋', description: 'Power storage' },
-  { id: '6', name: 'Chargers', icon: '⚡', description: 'Power adapters' },
-  { id: '7', name: 'Adapters', icon: '🔌', description: 'Converters' },
-  { id: '8', name: 'Lamps', icon: '💡', description: 'Lighting' },
-  { id: '9', name: 'Mexxsun', icon: '🌞', description: 'Energy products' },
-  { id: '10', name: 'Filament', icon: '🖨️', description: '3D printing' },
-  { id: '11', name: 'TV Remotes', icon: '📺', description: 'Remote controls' },
-  { id: '12', name: 'Fans', icon: '🌀', description: 'Cooling systems' },
-  { id: '13', name: 'Electrical', icon: '🔌', description: 'Electrical tools' },
-  { id: '14', name: 'Screwdrivers', icon: '🔩', description: 'Hand tools' },
+  { id: '1',  name: 'Solar',       icon: '☀️', description: 'Panels & inverters' },
+  { id: '2',  name: 'Electronics', icon: '💻', description: 'Daily essentials' },
+  { id: '3',  name: 'Arduino',     icon: '🔧', description: 'Boards & modules' },
+  { id: '4',  name: 'Sound',       icon: '🔊', description: 'Speakers & mixers' },
+  { id: '5',  name: 'Batteries',   icon: '🔋', description: 'Power storage' },
+  { id: '6',  name: 'Chargers',    icon: '⚡', description: 'Power adapters' },
+  { id: '7',  name: 'Adapters',    icon: '🔌', description: 'Converters' },
+  { id: '8',  name: 'Lamps',       icon: '💡', description: 'Lighting' },
+  { id: '9',  name: 'Mexxsun',     icon: '🌞', description: 'Energy products' },
+  { id: '10', name: 'Filament',    icon: '🖨️', description: '3D printing' },
+  { id: '11', name: 'TV Remotes',  icon: '📺', description: 'Remote controls' },
+  { id: '12', name: 'Fans',        icon: '🌀', description: 'Cooling systems' },
+  { id: '13', name: 'Electrical',  icon: '🔌', description: 'Electrical tools' },
+  { id: '14', name: 'Screwdrivers',icon: '🔩', description: 'Hand tools' },
   { id: '15', name: 'Spray & Gum', icon: '🧴', description: 'Spray & adhesive' },
 ];
 
 const products = [
   { name: 'Mexxsun Solar Panel', price: '850 TL' },
-  { name: 'TV Remote', price: '267 TL' },
-  { name: 'Fan', price: '1500 TL' },
+  { name: 'TV Remote',           price: '267 TL' },
+  { name: 'Fan',                 price: '1500 TL' },
+];
+
+const LANGS = [
+  { code: 'EN', flag: '🇬🇧' },
+  { code: 'TR', flag: '🇹🇷' },
+];
+const CURRENCIES = [
+  { code: 'TRY', symbol: '₺' },
+  { code: 'USD', symbol: '$' },
+  { code: 'EUR', symbol: '€' },
 ];
 
 export default function TabOneScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useColorScheme() === 'dark';
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
-  const bg = isDark ? '#000' : '#f2f2f7';
-  const cardBg = isDark ? '#1c1c1e' : '#ffffff';
+  const [lang, setLang]           = useState('EN');
+  const [currency, setCurrency]   = useState('TRY');
+  const [showLang, setShowLang]   = useState(false);
+  const [showCurr, setShowCurr]   = useState(false);
+
+  const bg      = isDark ? '#000' : '#f2f2f7';
+  const cardBg  = isDark ? '#1c1c1e' : '#ffffff';
   const textColor = isDark ? '#ffffff' : '#000000';
-  const subText = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
+  const subText   = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
 
-  // Auto-scroll effect
   useEffect(() => {
-    let interval = setInterval(() => {
-      const nextIndex = (currentIndex + 1) % carouselData.length;
-      flatListRef.current?.scrollToIndex({
-        index: nextIndex,
-        animated: true,
-      });
-      setCurrentIndex(nextIndex);
+    const t = setInterval(() => {
+      const next = (currentIndex + 1) % carouselData.length;
+      flatListRef.current?.scrollToIndex({ index: next, animated: true });
+      setCurrentIndex(next);
     }, 4000);
-
-    return () => clearInterval(interval);
+    return () => clearInterval(t);
   }, [currentIndex]);
 
-  const handleScroll = (event: any) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
-    setCurrentIndex(index);
-  };
+  const handleScroll = (e: any) =>
+    setCurrentIndex(Math.round(e.nativeEvent.contentOffset.x / W));
+
+  const closeAll = () => { setShowLang(false); setShowCurr(false); };
+
+  const currentFlag = LANGS.find(l => l.code === lang)?.flag;
+  const currentSymbol = CURRENCIES.find(c => c.code === currency)?.symbol;
 
   const renderCarouselItem = ({ item }: { item: typeof carouselData[0] }) => (
-    <View style={[styles.carouselSlide, { width: screenWidth, backgroundColor: item.bgColor }]}>
-      <RNView style={styles.carouselContent}>
-        {/* Brand Section */}
-        <RNView style={styles.carouselBrand}>
-          <Text style={styles.carouselBrandTitle}>{item.title}</Text>
-          {item.subtitle && (
-            <Text style={styles.carouselBrandSub}>{item.subtitle}</Text>
-          )}
+    <View style={[styles.slide, { width: W, backgroundColor: item.bgColor }]}>
+      <RNView style={styles.slideContent}>
+        <RNView style={styles.slideBrand}>
+          <Text style={styles.slideTitle}>{item.title}</Text>
+          {item.subtitle && <Text style={styles.slideSub}>{item.subtitle}</Text>}
         </RNView>
-
-        {/* Product/Description Section */}
-        <RNView style={styles.carouselInfo}>
-          {item.description && (
-            <Text style={styles.carouselDescription}>{item.description}</Text>
-          )}
+        <RNView style={styles.slideInfo}>
+          {item.description && <Text style={styles.slideDesc}>{item.description}</Text>}
           {item.product && (
-            <RNView style={styles.carouselProduct}>
-              <Text style={styles.carouselProductLabel}>Product</Text>
-              <Text style={styles.carouselProductName}>{item.product}</Text>
+            <RNView style={{ marginTop: 8 }}>
+              <Text style={styles.slideProductLabel}>Product</Text>
+              <Text style={styles.slideProductName}>{item.product}</Text>
             </RNView>
           )}
         </RNView>
-
-        {/* CTA Button */}
-        <TouchableOpacity style={styles.carouselButton}>
-          <Text style={styles.carouselButtonText}>View Details</Text>
+        <TouchableOpacity style={styles.slideBtn}>
+          <Text style={styles.slideBtnText}>View Details</Text>
           <Ionicons name="arrow-forward" size={18} color="#fff" />
         </TouchableOpacity>
       </RNView>
@@ -132,100 +107,136 @@ export default function TabOneScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bg }]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} onScrollBeginDrag={closeAll}>
 
-        {/* Header */}
-       <View style={[styles.header, { backgroundColor: '#1a3a6b' }]}>
-         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'transparent' }}>
-           <Image
-             source={{ uri: 'https://alemdarteknik.com/wp-content/uploads/2021/01/alemdar-logo.png' }}
-             style={styles.logoImage}
-             resizeMode="contain"
-           />
-           <View style={{ backgroundColor: 'transparent' }}>
-             <Text style={[styles.logo, { color: '#ffffff' }]}>Alemdar Teknik</Text>
-             <Text style={[styles.logoSub, { color: 'rgba(255,255,255,0.6)' }]}>Lefkoşa, KKTC</Text>
-           </View>
-         </View>
-         <Ionicons name="cart-outline" size={26} color="#ffffff" />
-       </View>
+        {/* ── Header ── */}
+        <View style={[styles.header, { backgroundColor: '#1a3a6b' }]}>
+          {/* Logo */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'transparent' }}>
+            <Image
+              source={{ uri: 'https://alemdarteknik.com/wp-content/uploads/2021/01/alemdar-logo.png' }}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            <View style={{ backgroundColor: 'transparent' }}>
+              <Text style={[styles.logo, { color: '#fff' }]}>Alemdar Teknik</Text>
+              <Text style={[styles.logoSub, { color: 'rgba(255,255,255,0.6)' }]}>Lefkoşa, KKTC</Text>
+            </View>
+          </View>
 
-        {/* Categories - NOW ABOVE CAROUSEL */}
-        <Text style={[styles.categoriesTitle, { color: textColor }]}>
-          Categories
-        </Text>
+          {/* Controls */}
+          <RNView style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.categoriesScrollContainer}
-        >
-          {categories.map((cat) => (
-            <TouchableOpacity key={cat.id} style={[styles.categorySquare, { 
-              backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
-              borderColor: isDark ? '#333' : '#e0e0e0',
-            }]}>
-              <View style={styles.categorySquareIcon}>
-                <Text style={styles.categorySquareEmoji}>{cat.icon}</Text>
+            {/* Language */}
+            <RNView style={{ position: 'relative' }}>
+              <TouchableOpacity
+                style={styles.selectorBtn}
+                onPress={() => { setShowLang(!showLang); setShowCurr(false); }}
+              >
+                <Text style={styles.selectorFlag}>{currentFlag}</Text>
+                <Text style={styles.selectorText}>{lang}</Text>
+                <Text style={styles.selectorChevron}>▾</Text>
+              </TouchableOpacity>
+              {showLang && (
+                <RNView style={styles.dropdown}>
+                  {LANGS.map(l => (
+                    <TouchableOpacity
+                      key={l.code}
+                      style={styles.dropdownItem}
+                      onPress={() => { setLang(l.code); setShowLang(false); }}
+                    >
+                      <Text style={styles.selectorFlag}>{l.flag}</Text>
+                      <Text style={styles.dropdownLabel}>{l.code}</Text>
+                      {lang === l.code && <Ionicons name="checkmark" size={14} color="#1a3a6b" style={{ marginLeft: 'auto' }} />}
+                    </TouchableOpacity>
+                  ))}
+                </RNView>
+              )}
+            </RNView>
+
+            {/* Currency */}
+            <RNView style={{ position: 'relative' }}>
+              <TouchableOpacity
+                style={styles.selectorBtn}
+                onPress={() => { setShowCurr(!showCurr); setShowLang(false); }}
+              >
+                <Text style={styles.selectorText}>{currentSymbol} {currency}</Text>
+                <Text style={styles.selectorChevron}>▾</Text>
+              </TouchableOpacity>
+              {showCurr && (
+                <RNView style={[styles.dropdown, { right: 0, left: undefined }]}>
+                  {CURRENCIES.map(c => (
+                    <TouchableOpacity
+                      key={c.code}
+                      style={styles.dropdownItem}
+                      onPress={() => { setCurrency(c.code); setShowCurr(false); }}
+                    >
+                      <Text style={[styles.dropdownLabel, { fontWeight: '700' }]}>{c.symbol}</Text>
+                      <Text style={styles.dropdownLabel}>{c.code}</Text>
+                      {currency === c.code && <Ionicons name="checkmark" size={14} color="#1a3a6b" style={{ marginLeft: 'auto' }} />}
+                    </TouchableOpacity>
+                  ))}
+                </RNView>
+              )}
+            </RNView>
+
+            <Ionicons name="cart-outline" size={26} color="#fff" />
+          </RNView>
+        </View>
+
+        {/* ── Categories ── */}
+        <Text style={[styles.sectionTitle, { color: textColor }]}>Categories</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesRow}>
+          {categories.map(cat => (
+            <TouchableOpacity
+              key={cat.id}
+              style={[styles.categorySquare, { backgroundColor: isDark ? '#1a1a2e' : '#fff', borderColor: isDark ? '#333' : '#e0e0e0' }]}
+            >
+              <View style={styles.categoryIcon}>
+                <Text style={styles.categoryEmoji}>{cat.icon}</Text>
               </View>
-              <Text style={[styles.categorySquareName, { color: textColor }]}>{cat.name}</Text>
-              <Text style={[styles.categorySquareDescription, { color: subText }]}>{cat.description}</Text>
+              <Text style={[styles.categoryName, { color: textColor }]}>{cat.name}</Text>
+              <Text style={[styles.categoryDesc, { color: subText }]}>{cat.description}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-        {/* Carousel - NOW BELOW CATEGORIES */}
-        <View style={styles.carouselContainer}>
+        {/* ── Carousel ── */}
+        <View style={styles.carouselWrap}>
           <FlatList
             ref={flatListRef}
             data={carouselData}
-            horizontal
-            pagingEnabled
+            horizontal pagingEnabled
             showsHorizontalScrollIndicator={false}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            keyExtractor={(item) => item.id}
+            keyExtractor={item => item.id}
             renderItem={renderCarouselItem}
-            getItemLayout={(data, index) => ({
-              length: screenWidth,
-              offset: screenWidth * index,
-              index,
-            })}
+            getItemLayout={(_, i) => ({ length: W, offset: W * i, index: i })}
           />
-          
-          {/* Dot indicators */}
-          <View style={styles.dotContainer}>
-            {carouselData.map((_, index) => (
+          <View style={styles.dots}>
+            {carouselData.map((_, i) => (
               <View
-                key={index}
-                style={[
-                  styles.dot,
-                  { 
-                    backgroundColor: index === currentIndex ? '#113470' : 
-                    isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)',
-                    width: index === currentIndex ? 24 : 8,
-                  }
-                ]}
+                key={i}
+                style={[styles.dot, {
+                  backgroundColor: i === currentIndex ? '#113470' : isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)',
+                  width: i === currentIndex ? 24 : 8,
+                }]}
               />
             ))}
           </View>
         </View>
 
-        {/* Best Sellers */}
-        <Text style={[styles.sectionTitle, { color: textColor }]}>Best Sellers</Text>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingBottom: 8 }}
-        >
-          {products.map((p) => (
+        {/* ── Best Sellers ── */}
+        <Text style={[styles.sectionTitle, { color: textColor, marginTop: 16 }]}>Best Sellers</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingBottom: 8 }}>
+          {products.map(p => (
             <View key={p.name} style={[styles.productCard, { backgroundColor: cardBg }]}>
-              <View style={[styles.productImageBox, { backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0' }]}>
+              <View style={[styles.productImgBox, { backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0' }]}>
                 <Text style={{ fontSize: 40 }}>📦</Text>
               </View>
               <Text style={[styles.productName, { color: textColor }]}>{p.name}</Text>
-              <Text style={[styles.productPrice]}>{p.price}</Text>
+              <Text style={styles.productPrice}>{p.price}</Text>
               <TouchableOpacity style={styles.addBtn}>
                 <Text style={styles.addBtnText}>Add to Cart</Text>
               </TouchableOpacity>
@@ -233,19 +244,12 @@ export default function TabOneScreen() {
           ))}
         </ScrollView>
 
-        {/* Repair Banner */}
-        <View style={[styles.repairBanner, {
-          backgroundColor: isDark ? '#1a0a00' : '#fff3e0',
-          borderColor: isDark ? 'rgba(245,166,35,0.2)' : '#f5a623',
-        }]}>
+        {/* ── Repair Banner ── */}
+        <View style={[styles.repairBanner, { backgroundColor: isDark ? '#1a0a00' : '#fff3e0', borderColor: isDark ? 'rgba(245,166,35,0.2)' : '#f5a623' }]}>
           <Text style={{ fontSize: 32 }}>🔧</Text>
           <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-            <Text style={[styles.repairTitle, { color: textColor }]}>
-              Does it run on electricity?
-            </Text>
-            <Text style={[styles.repairSub, { color: subText }]}>
-              We fix it. Same day service.
-            </Text>
+            <Text style={[styles.repairTitle, { color: textColor }]}>Does it run on electricity?</Text>
+            <Text style={[styles.repairSub, { color: subText }]}>We fix it. Same day service.</Text>
           </View>
           <TouchableOpacity style={styles.callBtn}>
             <Text style={styles.callBtnText}>📞 Call</Text>
@@ -260,194 +264,56 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 4,
-  },
+  // Header
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, marginBottom: 4 },
   logoImage: { width: 36, height: 36, borderRadius: 8 },
   logo: { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
   logoSub: { fontSize: 10, marginTop: 1 },
 
-  // Categories Styles
-  categoriesTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    paddingTop: 8,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-  },
-  categoriesScrollContainer: {
-    paddingHorizontal: 16,
-    paddingRight: 32,
-    gap: 12,
-  },
-  categorySquare: {
-    width: 140,
-    height: 160,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  categorySquareIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    backgroundColor: '#113470',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  categorySquareEmoji: {
-    fontSize: 28,
-  },
-  categorySquareName: {
-    fontSize: 14,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  categorySquareDescription: {
-    fontSize: 10,
-    textAlign: 'center',
-  },
+  // Language / Currency selectors
+  selectorBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(0,0,0,0.35)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, minWidth: 68, justifyContent: 'center' },
+  selectorFlag: { fontSize: 15 },
+  selectorText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  selectorChevron: { color: 'rgba(255,255,255,0.8)', fontSize: 9 },
+  dropdown: { position: 'absolute', top: 38, left: 0, backgroundColor: '#fff', borderRadius: 10, minWidth: 120, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 20, zIndex: 9999 },
+  dropdownItem: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 11, borderBottomWidth: 0.5, borderBottomColor: '#e0e0e0' },
+  dropdownLabel: { fontSize: 13, color: '#000' },
 
-  // Carousel Styles
-  carouselContainer: {
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  carouselSlide: {
-    height: 280,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  carouselContent: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  carouselBrand: {
-    marginBottom: 16,
-  },
-  carouselBrandTitle: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: 1,
-  },
-  carouselBrandSub: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
-    marginTop: 2,
-    letterSpacing: 2,
-  },
-  carouselInfo: {
-    marginBottom: 20,
-  },
-  carouselDescription: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.9)',
-    lineHeight: 24,
-  },
-  carouselProduct: {
-    marginTop: 8,
-  },
-  carouselProductLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.6)',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  carouselProductName: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff',
-    marginTop: 2,
-  },
-  carouselButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 25,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  carouselButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  dotContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 12,
-    gap: 8,
-  },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-  },
+  // Categories
+  sectionTitle: { fontSize: 18, fontWeight: '700', paddingHorizontal: 16, marginBottom: 12, paddingTop: 8 },
+  categoriesRow: { paddingHorizontal: 16, paddingRight: 32, gap: 12 },
+  categorySquare: { width: 140, height: 160, borderRadius: 16, borderWidth: 1, padding: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 3 },
+  categoryIcon: { width: 56, height: 56, borderRadius: 14, backgroundColor: '#113470', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
+  categoryEmoji: { fontSize: 28 },
+  categoryName: { fontSize: 14, fontWeight: '700', textAlign: 'center', marginBottom: 2 },
+  categoryDesc: { fontSize: 10, textAlign: 'center' },
 
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    marginTop: 16,
-  },
+  // Carousel
+  carouselWrap: { marginTop: 8, marginBottom: 8 },
+  slide: { height: 280, padding: 24, justifyContent: 'center' },
+  slideContent: { flex: 1, justifyContent: 'center' },
+  slideBrand: { marginBottom: 16 },
+  slideTitle: { fontSize: 34, fontWeight: '800', color: '#fff', letterSpacing: 1 },
+  slideSub: { fontSize: 14, fontWeight: '500', color: 'rgba(255,255,255,0.8)', marginTop: 2, letterSpacing: 2 },
+  slideInfo: { marginBottom: 20 },
+  slideDesc: { fontSize: 16, fontWeight: '400', color: 'rgba(255,255,255,0.9)', lineHeight: 24 },
+  slideProductLabel: { fontSize: 11, fontWeight: '600', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: 1 },
+  slideProductName: { fontSize: 22, fontWeight: '700', color: '#fff', marginTop: 2 },
+  slideBtn: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 25, gap: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  slideBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  dots: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 12, gap: 8 },
+  dot: { height: 8, borderRadius: 4 },
 
-  productCard: {
-    width: 140,
-    borderRadius: 14,
-    overflow: 'hidden',
-    padding: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
-  },
-  productImageBox: {
-    height: 90,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
+  // Products
+  productCard: { width: 140, borderRadius: 14, overflow: 'hidden', padding: 10, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  productImgBox: { height: 90, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   productName: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
   productPrice: { fontSize: 14, fontWeight: '800', color: '#f5a623', marginBottom: 8 },
   addBtn: { backgroundColor: '#1a3a6b', borderRadius: 8, padding: 7, alignItems: 'center' },
   addBtnText: { color: '#fff', fontSize: 11, fontWeight: '700' },
 
-  repairBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: 16,
-    borderRadius: 16,
-    padding: 14,
-    gap: 12,
-    borderWidth: 1,
-    marginBottom: 30,
-  },
+  // Repair Banner
+  repairBanner: { flexDirection: 'row', alignItems: 'center', margin: 16, borderRadius: 16, padding: 14, gap: 12, borderWidth: 1, marginBottom: 30 },
   repairTitle: { fontSize: 13, fontWeight: '700' },
   repairSub: { fontSize: 11, marginTop: 2 },
   callBtn: { backgroundColor: '#f5a623', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7 },
