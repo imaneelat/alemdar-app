@@ -33,10 +33,31 @@ const categories = [
   { id: '15', name: 'Spray & Gum', icon: '🧴', description: 'Spray & adhesive' },
 ];
 
+// Updated Best Sellers with real products and prices from screenshots
 const products = [
-  { name: 'Mexxsun Solar Panel', price: '850 TL' },
-  { name: 'TV Remote',           price: '267 TL' },
-  { name: 'Fan',                 price: '1500 TL' },
+  
+  { name: 'HC-SR04 Ultra Sonic Sensor', price: '232.22 TL' },
+  { name: 'Arduino Uno R3 SMD CH340 Development Board', price: '836.01 TL' },
+  { name: 'Arduino IR Receiver - Transmitter Module', price: '278.67 TL' },
+  { name: 'MG996 Metal Servo Motor', price: '557.34 TL' },
+  { name: 'Large Breadboard 830', price: '371.56 TL' },
+  { name: 'L298 DC ve Step Motor Sürücü Modülü', price: '371.56 TL' },
+  
+  
+  { name: 'Mini Breadboard', price: '139.34 TL' },
+  { name: 'Arduino Buzzer Board / Module', price: '139.34 TL' },
+  { name: 'JUMPER WIRES (Male-Male) (Female-Female)', price: '6.50 TL' },
+  { name: 'ESP32-WROOM-32D Wifi Bluetooth Module', price: '11,468.68 TL' },
+  { name: 'ESP32-WROOM-32U Wifi Bluetooth Module', price: '1,021.79 TL' },
+  { name: 'DHT11 Arduino Temperature and Humidity Sensor', price: '278.67 TL' },
+  
+ 
+  { name: 'Lm2596 Dc-Dc Adjustable Voltage Step Down', price: '185.78 TL' },
+  { name: 'Medium Breadboard', price: '278.67 TL' },
+  { name: 'Arduino Nano Clone-USB CH340 Chip', price: '743.12 TL' },
+  { name: '18650 Lithium-Ion Battery Slot - 3 Channels', price: '185.78 TL' },
+  { name: '5V 2 Channel Relay Board', price: '278.67 TL' },
+  { name: 'Rc522 RFID TAG READER 13.56 Mhz', price: '371.56 TL' },
 ];
 
 const LANGS = [
@@ -229,13 +250,19 @@ export default function TabOneScreen() {
 
         {/* ── Best Sellers ── */}
         <Text style={[styles.sectionTitle, { color: textColor, marginTop: 16 }]}>Best Sellers</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12, paddingBottom: 8 }}>
-          {products.map(p => (
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.bestSellersContainer}
+        >
+          {products.map((p) => (
             <View key={p.name} style={[styles.productCard, { backgroundColor: cardBg }]}>
               <View style={[styles.productImgBox, { backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0' }]}>
-                <Text style={{ fontSize: 40 }}>📦</Text>
+                <Text style={{ fontSize: 32 }}>📦</Text>
               </View>
-              <Text style={[styles.productName, { color: textColor }]}>{p.name}</Text>
+              <Text style={[styles.productName, { color: textColor }]} numberOfLines={2}>
+                {p.name}
+              </Text>
               <Text style={styles.productPrice}>{p.price}</Text>
               <TouchableOpacity style={styles.addBtn}>
                 <Text style={styles.addBtnText}>Add to Cart</Text>
@@ -304,13 +331,58 @@ const styles = StyleSheet.create({
   dots: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: 12, gap: 8 },
   dot: { height: 8, borderRadius: 4 },
 
-  // Products
-  productCard: { width: 140, borderRadius: 14, overflow: 'hidden', padding: 10, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
-  productImgBox: { height: 90, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  productName: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
-  productPrice: { fontSize: 14, fontWeight: '800', color: '#f5a623', marginBottom: 8 },
-  addBtn: { backgroundColor: '#1a3a6b', borderRadius: 8, padding: 7, alignItems: 'center' },
-  addBtnText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  // Best Sellers
+  bestSellersContainer: { 
+    paddingHorizontal: 16, 
+    gap: 12, 
+    paddingBottom: 8 
+  },
+  productCard: { 
+    width: 150, 
+    height: 210, 
+    borderRadius: 14, 
+    overflow: 'hidden', 
+    padding: 12, 
+    shadowColor: '#000', 
+    shadowOpacity: 0.06, 
+    shadowRadius: 6, 
+    shadowOffset: { width: 0, height: 2 }, 
+    elevation: 2,
+    justifyContent: 'space-between',
+  },
+  productImgBox: { 
+    height: 70, 
+    borderRadius: 10, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 4 
+  },
+  productName: { 
+    fontSize: 11, 
+    fontWeight: '600', 
+    textAlign: 'center',
+    flexShrink: 1,
+    minHeight: 32,
+  },
+  productPrice: { 
+    fontSize: 13, 
+    fontWeight: '800', 
+    color: '#f5a623', 
+    textAlign: 'center',
+    marginVertical: 4,
+  },
+  addBtn: { 
+    backgroundColor: '#1a3a6b', 
+    borderRadius: 8, 
+    padding: 8, 
+    alignItems: 'center',
+    width: '100%',
+  },
+  addBtnText: { 
+    color: '#fff', 
+    fontSize: 10, 
+    fontWeight: '700' 
+  },
 
   // Repair Banner
   repairBanner: { flexDirection: 'row', alignItems: 'center', margin: 16, borderRadius: 16, padding: 14, gap: 12, borderWidth: 1, marginBottom: 30 },
