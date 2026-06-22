@@ -309,7 +309,13 @@ const styles = StyleSheet.create({
   // Categories
   sectionTitle: { fontSize: 18, fontWeight: '700', paddingHorizontal: 16, marginBottom: 12, paddingTop: 8 },
   categoriesRow: { paddingHorizontal: 16, paddingRight: 32, gap: 12 },
-  categorySquare: { width: 140, height: 160, borderRadius: 16, borderWidth: 1, padding: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 3 },
+  categorySquare: { 
+    width: 150, 
+    height: 180,
+     borderRadius: 16,
+     borderWidth: 1,
+      padding: 14, 
+      alignItems: 'center', justifyContent: 'center', marginRight: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 3 },
   categoryIcon: { width: 56, height: 56, borderRadius: 14, backgroundColor: '#113470', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
   categoryEmoji: { fontSize: 28 },
   categoryName: { fontSize: 14, fontWeight: '700', textAlign: 'center', marginBottom: 2 },
