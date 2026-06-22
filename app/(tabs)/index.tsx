@@ -33,7 +33,7 @@ const categories = [
   { id: '15', name: 'Spray & Gum', icon: '🧴', description: 'Spray & adhesive' },
 ];
 
-// Updated Best Sellers with real products and prices from screenshots
+// Updated Best Sellers with real products and prices.
 const products = [
   
   { name: 'HC-SR04 Ultra Sonic Sensor', price: '232.22 TL' },
@@ -333,13 +333,13 @@ const styles = StyleSheet.create({
 
   // Best Sellers
   bestSellersContainer: { 
-    paddingHorizontal: 16, 
+    paddingHorizontal: 30, 
     gap: 12, 
     paddingBottom: 8 
   },
   productCard: { 
-    width: 150, 
-    height: 210, 
+    width: 195, 
+    height: 300, 
     borderRadius: 14, 
     overflow: 'hidden', 
     padding: 12, 
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   productImgBox: { 
-    height: 70, 
+    height: 170, 
     borderRadius: 10, 
     alignItems: 'center', 
     justifyContent: 'center', 
