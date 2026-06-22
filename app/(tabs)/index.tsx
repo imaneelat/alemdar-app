@@ -16,48 +16,74 @@ const carouselData = [
 ];
 
 const categories = [
-  { id: '1',  name: 'Solar',       icon: '☀️', description: 'Panels & inverters' },
-  { id: '2',  name: 'Electronics', icon: '💻', description: 'Daily essentials' },
-  { id: '3',  name: 'Arduino',     icon: '🔧', description: 'Boards & modules' },
-  { id: '4',  name: 'Sound',       icon: '🔊', description: 'Speakers & mixers' },
-  { id: '5',  name: 'Batteries',   icon: '🔋', description: 'Power storage' },
-  { id: '6',  name: 'Chargers',    icon: '⚡', description: 'Power adapters' },
-  { id: '7',  name: 'Adapters',    icon: '🔌', description: 'Converters' },
-  { id: '8',  name: 'Lamps',       icon: '💡', description: 'Lighting' },
-  { id: '9',  name: 'Mexxsun',     icon: '🌞', description: 'Energy products' },
-  { id: '10', name: 'Filament',    icon: '🖨️', description: '3D printing' },
-  { id: '11', name: 'TV Remotes',  icon: '📺', description: 'Remote controls' },
-  { id: '12', name: 'Fans',        icon: '🌀', description: 'Cooling systems' },
-  { id: '13', name: 'Electrical',  icon: '🔌', description: 'Electrical tools' },
-  { id: '14', name: 'Screwdrivers',icon: '🔩', description: 'Hand tools' },
-  { id: '15', name: 'Spray & Gum', icon: '🧴', description: 'Spray & adhesive' },
+  { id: '1',  name: 'Solar',        description: 'Panels & inverters' },
+  { id: '2',  name: 'Electronics',  description: 'Daily essentials' },
+  { id: '3',  name: 'Arduino',     description: 'Boards & modules' },
+  { id: '4',  name: 'Sound',        description: 'Speakers & mixers' },
+  { id: '5',  name: 'Batteries',    description: 'Power storage' },
+  { id: '6',  name: 'Chargers',     description: 'Power adapters' },
+  { id: '7',  name: 'Adapters',     description: 'Converters' },
+  { id: '8',  name: 'Lamps',       description: 'Lighting' },
+  { id: '9',  name: 'Mexxsun',     description: 'Energy products' },
+  { id: '10', name: 'Filament',    description: '3D printing' },
+  { id: '11', name: 'TV Remotes',  description: 'Remote controls' },
+  { id: '12', name: 'Fans',        description: 'Cooling systems' },
+  { id: '13', name: 'Electrical',  description: 'Electrical tools' },
+  { id: '14', name: 'Screwdrivers',description: 'Hand tools' },
+  { id: '15', name: 'Spray & Gum', description: 'Spray & adhesive' },
 ];
 
-// Updated Best Sellers with real products and prices.
+// Best Sellers Products
 const products = [
-  
   { name: 'HC-SR04 Ultra Sonic Sensor', price: '232.22 TL' },
   { name: 'Arduino Uno R3 SMD CH340 Development Board', price: '836.01 TL' },
   { name: 'Arduino IR Receiver - Transmitter Module', price: '278.67 TL' },
   { name: 'MG996 Metal Servo Motor', price: '557.34 TL' },
   { name: 'Large Breadboard 830', price: '371.56 TL' },
   { name: 'L298 DC ve Step Motor Sürücü Modülü', price: '371.56 TL' },
-  
-  
   { name: 'Mini Breadboard', price: '139.34 TL' },
   { name: 'Arduino Buzzer Board / Module', price: '139.34 TL' },
   { name: 'JUMPER WIRES (Male-Male) (Female-Female)', price: '6.50 TL' },
   { name: 'ESP32-WROOM-32D Wifi Bluetooth Module', price: '11,468.68 TL' },
   { name: 'ESP32-WROOM-32U Wifi Bluetooth Module', price: '1,021.79 TL' },
   { name: 'DHT11 Arduino Temperature and Humidity Sensor', price: '278.67 TL' },
-  
- 
   { name: 'Lm2596 Dc-Dc Adjustable Voltage Step Down', price: '185.78 TL' },
   { name: 'Medium Breadboard', price: '278.67 TL' },
   { name: 'Arduino Nano Clone-USB CH340 Chip', price: '743.12 TL' },
   { name: '18650 Lithium-Ion Battery Slot - 3 Channels', price: '185.78 TL' },
   { name: '5V 2 Channel Relay Board', price: '278.67 TL' },
   { name: 'Rc522 RFID TAG READER 13.56 Mhz', price: '371.56 TL' },
+];
+
+// Chargers Category Products
+const chargerProducts = [
+  { name: '8 Lithium Battery Charger 20V 1.2A XIAOMI MOP 2SROBOT VACUUM CLEANER', price: '1,486.78 TL', stock: 'Only 1 left' },
+  { name: 'PMR-988 4.2V 2X1200MA Battery Charger', price: '464.62 TL', stock: 'Only 3 left' },
+  { name: 'PMR-WO13 4.2V 650mA Battery Charger', price: '232.31 TL', stock: 'Only 1 left' },
+  { name: 'NITECORE INTELLICHARGER NEW 14', price: '3,763.42 TL', stock: 'Only 1 left' },
+  { name: 'BEKO 25 - 29V 500mA Upright Vacuum Cleaner Charger', price: '2,090.79 TL', stock: 'Only 1 left' },
+  { name: 'NITECORE INTELLICHARGER NEW 4', price: '3,763 TL', stock: 'Only 1 left' },
+  { name: 'BEKO 25 - 29V 500mA Upright Vacuum Cleaner Charger -', price: '2,090 TL' },
+  { name: 'XIAOMI 25.8V 0.6A LEXY JIMMY VERTICAL VACUUM CLEANER', price: '1,858 TL' },
+  { name: 'BEKO 27V 0.5A VERTICAL VACUUM CLEANER CHARGER', price: '1,858 TL' },
+  { name: 'Bosch Mijia 30V 1.1A Upright Vacuum Cleaner Charger', price: '1,858 TL', stock: 'Only 3 left' },
+  { name: 'SMART BATTERY CHARGER', price: '1,533 TL' },
+];
+
+// Adapters Category Products
+const adapterProducts = [
+  { name: '15 VOLT TRANSFORMER-POWERED CORDLESS DRILL', price: '696.93 TL' },
+  { name: '5.99V 2A ADAPTER', price: '557.54 TL' },
+  { name: '5V 2A WEKO WALL-MOUNTED ADAPTER', price: '464.62 TL' },
+  { name: '9V 2.5A Adaptor', price: '464.62 TL' },
+  { name: '21590 8.4V 1A ADAPTOR', price: '464.62 TL' },
+  { name: '20V 1A ADAPTOR WEKO', price: '464.62 TL' },
+  { name: '9V 3A ADAPTOR', price: '418.16 TL', stock: 'Only 2 left' },
+  { name: '3.6V 1A Shaver Charger Adapter', price: '348.47 TL', stock: 'Only 1 left' },
+  { name: '4.2V 0.6A Shaver Charger Adapter', price: '348.47 TL', stock: 'Only 2 left' },
+  { name: '6V 0.12 Shaver Charger Adapter', price: '348.47 TL', stock: 'Only 3 left' },
+  { name: '6V 1.67A ADAPTOR', price: '325.23 TL' },
+  { name: '7.2V 2A WEKO POWER ADAPTOR', price: '325.23 TL' },
 ];
 
 const LANGS = [
@@ -207,15 +233,19 @@ export default function TabOneScreen() {
 
         {/* ── Categories ── */}
         <Text style={[styles.sectionTitle, { color: textColor }]}>Categories</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesRow}>
-          {categories.map(cat => (
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.categoriesContainer}
+        >
+          {categories.map((cat) => (
             <TouchableOpacity
               key={cat.id}
-              style={[styles.categorySquare, { backgroundColor: isDark ? '#1a1a2e' : '#fff', borderColor: isDark ? '#333' : '#e0e0e0' }]}
+              style={[styles.categoryCard, { 
+                backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
+                borderColor: isDark ? '#333' : '#e0e0e0',
+              }]}
             >
-              <View style={styles.categoryIcon}>
-                <Text style={styles.categoryEmoji}>{cat.icon}</Text>
-              </View>
               <Text style={[styles.categoryName, { color: textColor }]}>{cat.name}</Text>
               <Text style={[styles.categoryDesc, { color: subText }]}>{cat.description}</Text>
             </TouchableOpacity>
@@ -271,17 +301,65 @@ export default function TabOneScreen() {
           ))}
         </ScrollView>
 
-        {/* ── Repair Banner ── */}
-        <View style={[styles.repairBanner, { backgroundColor: isDark ? '#1a0a00' : '#fff3e0', borderColor: isDark ? 'rgba(245,166,35,0.2)' : '#f5a623' }]}>
-          <Text style={{ fontSize: 32 }}>🔧</Text>
-          <View style={{ flex: 1, backgroundColor: 'transparent' }}>
-            <Text style={[styles.repairTitle, { color: textColor }]}>Does it run on electricity?</Text>
-            <Text style={[styles.repairSub, { color: subText }]}>We fix it. Same day service.</Text>
-          </View>
-          <TouchableOpacity style={styles.callBtn}>
-            <Text style={styles.callBtnText}>📞 Call</Text>
-          </TouchableOpacity>
-        </View>
+        {/* ── Chargers Category ── */}
+        <Text style={[styles.sectionTitle, { color: textColor, marginTop: 16 }]}>Chargers</Text>
+        <Text style={[styles.categoryDescription, { color: subText }]}>
+          Power adapters and charging essentials for daily devices.
+        </Text>
+        
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.chargersContainer}
+        >
+          {chargerProducts.map((p) => (
+            <View key={p.name} style={[styles.chargerCard, { backgroundColor: cardBg }]}>
+              <View style={[styles.chargerImgBox, { backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0' }]}>
+                <Text style={{ fontSize: 32 }}>🔌</Text>
+              </View>
+              <Text style={[styles.chargerName, { color: textColor }]} numberOfLines={2}>
+                {p.name}
+              </Text>
+              {p.stock && (
+                <Text style={[styles.stockText, { color: '#e74c3c' }]}>{p.stock}</Text>
+              )}
+              <Text style={styles.chargerPrice}>{p.price}</Text>
+              <TouchableOpacity style={styles.chargerAddBtn}>
+                <Text style={styles.chargerAddBtnText}>Add to Cart</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* ── Adapters Category ── */}
+        <Text style={[styles.sectionTitle, { color: textColor, marginTop: 16 }]}>Adapters</Text>
+        <Text style={[styles.categoryDescription, { color: subText }]}>
+          Power adapters and converters for everyday electronics.
+        </Text>
+        
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          contentContainerStyle={styles.adaptersContainer}
+        >
+          {adapterProducts.map((p) => (
+            <View key={p.name} style={[styles.adapterCard, { backgroundColor: cardBg }]}>
+              <View style={[styles.adapterImgBox, { backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0' }]}>
+                <Text style={{ fontSize: 32 }}>🔌</Text>
+              </View>
+              <Text style={[styles.adapterName, { color: textColor }]} numberOfLines={2}>
+                {p.name}
+              </Text>
+              {p.stock && (
+                <Text style={[styles.stockText, { color: '#e74c3c' }]}>{p.stock}</Text>
+              )}
+              <Text style={styles.adapterPrice}>{p.price}</Text>
+              <TouchableOpacity style={styles.adapterAddBtn}>
+                <Text style={styles.adapterAddBtnText}>Add to Cart</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
 
       </ScrollView>
     </SafeAreaView>
@@ -308,18 +386,41 @@ const styles = StyleSheet.create({
 
   // Categories
   sectionTitle: { fontSize: 18, fontWeight: '700', paddingHorizontal: 16, marginBottom: 12, paddingTop: 8 },
-  categoriesRow: { paddingHorizontal: 16, paddingRight: 32, gap: 12 },
-  categorySquare: { 
+  categoriesContainer: { 
+    paddingHorizontal: 16, 
+    gap: 12, 
+    paddingBottom: 8 
+  },
+  categoryCard: { 
     width: 150, 
-    height: 180,
-     borderRadius: 16,
-     borderWidth: 1,
-      padding: 14, 
-      alignItems: 'center', justifyContent: 'center', marginRight: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 3 },
-  categoryIcon: { width: 56, height: 56, borderRadius: 14, backgroundColor: '#113470', justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-  categoryEmoji: { fontSize: 28 },
-  categoryName: { fontSize: 14, fontWeight: '700', textAlign: 'center', marginBottom: 2 },
-  categoryDesc: { fontSize: 10, textAlign: 'center' },
+    height: 100, 
+    borderRadius: 14, 
+    borderWidth: 1, 
+    padding: 14, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.06, 
+    shadowRadius: 6, 
+    elevation: 3,
+  },
+  categoryName: { 
+    fontSize: 16, 
+    fontWeight: '700', 
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  categoryDesc: { 
+    fontSize: 11, 
+    textAlign: 'center',
+  },
+  categoryDescription: {
+    fontSize: 14,
+    fontWeight: '400',
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
 
   // Carousel
   carouselWrap: { marginTop: 8, marginBottom: 8 },
@@ -357,7 +458,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   productImgBox: { 
-    height: 170, 
+    height: 171, 
     borderRadius: 10, 
     alignItems: 'center', 
     justifyContent: 'center', 
@@ -377,6 +478,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 4,
   },
+  stockText: {
+    fontSize: 10,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 2,
+    color: '#e74c3c',
+  },
   addBtn: { 
     backgroundColor: '#1a3a6b', 
     borderRadius: 8, 
@@ -390,10 +498,109 @@ const styles = StyleSheet.create({
     fontWeight: '700' 
   },
 
-  // Repair Banner
-  repairBanner: { flexDirection: 'row', alignItems: 'center', margin: 16, borderRadius: 16, padding: 14, gap: 12, borderWidth: 1, marginBottom: 30 },
-  repairTitle: { fontSize: 13, fontWeight: '700' },
-  repairSub: { fontSize: 11, marginTop: 2 },
-  callBtn: { backgroundColor: '#f5a623', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7 },
-  callBtnText: { color: '#000', fontWeight: '700', fontSize: 12 },
+  // Chargers - Same size as Best Sellers
+  chargersContainer: { 
+    paddingHorizontal: 30, 
+    gap: 12, 
+    paddingBottom: 8 
+  },
+  chargerCard: { 
+    width: 195, 
+    height: 300, 
+    borderRadius: 14, 
+    overflow: 'hidden', 
+    padding: 14, 
+    shadowColor: '#000', 
+    shadowOpacity: 0.06, 
+    shadowRadius: 6, 
+    shadowOffset: { width: 0, height: 2 }, 
+    elevation: 2,
+    justifyContent: 'space-between',
+  },
+  chargerImgBox: { 
+    height: 171, 
+    borderRadius: 10, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 6 
+  },
+  chargerName: { 
+    fontSize: 11, 
+    fontWeight: '600', 
+    textAlign: 'center',
+    flexShrink: 1,
+    minHeight: 32,
+  },
+  chargerPrice: { 
+    fontSize: 13, 
+    fontWeight: '800', 
+    color: '#f5a623', 
+    textAlign: 'center',
+    marginVertical: 4,
+  },
+  chargerAddBtn: { 
+    backgroundColor: '#1a3a6b', 
+    borderRadius: 8, 
+    padding: 8, 
+    alignItems: 'center',
+    width: '100%',
+  },
+  chargerAddBtnText: { 
+    color: '#fff', 
+    fontSize: 10, 
+    fontWeight: '700' 
+  },
+
+  // Adapters - Same size as Best Sellers and Chargers
+  adaptersContainer: { 
+    paddingHorizontal: 30, 
+    gap: 12, 
+    paddingBottom: 8 
+  },
+  adapterCard: { 
+    width: 195, 
+    height: 300, 
+    borderRadius: 14, 
+    overflow: 'hidden', 
+    padding: 14, 
+    shadowColor: '#000', 
+    shadowOpacity: 0.06, 
+    shadowRadius: 6, 
+    shadowOffset: { width: 0, height: 2 }, 
+    elevation: 2,
+    justifyContent: 'space-between',
+  },
+  adapterImgBox: { 
+    height: 171, 
+    borderRadius: 10, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    marginBottom: 6 
+  },
+  adapterName: { 
+    fontSize: 11, 
+    fontWeight: '600', 
+    textAlign: 'center',
+    flexShrink: 1,
+    minHeight: 32,
+  },
+  adapterPrice: { 
+    fontSize: 13, 
+    fontWeight: '800', 
+    color: '#f5a623', 
+    textAlign: 'center',
+    marginVertical: 4,
+  },
+  adapterAddBtn: { 
+    backgroundColor: '#1a3a6b', 
+    borderRadius: 8, 
+    padding: 8, 
+    alignItems: 'center',
+    width: '100%',
+  },
+  adapterAddBtnText: { 
+    color: '#fff', 
+    fontSize: 10, 
+    fontWeight: '700' 
+  },
 });
