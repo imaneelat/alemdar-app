@@ -5,7 +5,8 @@ import { Pressable } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-import { StatusBar } from 'expo-status-bar'; // ✅ keep this import at the top
+import { StatusBar } from 'expo-status-bar'; //  keep this import at the top
+import { Ionicons } from '@expo/vector-icons';
 
 function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>['name']; color: string }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
@@ -78,13 +79,15 @@ export default function TabLayout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="two"
-          options={{
-            title: 'Search',
-            tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
-          }}
-        />
+          <Tabs.Screen
+        name="search"  // Changed from "two" to "search"
+        options={{
+          title: 'Search',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" size={size} color={color} />
+          ),
+        }}
+      />
         <Tabs.Screen
           name="three"
           options={{
