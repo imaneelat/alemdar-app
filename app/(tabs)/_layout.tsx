@@ -1,137 +1,251 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import React, { useRef, useEffect } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+  Platform,
+  Text,
+} from 'react-native';
+import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from '@/components/useColorScheme';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
+// ─── Config ───────────────────────────────────────────────────────
+const AMBER = '#f5a623';
+
+const TABS = [
+  { name: 'index',  icon: 'home-outline',   iconActive: 'home',    label: 'Home'     },
+  { name: 'search', icon: 'search-outline', iconActive: 'search',  label: 'Search'   },
+  { name: 'three',  icon: 'heart-outline',  iconActive: 'heart',   label: 'Wishlist', badge: true },
+  { name: 'four',   icon: 'person-outline', iconActive: 'person',  label: 'Account'  },
+] as const;
+
+// ─── Single Tab Button ────────────────────────────────────────────
+function TabBtn({
+  tab,
+  isActive,
+  onPress,
+  isDark,
+}: {
+  tab: typeof TABS[number];
+  isActive: boolean;
+  onPress: () => void;
+  isDark: boolean;
 }) {
-  return <FontAwesome size={24} style={{ marginBottom: -3 }} {...props} />;
+  // pill width: expands from 44 → 110 when active
+  const pillW   = useRef(new Animated.Value(isActive ? 110 : 44)).current;
+  const pillOp  = useRef(new Animated.Value(isActive ? 1 : 0)).current;
+  const labelOp = useRef(new Animated.Value(isActive ? 1 : 0)).current;
+  const scale   = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (isActive) {
+      Animated.parallel([
+        Animated.spring(pillW,  { toValue: 110, useNativeDriver: false, speed: 26, bounciness: 10 }),
+        Animated.timing(pillOp, { toValue: 1, duration: 200, useNativeDriver: false }),
+        Animated.timing(labelOp,{ toValue: 1, duration: 220, delay: 80, useNativeDriver: true }),
+        Animated.sequence([
+          Animated.timing(scale, { toValue: 0.88, duration: 80, useNativeDriver: true }),
+          Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 30, bounciness: 14 }),
+        ]),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.spring(pillW,  { toValue: 44, useNativeDriver: false, speed: 26, bounciness: 8 }),
+        Animated.timing(pillOp, { toValue: 0, duration: 160, useNativeDriver: false }),
+        Animated.timing(labelOp,{ toValue: 0, duration: 100, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [isActive]);
+
+  const iconColor = isActive
+    ? '#0C0E14'
+    : isDark ? 'rgba(255,255,255,0.30)' : 'rgba(0,0,0,0.28)';
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.85}
+      style={styles.tabOuter}
+      accessibilityLabel={tab.label}
+      accessibilityRole="button"
+      accessibilityState={{ selected: isActive }}
+    >
+      {/* Expanding amber pill */}
+      <Animated.View
+        style={[
+          styles.pill,
+          {
+            width: pillW,
+            backgroundColor: pillOp.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['rgba(245,166,35,0)', AMBER],
+            }),
+          },
+        ]}
+      >
+        {/* Icon */}
+        <Animated.View style={{ transform: [{ scale }] }}>
+          <Ionicons
+            name={(isActive ? tab.iconActive : tab.icon) as any}
+            size={20}
+            color={iconColor}
+          />
+          {/* Badge pip */}
+          {'badge' in tab && tab.badge && !isActive && (
+            <View style={[
+              styles.pip,
+              { borderColor: isDark ? '#111520' : '#EEEEF6' }
+            ]} />
+          )}
+        </Animated.View>
+
+        {/* Label — fades in alongside pill */}
+        <Animated.Text
+          style={[styles.label, { opacity: labelOp }]}
+          numberOfLines={1}
+        >
+          {tab.label}
+        </Animated.Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
 }
 
+// ─── Custom Tab Bar ───────────────────────────────────────────────
+function CustomTabBar({ state, navigation }: any) {
+  const scheme = useColorScheme();
+  const isDark  = scheme === 'dark';
+  const insets  = useSafeAreaInsets();
+
+  const BAR_BG     = isDark ? '#111520' : '#EEEEF6';
+  const BAR_BORDER = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+
+  return (
+    <View
+      style={[
+        styles.barWrapper,
+        { bottom: Math.max(insets.bottom + 10, 20) },
+      ]}
+    >
+      <View
+        style={[
+          styles.bar,
+          { backgroundColor: BAR_BG, borderColor: BAR_BORDER },
+        ]}
+      >
+        {state.routes.map((route: any, index: number) => {
+          const tab      = TABS[index];
+          const isActive = state.index === index;
+
+          const onPress = () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+            if (!isActive && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          return (
+            <TabBtn
+              key={route.key}
+              tab={tab}
+              isActive={isActive}
+              onPress={onPress}
+              isDark={isDark}
+            />
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+// ─── Root Layout ─────────────────────────────────────────────────
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
-  // === THEME TOKENS ===
-  const ACTIVE_COLOR   = '#FF6B00';   // orange 
-  const INACTIVE_DARK  = '#8A8A9A';   // muted grey for dark mode
-  const INACTIVE_LIGHT = '#6B6B80';   // slightly darker for light mode readability
-
-  const BAR_BG_DARK    = '#0B1525';   // deep navy 
-  const BAR_BG_LIGHT   = '#F0F0F5';   // soft off-white for light mode
-
-  const SHADOW_DARK    = '#000000';
-  const SHADOW_LIGHT   = '#AAAACC';
+  const scheme = useColorScheme();
+  const isDark  = scheme === 'dark';
 
   return (
     <>
       <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor="transparent" translucent />
-
       <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarActiveTintColor: ACTIVE_COLOR,
-          tabBarInactiveTintColor: isDark ? INACTIVE_DARK : INACTIVE_LIGHT,
-
-          tabBarStyle: {
-           position: 'absolute',
-           bottom: 28,
-            left: 24,
-            right: 24,
-            height: 58,
-            borderRadius: 29,
-             
-            
-            backgroundColor: isDark ? BAR_BG_DARK : BAR_BG_LIGHT,
-
-             borderWidth: 1,
-            
-            borderColor: isDark ? '#737390' : '#737390',
-
-            // Shadow
-            shadowColor: isDark ? SHADOW_DARK : SHADOW_LIGHT,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: isDark ? 0.5 : 0.2,
-            shadowRadius: 16,
-            elevation: 12, // Android
-          },
-
-          tabBarLabelStyle: {
-  fontSize: 11,
-  fontWeight: '500',
-  marginBottom: 2,
-},
-
-          tabBarIconStyle: {
-  marginTop: 2,
-},
-          tabBarItemStyle: {
-            borderRadius: 34,
-          },
-        }}
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{ headerShown: false }}
       >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="home" size={22} color={color} />
-            ),
-            headerRight: () => (
-              <Link href="/modal" asChild>
-                <Pressable>
-                  {({ pressed }) => (
-                    <FontAwesome
-                      name="info-circle"
-                      size={22}
-                      color={Colors[colorScheme ?? 'light'].text}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-              </Link>
-            ),
-          }}
-        />
-
-        <Tabs.Screen
-          name="search"
-          options={{
-            title: 'Search',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="search" size={22} color={color} />
-            ),
-          }}
-        />
-
-        <Tabs.Screen
-          name="three"
-          options={{
-            title: 'Wishlist',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="heart-outline" size={22} color={color} />
-            ),
-          }}
-        />
-
-        <Tabs.Screen
-          name="four"
-          options={{
-            title: 'Account',
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="person-outline" size={22} color={color} />
-            ),
-          }}
-        />
+        <Tabs.Screen name="index"  />
+        <Tabs.Screen name="search" />
+        <Tabs.Screen name="three"  />
+        <Tabs.Screen name="four"   />
       </Tabs>
     </>
   );
 }
-  
+
+// ─── Styles ──────────────────────────────────────────────────────
+const styles = StyleSheet.create({
+  barWrapper: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    alignItems: 'center',
+  },
+  bar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 62,
+    width: '100%',
+    borderRadius: 20,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.18,
+        shadowRadius: 18,
+      },
+      android: { elevation: 16 },
+    }),
+  },
+  tabOuter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 62,
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    borderRadius: 20,
+    gap: 6,
+    paddingHorizontal: 10,
+    overflow: 'hidden',
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0C0E14',
+    letterSpacing: 0.2,
+  },
+  pip: {
+    position: 'absolute',
+    top: -2,
+    right: -4,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: AMBER,
+    borderWidth: 2,
+  },
+});
