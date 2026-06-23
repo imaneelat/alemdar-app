@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Animated,
   Platform,
-  Text,
 } from 'react-native';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -15,16 +14,43 @@ import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // ─── Config ───────────────────────────────────────────────────────
-const AMBER = '#f5a623';
+const AMBER    = '#f5a623';
+const TAB_W    = 72; // width per tab slot
+const BAR_H    = 62;
+const H_PAD    = 12; // horizontal padding inside bar
 
 const TABS = [
-  { name: 'index',  icon: 'home-outline',   iconActive: 'home',    label: 'Home'     },
-  { name: 'search', icon: 'search-outline', iconActive: 'search',  label: 'Search'   },
-  { name: 'three',  icon: 'heart-outline',  iconActive: 'heart',   label: 'Wishlist', badge: true },
-  { name: 'four',   icon: 'person-outline', iconActive: 'person',  label: 'Account'  },
+  { name: 'index',  icon: 'home-outline',   iconActive: 'home',   label: 'Home'     },
+  { name: 'search', icon: 'search-outline', iconActive: 'search', label: 'Search'   },
+  { name: 'three',  icon: 'heart-outline',  iconActive: 'heart',  label: 'Wishlist', badge: true },
+  { name: 'four',   icon: 'person-outline', iconActive: 'person', label: 'Account'  },
 ] as const;
 
-// ─── Single Tab Button ────────────────────────────────────────────
+// ─── Sliding indicator ────────────────────────────────────────────
+function Indicator({ activeIndex, isDark }: { activeIndex: number; isDark: boolean }) {
+  const x = useRef(new Animated.Value(H_PAD + activeIndex * TAB_W + TAB_W / 2 - 14)).current;
+
+  useEffect(() => {
+    const target = H_PAD + activeIndex * TAB_W + TAB_W / 2 - 14;
+    Animated.spring(x, {
+      toValue: target,
+      useNativeDriver: true,
+      speed: 22,
+      bounciness: 12,
+    }).start();
+  }, [activeIndex]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.indicator,
+        { transform: [{ translateX: x }] },
+      ]}
+    />
+  );
+}
+
+// ─── Tab Button ───────────────────────────────────────────────────
 function TabBtn({
   tab,
   isActive,
@@ -36,82 +62,65 @@ function TabBtn({
   onPress: () => void;
   isDark: boolean;
 }) {
-  // pill width: expands from 44 → 110 when active
-  const pillW   = useRef(new Animated.Value(isActive ? 110 : 44)).current;
-  const pillOp  = useRef(new Animated.Value(isActive ? 1 : 0)).current;
-  const labelOp = useRef(new Animated.Value(isActive ? 1 : 0)).current;
-  const scale   = useRef(new Animated.Value(1)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+  const scale      = useRef(new Animated.Value(1)).current;
+  const dotScale   = useRef(new Animated.Value(isActive ? 1 : 0)).current;
+  const dotOp      = useRef(new Animated.Value(isActive ? 1 : 0)).current;
 
   useEffect(() => {
     if (isActive) {
       Animated.parallel([
-        Animated.spring(pillW,  { toValue: 110, useNativeDriver: false, speed: 26, bounciness: 10 }),
-        Animated.timing(pillOp, { toValue: 1, duration: 200, useNativeDriver: false }),
-        Animated.timing(labelOp,{ toValue: 1, duration: 220, delay: 80, useNativeDriver: true }),
-        Animated.sequence([
-          Animated.timing(scale, { toValue: 0.88, duration: 80, useNativeDriver: true }),
-          Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 30, bounciness: 14 }),
-        ]),
+        Animated.spring(translateY, { toValue: -4, useNativeDriver: true, speed: 28, bounciness: 14 }),
+        Animated.spring(scale,      { toValue: 1.18, useNativeDriver: true, speed: 28, bounciness: 14 }),
+        Animated.spring(dotScale,   { toValue: 1, useNativeDriver: true, speed: 28, bounciness: 16 }),
+        Animated.timing(dotOp,      { toValue: 1, duration: 180, useNativeDriver: true }),
       ]).start();
     } else {
       Animated.parallel([
-        Animated.spring(pillW,  { toValue: 44, useNativeDriver: false, speed: 26, bounciness: 8 }),
-        Animated.timing(pillOp, { toValue: 0, duration: 160, useNativeDriver: false }),
-        Animated.timing(labelOp,{ toValue: 0, duration: 100, useNativeDriver: true }),
+        Animated.spring(translateY, { toValue: 0, useNativeDriver: true, speed: 28, bounciness: 8 }),
+        Animated.spring(scale,      { toValue: 1, useNativeDriver: true, speed: 28, bounciness: 8 }),
+        Animated.spring(dotScale,   { toValue: 0, useNativeDriver: true, speed: 28, bounciness: 8 }),
+        Animated.timing(dotOp,      { toValue: 0, duration: 120, useNativeDriver: true }),
       ]).start();
     }
   }, [isActive]);
 
   const iconColor = isActive
-    ? '#0C0E14'
-    : isDark ? 'rgba(255,255,255,0.30)' : 'rgba(0,0,0,0.28)';
+    ? AMBER
+    : isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.25)';
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={0.85}
-      style={styles.tabOuter}
+      activeOpacity={0.8}
+      style={styles.tabBtn}
       accessibilityLabel={tab.label}
       accessibilityRole="button"
       accessibilityState={{ selected: isActive }}
     >
-      {/* Expanding amber pill */}
+      {/* Icon lifts up when active */}
+      <Animated.View style={{ transform: [{ translateY }, { scale }] }}>
+        <Ionicons
+          name={(isActive ? tab.iconActive : tab.icon) as any}
+          size={22}
+          color={iconColor}
+        />
+        {/* Notification badge */}
+        {'badge' in tab && tab.badge && !isActive && (
+          <View style={[
+            styles.pip,
+            { borderColor: isDark ? '#111520' : '#EEEEF6' },
+          ]} />
+        )}
+      </Animated.View>
+
+      {/* Dot below icon */}
       <Animated.View
         style={[
-          styles.pill,
-          {
-            width: pillW,
-            backgroundColor: pillOp.interpolate({
-              inputRange: [0, 1],
-              outputRange: ['rgba(245,166,35,0)', AMBER],
-            }),
-          },
+          styles.dot,
+          { opacity: dotOp, transform: [{ scale: dotScale }] },
         ]}
-      >
-        {/* Icon */}
-        <Animated.View style={{ transform: [{ scale }] }}>
-          <Ionicons
-            name={(isActive ? tab.iconActive : tab.icon) as any}
-            size={20}
-            color={iconColor}
-          />
-          {/* Badge pip */}
-          {'badge' in tab && tab.badge && !isActive && (
-            <View style={[
-              styles.pip,
-              { borderColor: isDark ? '#111520' : '#EEEEF6' }
-            ]} />
-          )}
-        </Animated.View>
-
-        {/* Label — fades in alongside pill */}
-        <Animated.Text
-          style={[styles.label, { opacity: labelOp }]}
-          numberOfLines={1}
-        >
-          {tab.label}
-        </Animated.Text>
-      </Animated.View>
+      />
     </TouchableOpacity>
   );
 }
@@ -126,18 +135,12 @@ function CustomTabBar({ state, navigation }: any) {
   const BAR_BORDER = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
 
   return (
-    <View
-      style={[
-        styles.barWrapper,
-        { bottom: Math.max(insets.bottom + 10, 20) },
-      ]}
-    >
-      <View
-        style={[
-          styles.bar,
-          { backgroundColor: BAR_BG, borderColor: BAR_BORDER },
-        ]}
-      >
+    <View style={[styles.wrapper, { bottom: Math.max(insets.bottom + 10, 20) }]}>
+      <View style={[styles.bar, { backgroundColor: BAR_BG, borderColor: BAR_BORDER }]}>
+
+        {/* Sliding amber bar indicator */}
+        <Indicator activeIndex={state.index} isDark={isDark} />
+
         {state.routes.map((route: any, index: number) => {
           const tab      = TABS[index];
           const isActive = state.index === index;
@@ -192,7 +195,7 @@ export default function TabLayout() {
 
 // ─── Styles ──────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  barWrapper: {
+  wrapper: {
     position: 'absolute',
     left: 20,
     right: 20,
@@ -201,12 +204,12 @@ const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 62,
+    justifyContent: 'space-around',
+    height: BAR_H,
     width: '100%',
     borderRadius: 20,
     borderWidth: 1,
-    paddingHorizontal: 10,
+    paddingHorizontal: H_PAD,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -217,31 +220,32 @@ const styles = StyleSheet.create({
       android: { elevation: 16 },
     }),
   },
-  tabOuter: {
+  // sliding top bar
+  indicator: {
+    position: 'absolute',
+    top: 0,
+    width: 28,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: AMBER,
+  },
+  tabBtn: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 62,
+    height: BAR_H,
+    gap: 4,
   },
-  pill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 40,
-    borderRadius: 20,
-    gap: 6,
-    paddingHorizontal: 10,
-    overflow: 'hidden',
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0C0E14',
-    letterSpacing: 0.2,
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: AMBER,
   },
   pip: {
     position: 'absolute',
     top: -2,
-    right: -4,
+    right: -5,
     width: 7,
     height: 7,
     borderRadius: 4,
