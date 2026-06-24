@@ -7,6 +7,7 @@ import Svg, { Path } from 'react-native-svg';
 import { NAVBAR_V2_STYLE, NavbarV2Background } from '@/components/NavbarV2';
 import PrivacySheet from '@/components/PrivacySheet';
 import LanguageSheet from '@/components/LanguageSheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 let _set: ((s: string|null) => void)|null = null;
 export const openSheet = (s: string) => _set?.(s);
@@ -23,7 +24,7 @@ export default function TabLayout() {
   const INACTIVE_LIGHT = '#6B6B80';
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor="transparent" translucent />
       <Tabs
         screenOptions={{
@@ -91,6 +92,6 @@ export default function TabLayout() {
       </Tabs>
       <PrivacySheet visible={sheet === 'privacy'} onClose={closeSheets} />
       <LanguageSheet visible={sheet === 'language'} onClose={closeSheets} />
-    </>
+    </GestureHandlerRootView>
   );
 }
