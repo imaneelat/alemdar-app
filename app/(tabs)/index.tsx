@@ -6,8 +6,6 @@ import {
   Dimensions,
   View as RNView,
   TextInput,
-  Modal,
-  Animated,
 } from 'react-native';
 import { Text } from '@/components/Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -132,175 +130,6 @@ function RepairServiceCard({ isDark, BORDER }: any) {
         <Text style={{ fontSize: 14, fontWeight: '800', color: '#000' }}>Call me back · Beni Ara</Text>
       </TouchableOpacity>
 
-    </RNView>
-  );
-}
-
-// ─── LANGUAGE DROPDOWN ────────────────────────────────────────────
-function LanguageDropdown({ isDark, TEXT, BORDER, CARD_BG }: any) {
-  const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState<'EN' | 'TR'>('EN');
-  const anim = useRef(new Animated.Value(0)).current;
-
-  const toggle = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (open) {
-      Animated.timing(anim, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => setOpen(false));
-    } else {
-      setOpen(true);
-      Animated.timing(anim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
-    }
-  };
-
-  const select = (l: 'EN' | 'TR') => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setLang(l);
-    Animated.timing(anim, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => setOpen(false));
-  };
-
-  const dropdownStyle = {
-    opacity: anim,
-    transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-8, 0] }) }],
-  };
-
-  return (
-    <RNView style={{ position: 'relative', zIndex: 999 }}>
-      <TouchableOpacity
-        onPress={toggle}
-        activeOpacity={0.75}
-        style={{
-          flexDirection: 'row', alignItems: 'center', gap: 4,
-          paddingHorizontal: 10, paddingVertical: 6,
-          borderRadius: 8,
-          backgroundColor: isDark ? '#1e2433' : '#f0f0f5',
-          borderWidth: 1, borderColor: BORDER,
-        }}
-      >
-        <Ionicons name="globe-outline" size={14} color={AMBER} />
-        <Text style={{ fontSize: 12, fontWeight: '700', color: TEXT }}>{lang}</Text>
-        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={12} color={TEXT} />
-      </TouchableOpacity>
-
-      {open && (
-        <Animated.View style={[dropdownStyle, {
-          position: 'absolute', top: 38, right: 0,
-          backgroundColor: CARD_BG,
-          borderRadius: 10, borderWidth: 1, borderColor: BORDER,
-          overflow: 'hidden', minWidth: 90,
-          shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15, shadowRadius: 8, elevation: 10,
-        }]}>
-          {(['EN', 'TR'] as const).map((l) => (
-            <TouchableOpacity
-              key={l}
-              onPress={() => select(l)}
-              activeOpacity={0.7}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 8,
-                paddingHorizontal: 14, paddingVertical: 11,
-                backgroundColor: lang === l ? (isDark ? '#1e2d45' : '#fff8ee') : 'transparent',
-              }}
-            >
-              <Text style={{ fontSize: 13, fontWeight: lang === l ? '700' : '500', color: lang === l ? AMBER : TEXT }}>
-                {l === 'EN' ? '🇬🇧  English' : '🇹🇷  Türkçe'}
-              </Text>
-              {lang === l && <Ionicons name="checkmark" size={14} color={AMBER} style={{ marginLeft: 'auto' }} />}
-            </TouchableOpacity>
-          ))}
-        </Animated.View>
-      )}
-    </RNView>
-  );
-}
-
-// ─── CURRENCY DROPDOWN ───────────────────────────────────────────
-const CURRENCIES = [
-  { code: 'TRY', symbol: '₺', label: 'Turkish Lira' },
-  { code: 'USD', symbol: '$', label: 'US Dollar'     },
-  { code: 'EUR', symbol: '€', label: 'Euro'          },
-] as const;
-
-type CurrencyCode = typeof CURRENCIES[number]['code'];
-
-function CurrencyDropdown({ isDark, TEXT, BORDER, CARD_BG }: any) {
-  const [open,     setOpen]     = useState(false);
-  const [currency, setCurrency] = useState<CurrencyCode>('TRY');
-  const anim = useRef(new Animated.Value(0)).current;
-
-  const toggle = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (open) {
-      Animated.timing(anim, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => setOpen(false));
-    } else {
-      setOpen(true);
-      Animated.timing(anim, { toValue: 1, duration: 200, useNativeDriver: true }).start();
-    }
-  };
-
-  const select = (code: CurrencyCode) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setCurrency(code);
-    Animated.timing(anim, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => setOpen(false));
-  };
-
-  const dropdownStyle = {
-    opacity: anim,
-    transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [-8, 0] }) }],
-  };
-
-  const selected = CURRENCIES.find(c => c.code === currency)!;
-
-  return (
-    <RNView style={{ position: 'relative', zIndex: 998 }}>
-      <TouchableOpacity
-        onPress={toggle}
-        activeOpacity={0.75}
-        style={{
-          flexDirection: 'row', alignItems: 'center', gap: 4,
-          paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
-          backgroundColor: isDark ? '#1e2433' : '#f0f0f5',
-          borderWidth: 1, borderColor: BORDER,
-        }}
-      >
-        <Text style={{ fontSize: 12, fontWeight: '700', color: AMBER }}>{selected.symbol}</Text>
-        <Text style={{ fontSize: 12, fontWeight: '700', color: TEXT }}>{selected.code}</Text>
-        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={12} color={TEXT} />
-      </TouchableOpacity>
-
-      {open && (
-        <Animated.View style={[dropdownStyle, {
-          position: 'absolute', top: 38, right: 0,
-          backgroundColor: CARD_BG,
-          borderRadius: 10, borderWidth: 1, borderColor: BORDER,
-          overflow: 'hidden', minWidth: 130,
-          shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15, shadowRadius: 8, elevation: 10,
-        }]}>
-          {CURRENCIES.map((c) => (
-            <TouchableOpacity
-              key={c.code}
-              onPress={() => select(c.code)}
-              activeOpacity={0.7}
-              style={{
-                flexDirection: 'row', alignItems: 'center', gap: 10,
-                paddingHorizontal: 14, paddingVertical: 11,
-                backgroundColor: currency === c.code ? (isDark ? '#1e2d45' : '#fff8ee') : 'transparent',
-              }}
-            >
-              <Text style={{ fontSize: 15, fontWeight: '700', color: AMBER, width: 18 }}>{c.symbol}</Text>
-              <RNView>
-                <Text style={{ fontSize: 13, fontWeight: currency === c.code ? '700' : '500', color: currency === c.code ? AMBER : TEXT }}>
-                  {c.code}
-                </Text>
-                <Text style={{ fontSize: 10, color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}>{c.label}</Text>
-              </RNView>
-              {currency === c.code && (
-                <Ionicons name="checkmark" size={14} color={AMBER} style={{ marginLeft: 'auto' }} />
-              )}
-            </TouchableOpacity>
-          ))}
-        </Animated.View>
-      )}
     </RNView>
   );
 }
@@ -435,10 +264,8 @@ export default function HomeScreen() {
           </RNView>
         </RNView>
 
-        {/* Right: Language + Currency + Notifications + Cart */}
-        <RNView style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <LanguageDropdown isDark={isDark} TEXT={TEXT} BORDER={BORDER} CARD_BG={CARD_BG} />
-          <CurrencyDropdown isDark={isDark} TEXT={TEXT} BORDER={BORDER} CARD_BG={CARD_BG} />
+        {/* Right: Notifications + Cart */}
+        <RNView style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <TouchableOpacity style={{ padding: 6 }}>
             <Ionicons name="notifications-outline" size={22} color={ICON_COLOR} />
           </TouchableOpacity>
