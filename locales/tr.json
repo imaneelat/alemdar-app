@@ -1,0 +1,48 @@
+{
+  "myOrders": "Siparişlerim",
+  "wishlist": "Favoriler",
+  "coupons": "Kuponlar",
+  "history": "Geçmiş",
+  "addresses": "Adresler",
+  "helpCenter": "Yardım Merkezi",
+  "contactUs": "Bize Ulaşın",
+  "rateApp": "Uygulamayı Değerlendir",
+  "privacyPolicy": "Gizlilik Politikası",
+  "language": "Dil",
+  "logOut": "Çıkış Yap",
+  "deleteAccount": "Hesabı Sil",
+  "deleteWarning": "Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.",
+  "cancel": "İptal",
+  "deleteConfirm": "Sil",
+  "ordersCount": "12 Sipariş",
+  "wishlistCount": "8 Ürün",
+  "couponsCount": "3 Kupon",
+  "historyCount": "15 Ürün",
+  "notifications": "3",
+  "privacyTitle": "Gizlilik Politikası",
+  "privacyText": "Bu Gizlilik Politikası, uygulamamızı kullandığınızda kişisel bilgilerinizi nasıl topladığımızı, kullandığımızı ve paylaştığımızı açıklar. Hizmetlerimizi kullanarak, bu politikaya uygun olarak bilgilerin toplanmasını ve kullanılmasını kabul etmiş olursunuz.\n\nTopladığımız Bilgiler\n\nHizmetimizi sunmak ve geliştirmek için çeşitli amaçlarla farklı türde bilgiler toplarız. Kişisel Veriler bunlarla sınırlı olmamak üzere şunları içerir: e-posta adresi, ad ve soyad, telefon numarası, adres ve kullanım verileri. Kullanım Verileri, hizmeti kullanırken otomatik olarak toplanır ve cihazınızın IP adresi, tarayıcı türü, tarayıcı sürümü, ziyaret ettiğiniz hizmet sayfaları, ziyaretinizin saati ve tarihi, bu sayfalarda geçirilen süre ve diğer tanılama verilerini içerebilir.\n\nİzleme Teknolojileri ve Çerezler\n\nHizmetimizdeki etkinliği izlemek ve belirli bilgileri tutmak için çerezler ve benzer izleme teknolojileri kullanırız. Çerezler, anonim benzersiz tanımlayıcı içerebilen küçük veri dosyalarıdır. Tarayıcınıza tüm çerezleri reddetmesi veya bir çerez gönderildiğinde belirtmesi talimatını verebilirsiniz. Ancak, çerezleri kabul etmezseniz, hizmetimizin bazı bölümlerini kullanamayabilirsiniz.\n\nKişisel Verilerinizin Kullanımı\n\nKişisel verileri şu amaçlarla kullanabiliriz: hizmetimizi sunmak ve sürdürmek, hizmetimizdeki değişiklikler hakkında sizi bilgilendirmek, seçtiğinizde hizmetimizin etkileşimli özelliklerine katılmanıza izin vermek, müşteri desteği sağlamak, hizmetimizi geliştirebilmemiz için analiz veya değerli bilgiler toplamak, hizmetimizin kullanımını izlemek, teknik sorunları tespit etmek, önlemek ve ele almak ve size haberler, özel teklifler ve sunduğumuz diğer mal, hizmet ve etkinlikler hakkında genel bilgiler sağlamak.\n\nVeri Saklama\n\nKişisel verilerinizi yalnızca bu gizlilik politikasında belirtilen amaçlar için gerekli olduğu sürece saklayacağız. Yasal yükümlülüklerimize uymak, anlaşmazlıkları çözmek ve yasal anlaşmalarımızı ve politikalarımızı uygulamak için gerekli olduğu ölçüde kişisel verilerinizi saklayacak ve kullanacağız.\n\nVeri Aktarımı\n\nKişisel verileriniz de dahil olmak üzere bilgileriniz, veri koruma yasalarının sizinkinden farklı olabileceği eyalet, il, ülke veya diğer hükümet yetki alanınızın dışında bulunan bilgisayarlara aktarılabilir ve bu bilgisayarlarda saklanabilir. Bu gizlilik politikasına onay vermeniz ve ardından bu tür bilgileri göndermeniz, bu aktarıma ilişkin onayınızı temsil eder.\n\nKişisel Verilerinizin Güvenliği\n\nKişisel verilerinizin güvenliği bizim için önemlidir, ancak internet üzerinden hiçbir iletim yönteminin veya elektronik depolama yönteminin %100 güvenli olmadığını unutmayın. Kişisel verilerinizi korumak için ticari olarak kabul edilebilir yöntemler kullanmaya çalışsak da, mutlak güvenliğini garanti edemeyiz.\n\nBu Gizlilik Politikasındaki Değişiklikler\n\nGizlilik politikamızı zaman zaman güncelleyebiliriz. Herhangi bir değişiklik olduğunda, yeni gizlilik politikasını bu sayfada yayınlayarak sizi bilgilendireceğiz. Herhangi bir değişiklik için bu gizlilik politikasını periyodik olarak gözden geçirmeniz önerilir. Bu gizlilik politikasındaki değişiklikler, bu sayfada yayınlandıklarında geçerlidir.\n\nBize Ulaşın\n\nBu gizlilik politikası hakkında herhangi bir sorunuz varsa, lütfen support@alemdar.com adresinden e-posta yoluyla bizimle iletişime geçin.",
+  "languageTitle": "Dil",
+  "english": "English",
+  "turkish": "Türkçe",
+  "profileName": "Lamine Diamoutene",
+  "help": {
+    "callCenter": "Çağrı Merkezi",
+    "whatsapp": "WhatsApp",
+    "email": "E-posta",
+    "faq": "SSS"
+  },
+  "faq": {
+    "title": "SSS",
+    "subtitle": "Sıkça sorulan sorular",
+    "getStarted": { "question": "Nasıl başlayabilirim?", "answer": "Uygulamayı indirin, hesap oluşturun ve yakınınızdaki işletmeleri keşfetmeye başlayın." },
+    "dataSecure": { "question": "Verilerim güvende mi?", "answer": "Evet, kişisel bilgilerinizi korumak için endüstri standardı şifreleme kullanıyoruz." },
+    "cancelAnytime": { "question": "İstediğim zaman iptal edebilir miyim?", "answer": "Evet, hesabınızı veya aboneliklerinizi istediğiniz zaman cezasız olarak iptal edebilirsiniz." }
+  },
+  "address": {
+    "title": "Adres Yönetimi",
+    "line": "Adres Satırı",
+    "flat": "Daire / Apartman",
+    "phone": "Telefon",
+    "save": "Adresi Kaydet"
+  }
+}
