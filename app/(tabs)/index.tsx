@@ -14,7 +14,8 @@ import { useState, useRef, useEffect } from 'react';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useCart } from '@/context/CartContext';
-import { productSections } from '@/constants/ProductData';
+import { HomeProductSection } from '@/components/HomeProductSection';
+import { HOME_SECTIONS } from '@/lib/section-meta';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AMBER = '#f5a623';
@@ -29,21 +30,20 @@ const bannerSlides = [
 
 // ─── CATEGORIES ───────────────────────────────────────────────────
 const categories = [
-  { id: '1',  name: 'Solar',        icon: 'sunny-outline',            color: '#f5a623' },
-  { id: '2',  name: 'Electronics',  icon: 'flash-outline',            color: '#2ecc71' },
-  { id: '3',  name: 'Arduino',      icon: 'hardware-chip-outline',    color: '#00979d' },
-  { id: '4',  name: 'Sound',        icon: 'musical-notes-outline',    color: '#a855f7' },
-  { id: '5',  name: 'Batteries',    icon: 'battery-charging-outline', color: '#e3342f' },
-  { id: '6',  name: 'Chargers',     icon: 'phone-portrait-outline',   color: '#3b82f6' },
-  { id: '7',  name: 'Adapters',     icon: 'swap-horizontal-outline',  color: '#f5a623' },
-  { id: '8',  name: 'Lamps',        icon: 'bulb-outline',             color: '#fbbf24' },
-  { id: '9',  name: 'Mexxsun',      icon: 'leaf-outline',             color: '#10b981' },
-  { id: '10', name: 'Filaments',    icon: 'layers-outline',           color: '#ec4899' },
-  { id: '11', name: 'TV Remotes',   icon: 'tv-outline',               color: '#6366f1' },
-  { id: '12', name: 'Fans',         icon: 'thermometer-outline',      color: '#06b6d4' },
-  { id: '13', name: 'Electric',     icon: 'construct-outline',        color: '#f97316' },
-  { id: '14', name: 'Screwdrivers', icon: 'settings-outline',         color: '#78716c' },
-  { id: '15', name: 'Spray Gum',    icon: 'color-fill-outline',       color: '#84cc16' },
+  { id: '1',  name: 'Solar',        icon: 'sunny-outline',            color: '#f5a623', section: 'solardb' },
+  { id: '2',  name: 'Arduino',      icon: 'hardware-chip-outline',    color: '#00979d', section: 'arduino' },
+  { id: '3',  name: 'Sound',        icon: 'musical-notes-outline',    color: '#a855f7', section: 'sound' },
+  { id: '4',  name: 'Batteries',    icon: 'battery-charging-outline', color: '#e3342f', section: 'batteries' },
+  { id: '5',  name: 'Chargers',     icon: 'phone-portrait-outline',   color: '#3b82f6', section: 'chargers' },
+  { id: '6',  name: 'Adapters',     icon: 'swap-horizontal-outline',  color: '#f5a623', section: 'adapters' },
+  { id: '7',  name: 'Lamps',        icon: 'bulb-outline',             color: '#fbbf24', section: 'lamps' },
+  { id: '8',  name: 'Mexxsun',      icon: 'leaf-outline',             color: '#10b981', section: 'mexxsun' },
+  { id: '9',  name: 'Filaments',    icon: 'layers-outline',           color: '#ec4899', section: 'filaments' },
+  { id: '10', name: 'TV Remotes',   icon: 'tv-outline',               color: '#6366f1', section: 'tv_remotes' },
+  { id: '11', name: 'Fans',         icon: 'thermometer-outline',      color: '#06b6d4', section: 'fans' },
+  { id: '12', name: 'Electric',     icon: 'construct-outline',        color: '#f97316', section: 'electric' },
+  { id: '13', name: 'Screwdrivers', icon: 'settings-outline',         color: '#78716c', section: 'scrawesdriver' },
+  { id: '14', name: 'Spray Gum',    icon: 'color-fill-outline',       color: '#84cc16', section: 'spray_gum' },
 ];
 
 // ─── BRANDS ───────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ function RepairServiceCard({ isDark, BORDER }: any) {
 // ─── MAIN COMPONENT ───────────────────────────────────────────────
 export default function HomeScreen() {
   const router = useRouter();
-  const { addToCart, totalItems } = useCart();
+  const { totalItems } = useCart();
   const scheme  = useColorScheme();
   const isDark  = scheme === 'dark';
 
@@ -153,7 +153,6 @@ export default function HomeScreen() {
   const SEARCH_TC  = isDark ? '#ffffff' : '#111111';
 
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [searchText,   setSearchText]   = useState('');
   const bannerRef = useRef<FlatList>(null);
 
   useEffect(() => {
@@ -188,63 +187,6 @@ export default function HomeScreen() {
       <RNView style={{ width: 90, alignItems: 'center', justifyContent: 'center' }}>
         <Ionicons name="image-outline" size={40} color="rgba(255,255,255,0.1)" />
       </RNView>
-    </RNView>
-  );
-
-  // ── Product Card ─────────────────────────────────────────────
-  const renderProductCard = (item: typeof productSections[0]['products'][0], section: typeof productSections[0]) => (
-    <TouchableOpacity
-      key={item.id} activeOpacity={0.85}
-      onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        router.push({ pathname: '/product-detail', params: { productId: item.id, categoryId: section.id } });
-      }}
-      style={{ width: 155, backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, marginRight: 12, overflow: 'hidden' }}
-    >
-      <RNView style={{ height: 120, backgroundColor: isDark ? '#1a2030' : '#f5f5fa', alignItems: 'center', justifyContent: 'center' }}>
-        <Ionicons name="image-outline" size={30} color={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'} />
-      </RNView>
-      <RNView style={{ padding: 10 }}>
-        <Text style={{ fontSize: 9, fontWeight: '700', marginBottom: 4, color: item.low ? AMBER : '#2ecc71' }}>● {item.stock}</Text>
-        <Text numberOfLines={2} style={{ fontSize: 11, fontWeight: '600', color: TEXT, lineHeight: 15, minHeight: 30, marginBottom: 8 }}>{item.name}</Text>
-        <RNView style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom: 8 }}>
-          <Text style={{ fontSize: 17, fontWeight: '800', color: TEXT }}>{item.price}</Text>
-          <Text style={{ fontSize: 10, fontWeight: '600', color: TEXT, marginBottom: 1 }}>.{item.dec}</Text>
-          <Text style={{ fontSize: 10, color: SUBTEXT, marginBottom: 1, marginLeft: 2 }}>TL</Text>
-        </RNView>
-        <TouchableOpacity
-          onPress={(e) => {
-            e.stopPropagation();
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            addToCart({ id: item.id, name: item.name, price: item.price, dec: item.dec, categoryId: section.id, categoryTitle: section.title });
-          }}
-          style={{ backgroundColor: AMBER, borderRadius: 8, paddingVertical: 7, alignItems: 'center' }}
-        >
-          <Text style={{ color: '#000', fontSize: 10, fontWeight: '700' }}>Add to Cart</Text>
-        </TouchableOpacity>
-      </RNView>
-    </TouchableOpacity>
-  );
-
-  // ── Product Section ──────────────────────────────────────────
-  const renderSection = (section: typeof productSections[0]) => (
-    <RNView key={section.id} style={{ marginBottom: 32 }}>
-      <RNView style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 16, marginBottom: 4 }}>
-        <RNView style={{ flex: 1 }}>
-          <RNView style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <RNView style={{ width: 4, height: 18, borderRadius: 2, backgroundColor: section.accentColor }} />
-            <Text style={{ fontSize: 18, fontWeight: '700', color: TEXT }}>{section.title}</Text>
-          </RNView>
-          <Text style={{ fontSize: 11, color: SUBTEXT, marginTop: 3, marginLeft: 12 }}>{section.subtitle}</Text>
-        </RNView>
-        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: section.accentColor }}>View All</Text>
-          <Ionicons name="arrow-forward" size={13} color={section.accentColor} />
-        </TouchableOpacity>
-      </RNView>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4 }}>
-        {section.products.map(p => renderProductCard(p, section))}
-      </ScrollView>
     </RNView>
   );
 
@@ -284,11 +226,15 @@ export default function HomeScreen() {
 
       {/* SEARCH */}
       <RNView style={{ flexDirection: 'row', gap: 8, backgroundColor: HEADER_BG, paddingHorizontal: 16, paddingBottom: 14 }}>
-        <RNView style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: SEARCH_BG, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 }}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => router.push('/search')}
+          style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: SEARCH_BG, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 }}
+        >
           <Ionicons name="search" size={16} color={SEARCH_PH} style={{ marginRight: 8 }} />
-          <TextInput value={searchText} onChangeText={setSearchText} placeholder="Search Arduino, solar, cables..." placeholderTextColor={SEARCH_PH} style={{ flex: 1, fontSize: 13, color: SEARCH_TC }} />
-        </RNView>
-        <TouchableOpacity style={{ width: 42, height: 42, borderRadius: 10, backgroundColor: SEARCH_BG, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ flex: 1, fontSize: 13, color: SEARCH_PH }}>Search Arduino, solar, cables...</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/search')} style={{ width: 42, height: 42, borderRadius: 10, backgroundColor: SEARCH_BG, alignItems: 'center', justifyContent: 'center' }}>
           <Ionicons name="options-outline" size={20} color={ICON_COLOR} />
         </TouchableOpacity>
       </RNView>
@@ -320,7 +266,14 @@ export default function HomeScreen() {
         </RNView>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 16 }}>
           {categories.map(cat => (
-            <TouchableOpacity key={cat.id} style={{ alignItems: 'center', width: 62 }}>
+            <TouchableOpacity
+              key={cat.id}
+              style={{ alignItems: 'center', width: 62 }}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push({ pathname: '/category-detail', params: { section: cat.section } });
+              }}
+            >
               <RNView style={{ width: 56, height: 56, borderRadius: 16, backgroundColor: CARD_BG, borderWidth: 1, borderColor: BORDER, alignItems: 'center', justifyContent: 'center', marginBottom: 7 }}>
                 <Ionicons name={cat.icon as any} size={22} color={cat.color} />
               </RNView>
@@ -346,13 +299,15 @@ export default function HomeScreen() {
         {/* DIVIDER */}
         <RNView style={{ height: 1, backgroundColor: BORDER, marginHorizontal: 16, marginTop: 28, marginBottom: 28 }} />
 
-        {/* PRODUCT SECTIONS */}
-        {renderSection(productSections[0])}
+        {/* PRODUCT SECTIONS (live API) */}
+        <HomeProductSection sectionKey={HOME_SECTIONS[0]} />
 
-        {/* ⚡ REPAIR SERVICE — between Most Sold and Arduino */}
+        {/* ⚡ REPAIR SERVICE — between first and rest */}
         <RepairServiceCard isDark={isDark} BORDER={BORDER} />
 
-        {productSections.slice(1).map(renderSection)}
+        {HOME_SECTIONS.slice(1).map(key => (
+          <HomeProductSection key={key} sectionKey={key} />
+        ))}
 
         {/* SOCIAL FOOTER */}
         <RNView style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 16 }}>

@@ -13,24 +13,19 @@ import {
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import BottomSheet, {
+import {
+  BottomSheetModal,
   BottomSheetScrollView,
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { useSearchProducts } from '@/hooks/useSearchProducts';
+import { formatTL } from '@/lib/price';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ─── Data ────────────────────────────────────────────────────────────────────
-
-const categories = [
-  'Solar', 'Electronics', 'Arduino', 'Sound', 'Chargers',
-  'Adapters', 'Lamps', 'Filaments', 'TV Remotes', 'Mexxsun',
-  'Fans', 'Electric', 'Spray & Gum', 'Screwdrivers',
-];
-
-
 
 const INITIAL_RECENT = ['arduino uno', 'esp32', 'servo motor', 'lcd display'];
 
@@ -56,11 +51,6 @@ const sortOptions = [
   'New Arrivals',
 ];
 
-const getCategoryProducts = (categoryName: string) => ([
-  { id: '0', name: `${categoryName} Product 1`, price: '$29.99', description: `Sample ${categoryName} product` },
-  { id: '1', name: `${categoryName} Product 2`, price: '$49.99', description: `Another ${categoryName} product` },
-]);
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function SearchScreen() {
@@ -78,7 +68,7 @@ export default function SearchScreen() {
   const [priceRange, setPriceRange] = useState([160, 2500]);
 
   const inputRef = useRef<TextInput>(null);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['88%'], []);
 
   // ── Theme tokens
@@ -95,11 +85,17 @@ export default function SearchScreen() {
     sheetBg:  isDark ? '#1E1E1E' : '#F5F5F5',
   };
 
-  // ── Derived
-  const filtered = categories.filter((name) =>
-    name.toLowerCase().includes(query.toLowerCase())
-  );
-  const isSearching = query.length > 0;
+  // ── Derived (live API search)
+  const isSearching = query.trim().length > 0;
+  const { data: searchData, isLoading: searchLoading, isError: searchError } = useSearchProducts(query);
+  const results = (searchData?.data ?? []) as unknown as Array<{
+    id: number;
+    english_name: string | null;
+    turkish_name: string | null;
+    price: string | null;
+    image_filename: string | null;
+    category: string | null;
+  }>;
 
   //  Focus → auto opn keyboard
   useFocusEffect(
@@ -109,13 +105,17 @@ export default function SearchScreen() {
   );
 
   //  Handlers
-  const handleCategoryPress = (categoryName: string) => {
+  const openProduct = (item: (typeof results)[number]) => {
+    saveSearch(query);
     router.push({
-      pathname: '/category-detail',
+      pathname: '/product-detail',
       params: {
-        categoryName,
-    
-        products: JSON.stringify(getCategoryProducts(categoryName)),
+        productId: String(item.id),
+        section: 'main',
+        name: item.english_name ?? item.turkish_name ?? 'Product',
+        price: item.price ?? '',
+        image: item.image_filename ?? '',
+        category: item.category ?? '',
       },
     });
   };
@@ -131,8 +131,8 @@ export default function SearchScreen() {
     inputRef.current?.blur();
   };
 
-  const openFilter  = () => bottomSheetRef.current?.expand();
-  const closeFilter = () => bottomSheetRef.current?.close();
+  const openFilter  = () => bottomSheetRef.current?.present();
+  const closeFilter = () => bottomSheetRef.current?.dismiss();
 
   const resetFilters = () => {
     setSelectedFilterCat('Arduino');
@@ -196,8 +196,8 @@ export default function SearchScreen() {
 
       {/* ── Content ── */}
       <FlatList
-        data={isSearching ? filtered : []}
-        keyExtractor={(item) => item}
+        data={isSearching ? results : []}
+        keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
 
@@ -271,44 +271,46 @@ export default function SearchScreen() {
             </ScrollView>
           ) : (
             <Text style={{ color: t.subtext, fontSize: 13, paddingHorizontal: 16, paddingTop: 12 }}>
-              {filtered.length} results for "{query}"
+              {searchLoading ? 'Searching…' : `${results.length} results for "${query}"`}
             </Text>
           )
         }
 
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleCategoryPress(item)}
-            activeOpacity={0.7}
-            style={{
-              flexDirection: 'row', alignItems: 'center',
-              paddingHorizontal: 16, paddingVertical: 12,
-              backgroundColor: t.bg, gap: 14,
-            }}
-          >
-            <View style={{
-              width: 44, height: 44, borderRadius: 12,
-              
-              alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Text style={{ color: '#F97316', fontWeight: '700', fontSize: 17 }}>
-                {item.charAt(0)}
-              </Text>
-            </View>
-            <Text style={{ flex: 1, fontSize: 15, fontWeight: '500', color: t.text }}>{item}</Text>
-            <Ionicons name="chevron-forward" size={16} color={t.subtext} />
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          const name = item.english_name ?? item.turkish_name ?? 'Product';
+          return (
+            <TouchableOpacity
+              onPress={() => openProduct(item)}
+              activeOpacity={0.7}
+              style={{
+                flexDirection: 'row', alignItems: 'center',
+                paddingHorizontal: 16, paddingVertical: 12,
+                backgroundColor: t.bg, gap: 14,
+              }}
+            >
+              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: t.chipBg, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="cube-outline" size={20} color={t.accent} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text numberOfLines={2} style={{ fontSize: 15, fontWeight: '500', color: t.text }}>{name}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: t.accent, marginTop: 2 }}>{formatTL(item.price)}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={t.subtext} />
+            </TouchableOpacity>
+          );
+        }}
 
         ItemSeparatorComponent={() => (
           <View style={{ height: 1, backgroundColor: t.border, marginLeft: 74 }} />
         )}
 
         ListEmptyComponent={() =>
-          isSearching ? (
+          isSearching && !searchLoading ? (
             <View style={{ alignItems: 'center', marginTop: 80, gap: 12 }}>
               <Text style={{ fontSize: 40 }}>🔍</Text>
-              <Text style={{ color: t.subtext, fontSize: 15 }}>No results for "{query}"</Text>
+              <Text style={{ color: t.subtext, fontSize: 15 }}>
+                {searchError ? 'Search failed. Try again.' : `No results for "${query}"`}
+              </Text>
               <Text style={{ color: t.subtext, fontSize: 13 }}>Try a different keyword</Text>
             </View>
           ) : null
@@ -316,9 +318,8 @@ export default function SearchScreen() {
       />
 
       {/* ── Filter Bottom Sheet ── */}
-      <BottomSheet
+      <BottomSheetModal
         ref={bottomSheetRef}
-        index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose
         backdropComponent={renderBackdrop}
@@ -541,7 +542,7 @@ export default function SearchScreen() {
           </View>
 
         </BottomSheetScrollView>
-      </BottomSheet>
+      </BottomSheetModal>
 
     </SafeAreaView>
   );
