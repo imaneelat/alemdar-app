@@ -354,6 +354,67 @@ export default function HomeScreen() {
 
         {productSections.slice(1).map(renderSection)}
 
+        {/* SOCIAL FOOTER */}
+        <RNView style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 16 }}>
+          <Text style={{ fontSize: 11, color: SUBTEXT, textAlign: 'center', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
+            Follow us & find us
+          </Text>
+          <RNView style={{ flexDirection: 'row', gap: 10 }}>
+            {/* Facebook */}
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const { Linking } = require('react-native');
+                Linking.openURL('https://www.facebook.com/AlemdarTeknikLtd');
+              }}
+              activeOpacity={0.8}
+              style={{ flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderRadius: 12, backgroundColor: CARD_BG, borderWidth: 1, borderColor: BORDER }}
+            >
+              <RNView style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#1877F2', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: '#fff' }}>f</Text>
+              </RNView>
+              <Text style={{ fontSize: 11, fontWeight: '600', color: TEXT }}>Facebook</Text>
+            </TouchableOpacity>
+
+            {/* Instagram */}
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const { Linking } = require('react-native');
+                Linking.openURL('https://www.instagram.com/alemdarteknik?igsh=MTV3enhzczUxMGFiYg%3D%3D&utm_source=qr');
+              }}
+              activeOpacity={0.8}
+              style={{ flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderRadius: 12, backgroundColor: CARD_BG, borderWidth: 1, borderColor: BORDER }}
+            >
+              <RNView style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#E1306C', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="logo-instagram" size={18} color="#fff" />
+              </RNView>
+              <Text style={{ fontSize: 11, fontWeight: '600', color: TEXT }}>Instagram</Text>
+            </TouchableOpacity>
+
+            {/* Location */}
+            <TouchableOpacity
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                const { Linking } = require('react-native');
+                Linking.openURL('https://www.google.com/maps?q=Alemdar+Teknik,+Polis+Sk,+Lefko%C5%9Fa+5000&ftid=0x14de17339227c4f7:0x4bb7a378a71dcdc7&entry=gps&shh=CAE&lucs=,94297699,94275415,94231188,94280568,47071704,94218641,94282134,94286869&g_ep=CAISEjI2LjA1LjEuODYxMzIyMjEwMBgAIMi8BypILDk0Mjk3Njk5LDk0Mjc1NDE1LDk0MjMxMTg4LDk0MjgwNTY4LDQ3MDcxNzA0LDk0MjE4NjQxLDk0MjgyMTM0LDk0Mjg2ODY5QgJDWQ%3D%3D&skid=6b7c7b7d-a985-4e3a-92a6-6e0ec7205e39&g_st=ic');
+              }}
+              activeOpacity={0.8}
+              style={{ flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 14, borderRadius: 12, backgroundColor: CARD_BG, borderWidth: 1, borderColor: BORDER }}
+            >
+              <RNView style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#34A853', alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="location" size={18} color="#fff" />
+              </RNView>
+              <Text style={{ fontSize: 11, fontWeight: '600', color: TEXT }}>Location</Text>
+            </TouchableOpacity>
+          </RNView>
+
+          {/* Copyright */}
+          <Text style={{ fontSize: 11, color: SUBTEXT, textAlign: 'center', marginTop: 16, marginBottom: 8 }}>
+            © 2026 Alemdar Teknik · Lefkoşa, KKTC
+          </Text>
+        </RNView>
+
       </ScrollView>
     </SafeAreaView>
   );
