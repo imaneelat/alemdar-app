@@ -1,12 +1,17 @@
 import { useColorScheme } from '@/components/useColorScheme';
 import { CartProvider } from '@/context/CartContext';
+import { WishlistProvider } from '@/context/WishlistContext';
+import { LanguageProvider } from '@/lib/i18n';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+
+const queryClient = new QueryClient();
 
 export {
   ErrorBoundary
@@ -45,6 +50,9 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
+    <LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+    <WishlistProvider>
     <CartProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
@@ -58,5 +66,8 @@ function RootLayoutNav() {
         </Stack>
       </ThemeProvider>
     </CartProvider>
+    </WishlistProvider>
+    </QueryClientProvider>
+    </LanguageProvider>
   );
 }

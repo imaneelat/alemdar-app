@@ -9,6 +9,7 @@ import PrivacySheet from '@/components/PrivacySheet';
 import LanguageSheet from '@/components/LanguageSheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+
 let _set: ((s: string|null) => void)|null = null;
 export const openSheet = (s: string) => _set?.(s);
 export const closeSheets = () => _set?.(null);

@@ -14,11 +14,13 @@ import { useRef, useEffect, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { useCart } from '@/context/CartContext';
 import { productSections } from '@/constants/ProductData';
+import { useLocale, t } from '@/lib/i18n';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AMBER = '#f5a623';
 
 export default function ProductDetail() {
+  useLocale();
   const router    = useRouter();
   const params    = useLocalSearchParams();
   const { addToCart } = useCart();
@@ -44,7 +46,7 @@ export default function ProductDetail() {
   if (!product || !section) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: PAGE_BG, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: TEXT }}>Product not found.</Text>
+        <Text style={{ color: TEXT }}>{t('product.notFound')}</Text>
       </SafeAreaView>
     );
   }
@@ -124,12 +126,12 @@ export default function ProductDetail() {
 
           {/* Specs placeholder */}
           <RNView style={{ backgroundColor: isDark ? '#0d1120' : '#f8f8fc', borderRadius: 12, padding: 14, marginBottom: 4 }}>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: TEXT, marginBottom: 10 }}>Product Details</Text>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: TEXT, marginBottom: 10 }}>{t('product.details')}</Text>
             {[
-              { label: 'Category',     value: section.title       },
-              { label: 'Availability', value: product.stock       },
-              { label: 'SKU',          value: `AT-${section.id.toUpperCase()}-${product.id.padStart(3,'0')}` },
-              { label: 'Shipping',     value: 'Same-day in Lefkoşa' },
+              { label: t('product.category'),     value: section.title       },
+              { label: t('product.availability'), value: product.stock       },
+              { label: t('product.sku'),          value: `AT-${section.id.toUpperCase()}-${product.id.padStart(3,'0')}` },
+              { label: t('product.shipping'),     value: t('product.shippingValue') },
             ].map(row => (
               <RNView key={row.label} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: BORDER }}>
                 <Text style={{ fontSize: 12, color: SUBTEXT }}>{row.label}</Text>
@@ -144,7 +146,7 @@ export default function ProductDetail() {
           <RNView style={{ paddingTop: 8 }}>
             <RNView style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, marginBottom: 12 }}>
               <RNView style={{ width: 4, height: 18, borderRadius: 2, backgroundColor: section.accentColor }} />
-              <Text style={{ fontSize: 17, fontWeight: '700', color: TEXT }}>More from {section.title}</Text>
+              <Text style={{ fontSize: 17, fontWeight: '700', color: TEXT }}>{t('product.moreFrom', { title: section.title })}</Text>
             </RNView>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 12 }}>
@@ -175,7 +177,7 @@ export default function ProductDetail() {
                       }}
                       style={{ backgroundColor: AMBER, borderRadius: 8, paddingVertical: 7, alignItems: 'center' }}
                     >
-                      <Text style={{ color: '#000', fontSize: 10, fontWeight: '700' }}>Add to Cart</Text>
+                      <Text style={{ color: '#000', fontSize: 10, fontWeight: '700' }}>{t('addToCart')}</Text>
                     </TouchableOpacity>
                   </RNView>
                 </TouchableOpacity>
@@ -189,7 +191,7 @@ export default function ProductDetail() {
       <RNView style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: isDark ? '#0d0d0d' : '#ffffff', borderTopWidth: 1, borderTopColor: BORDER, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 28 }}>
         {/* Added confirmation */}
         <Animated.View style={{ opacity: fadeAnim, alignItems: 'center', marginBottom: 8 }}>
-          <Text style={{ fontSize: 12, color: '#2ecc71', fontWeight: '600' }}>✓ Added to cart!</Text>
+          <Text style={{ fontSize: 12, color: '#2ecc71', fontWeight: '600' }}>✓ {t('product.addedToCart')}</Text>
         </Animated.View>
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
           <TouchableOpacity
@@ -198,7 +200,7 @@ export default function ProductDetail() {
             style={{ backgroundColor: AMBER, borderRadius: 14, paddingVertical: 15, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}
           >
             <Ionicons name="cart-outline" size={20} color="#000" />
-            <Text style={{ fontSize: 16, fontWeight: '800', color: '#000' }}>Add to Cart</Text>
+            <Text style={{ fontSize: 16, fontWeight: '800', color: '#000' }}>{t('addToCart')}</Text>
           </TouchableOpacity>
         </Animated.View>
       </RNView>

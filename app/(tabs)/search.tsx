@@ -19,20 +19,38 @@ import BottomSheet, {
   BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { Card, Text as PaperText, Button, IconButton } from 'react-native-paper';
+import * as Haptics from 'expo-haptics';
+import { productSections } from '@/constants/ProductData';
+import { useWishlist } from '@/context/WishlistContext';
+import { useLocale, t as i18nT } from '@/lib/i18n';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// ─── Data ────────────────────────────────────────────────────────────────────
+// Flatten all products from productSections 
 
-const categories = [
-  'Solar', 'Electronics', 'Arduino', 'Sound', 'Chargers',
-  'Adapters', 'Lamps', 'Filaments', 'TV Remotes', 'Mexxsun',
-  'Fans', 'Electric', 'Spray & Gum', 'Screwdrivers',
-];
+type FlatProduct = {
+  id: string;
+  name: string;
+  price: string;
+  dec: string;
+  stock: string;
+  low: boolean;
+  sectionId: string;
+  sectionTitle: string;
+  accentColor: string;
+};
 
+const allProducts: FlatProduct[] = productSections.flatMap((section) =>
+  section.products.map((p) => ({
+    ...p,
+    sectionId: section.id,
+    sectionTitle: section.title,
+    accentColor: section.accentColor,
+  }))
+);
 
-
-const INITIAL_RECENT = ['arduino uno', 'esp32', 'servo motor', 'lcd display'];
+// Data
 
 const popularSearches = [
   'Arduino Uno R4', 'Esp32 Dev Kit', 'Raspberry Pi 4',
@@ -49,21 +67,94 @@ const brandEmoji: Record<string, string> = {
   Arduino: '.', Espressif: '.', Raspberry: '.', ToMaTeD: '.', Seeed: '.',
 };
 
-const sortOptions = [
-  'Popularity',
-  'Price: Low → High',
-  'Price: High → Low',
-  'New Arrivals',
+const sortOptionKeys = [
+  { key: 'Popularity',         i18nKey: 'search.popularity'   },
+  { key: 'Price: Low → High',  i18nKey: 'search.priceLowHigh' },
+  { key: 'Price: High → Low',  i18nKey: 'search.priceHighLow' },
+  { key: 'New Arrivals',       i18nKey: 'search.newArrivals'  },
 ];
 
-const getCategoryProducts = (categoryName: string) => ([
-  { id: '0', name: `${categoryName} Product 1`, price: '$29.99', description: `Sample ${categoryName} product` },
-  { id: '1', name: `${categoryName} Product 2`, price: '$49.99', description: `Another ${categoryName} product` },
-]);
+// ─ Product Card 
+function ProductCard({
+  product,
+  isWishlisted,
+  onWishlistToggle,
+  onPress,
+  t,
+}: {
+  product: FlatProduct;
+  isWishlisted: boolean;
+  onWishlistToggle: () => void;
+  onPress: () => void;
+  t: Record<string, string>;
+}) {
+  return (
+    <Card
+      mode="contained"
+      onPress={onPress}
+      style={{ marginHorizontal: 16, marginBottom: 12, backgroundColor: t.cardBg, borderRadius: 14 }}
+    >
+      <View style={{ flexDirection: 'row' }}>
+        {/* Image placeholder + heart */}
+        <View style={{
+          width: 120, height: 130,
+          backgroundColor: t.imageBg,
+          borderTopLeftRadius: 14, borderBottomLeftRadius: 14,
+          overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Ionicons name="image-outline" size={36} color={t.imagePlaceholder} />
+          <IconButton
+            icon={isWishlisted ? 'heart' : 'heart-outline'}
+            iconColor={isWishlisted ? '#e8375a' : '#ccc'}
+            size={20}
+            onPress={(e) => { (e as any).stopPropagation?.(); onWishlistToggle(); }}
+            style={{ position: 'absolute', top: 0, left: 0, backgroundColor: t.cardBg, margin: 6, borderRadius: 20 }}
+          />
+        </View>
 
-// ─── Component ───────────────────────────────────────────────────────────────
+        {/* Details */}
+        <Card.Content style={{ flex: 1, paddingVertical: 12, paddingHorizontal: 12, gap: 4 }}>
+          {/* Stock status */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: product.low ? '#f5a623' : '#4caf50' }} />
+            <PaperText variant="labelSmall" style={{ color: product.low ? '#f5a623' : '#4caf50' }}>
+              {product.stock}
+            </PaperText>
+          </View>
+
+          {/* Name */}
+          <PaperText variant="bodyMedium" style={{ color: t.text }} numberOfLines={2}>
+            {product.name}
+          </PaperText>
+
+          {/* Price */}
+          <PaperText variant="titleMedium" style={{ color: t.accent, fontWeight: '700' }}>
+            {product.price}.{product.dec} TL
+          </PaperText>
+
+          {/* Shop Now */}
+          <Button
+            mode="contained"
+            buttonColor={t.accent}
+            textColor="#fff"
+            compact
+            onPress={onPress}
+            icon="arrow-right"
+            contentStyle={{ flexDirection: 'row-reverse' }}
+            labelStyle={{ fontSize: 13 }}
+          >
+            {i18nT('shopNow')}
+          </Button>
+        </Card.Content>
+      </View>
+    </Card>
+  );
+}
+
+// components
 
 export default function SearchScreen() {
+  useLocale();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
@@ -71,6 +162,7 @@ export default function SearchScreen() {
   // ── State
   const [query, setQuery] = useState('');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const { toggleWishlist, isWishlisted } = useWishlist();
   const [selectedFilterCat, setSelectedFilterCat] = useState('Arduino');
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [availability, setAvailability] = useState<'all' | 'instock' | 'outofstock'>('instock');
@@ -81,42 +173,50 @@ export default function SearchScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['88%'], []);
 
-  // ── Theme tokens
-  const t = {
-    bg:       isDark ? '#0A0A0A' : '#F5F5F5',
-    border:   isDark ? '#2A2A2A' : '#E8E8E8',
-    text:     isDark ? '#FFFFFF' : '#111111',
-    subtext:  '#888888',
-    inputBg:  isDark ? '#1A1A1A' : '#FFFFFF',
-    chipBg:   isDark ? '#252525' : '#EFEFEF',
-    chipText: isDark ? '#CCCCCC' : '#444444',
-    accent:   '#F97316',
-    sheet:    isDark ? '#161616' : '#FFFFFF',
-    sheetBg:  isDark ? '#1E1E1E' : '#F5F5F5',
+  //  Theme tokens
+  const t: Record<string, string> = {
+    bg:               isDark ? '#0A0A0A' : '#F5F5F5',
+    border:           isDark ? '#2A2A2A' : '#E8E8E8',
+    text:             isDark ? '#FFFFFF' : '#111111',
+    subtext:          '#888888',
+    inputBg:          isDark ? '#1A1A1A' : '#FFFFFF',
+    chipBg:           isDark ? '#252525' : '#EFEFEF',
+    chipText:         isDark ? '#CCCCCC' : '#444444',
+    accent:           '#F97316',
+    sheet:            isDark ? '#161616' : '#FFFFFF',
+    sheetBg:          isDark ? '#1E1E1E' : '#F5F5F5',
+    cardBg:           isDark ? '#1A1A1A' : '#FFFFFF',
+    imageBg:          isDark ? '#242424' : '#F0F0F0',
+    imagePlaceholder: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
   };
 
-  // ── Derived
-  const filtered = categories.filter((name) =>
-    name.toLowerCase().includes(query.toLowerCase())
+  //  filter products by query (name or section title)
+  const filtered = useMemo(
+    () =>
+      allProducts.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query.toLowerCase()) ||
+          p.sectionTitle.toLowerCase().includes(query.toLowerCase())
+      ),
+    [query]
   );
+
   const isSearching = query.length > 0;
 
-  //  Focus → auto opn keyboard
+  // ── Focus → auto-open keyboard
   useFocusEffect(
     useCallback(() => {
       setTimeout(() => inputRef.current?.focus(), 100);
     }, [])
   );
 
-  //  Handlers
-  const handleCategoryPress = (categoryName: string) => {
+  //  Handlers  , change..
+
+  const handleProductPress = (product: FlatProduct) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
-      pathname: '/category-detail',
-      params: {
-        categoryName,
-    
-        products: JSON.stringify(getCategoryProducts(categoryName)),
-      },
+      pathname: '/product-detail',
+      params: { productId: product.id, categoryId: product.sectionId },
     });
   };
 
@@ -144,17 +244,12 @@ export default function SearchScreen() {
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.5} />
     ),
     []
   );
 
-  // ─────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
@@ -175,31 +270,30 @@ export default function SearchScreen() {
           <TextInput
             ref={inputRef}
             style={{ flex: 1, fontSize: 15, color: t.text }}
-            placeholder="Search products, categories..."
+            placeholder={i18nT('search.placeholder')}
             placeholderTextColor={t.subtext}
             value={query}
             onChangeText={setQuery}
             onSubmitEditing={() => saveSearch(query)}
             returnKeyType="search"
           />
-          {/* Filter trigger inside bar */}
           <TouchableOpacity onPress={openFilter} style={{ marginLeft: 8 }}>
             <Ionicons name="options-outline" size={20} color={t.accent} />
           </TouchableOpacity>
         </View>
 
-        {/* Cancel */}
         <TouchableOpacity onPress={handleCancel} hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}>
-          <Text style={{ color: t.accent, fontSize: 15, fontWeight: '600' }}>Cancel</Text>
+          <Text style={{ color: t.accent, fontSize: 15, fontWeight: '600' }}>{i18nT('search.cancel')}</Text>
         </TouchableOpacity>
       </View>
 
       {/* ── Content ── */}
       <FlatList
         data={isSearching ? filtered : []}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => `${item.sectionId}-${item.id}`}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 24 }}
 
         ListHeaderComponent={
           !isSearching ? (
@@ -208,32 +302,24 @@ export default function SearchScreen() {
               {/* Recent Searches */}
               <View style={{ paddingHorizontal: 16, marginTop: 20 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <Text style={{
-                    fontSize: 13, fontWeight: '700', color: t.subtext,
-                    letterSpacing: 0.8, textTransform: 'uppercase',
-                  }}>
-                    Recent Searches
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: t.subtext, letterSpacing: 0.8, textTransform: 'uppercase' }}>
+                    {i18nT('search.recentSearches')}
                   </Text>
                   {recentSearches.length > 0 && (
                     <TouchableOpacity onPress={() => setRecentSearches([])}>
-                      <Text style={{ fontSize: 13, color: t.accent, fontWeight: '600' }}>Clear all</Text>
+                      <Text style={{ fontSize: 13, color: t.accent, fontWeight: '600' }}>{i18nT('search.clearAll')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
-
                 {recentSearches.length === 0 ? (
-                  <Text style={{ color: t.subtext, fontSize: 13 }}>No recent searches</Text>
+                  <Text style={{ color: t.subtext, fontSize: 13 }}>{i18nT('search.noRecent')}</Text>
                 ) : (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                     {recentSearches.map((item) => (
                       <TouchableOpacity
                         key={item}
                         onPress={() => setQuery(item)}
-                        style={{
-                          flexDirection: 'row', alignItems: 'center', gap: 6,
-                          backgroundColor: t.chipBg, borderRadius: 20,
-                          paddingHorizontal: 14, paddingVertical: 8,
-                        }}
+                        style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: t.chipBg, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8 }}
                       >
                         <Ionicons name="time-outline" size={14} color={t.subtext} />
                         <Text style={{ color: t.chipText, fontSize: 13 }}>{item}</Text>
@@ -245,22 +331,15 @@ export default function SearchScreen() {
 
               {/* Popular Searches */}
               <View style={{ paddingHorizontal: 16, marginTop: 28 }}>
-                <Text style={{
-                  fontSize: 13, fontWeight: '700', color: t.subtext,
-                  letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12,
-                }}>
-                  Popular Searches
+                <Text style={{ fontSize: 13, fontWeight: '700', color: t.subtext, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
+                  {i18nT('search.popularSearches')}
                 </Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                   {popularSearches.map((item) => (
                     <TouchableOpacity
                       key={item}
                       onPress={() => { setQuery(item); saveSearch(item); }}
-                      style={{
-                        backgroundColor: t.chipBg, borderRadius: 20,
-                        paddingHorizontal: 14, paddingVertical: 8,
-                        borderWidth: 1, borderColor: t.border,
-                      }}
+                      style={{ backgroundColor: t.chipBg, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: t.border }}
                     >
                       <Text style={{ color: t.chipText, fontSize: 13 }}>{item}</Text>
                     </TouchableOpacity>
@@ -270,46 +349,30 @@ export default function SearchScreen() {
 
             </ScrollView>
           ) : (
-            <Text style={{ color: t.subtext, fontSize: 13, paddingHorizontal: 16, paddingTop: 12 }}>
-              {filtered.length} results for "{query}"
-            </Text>
+            /* ── Results header ── */
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
+              <Text style={{ color: t.text, fontSize: 15, fontWeight: '600' }}>{i18nT('search.resultsTitle')}</Text>
+              <Text style={{ color: t.subtext, fontSize: 13 }}>{filtered.length} {i18nT('search.results')}</Text>
+            </View>
           )
         }
 
         renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleCategoryPress(item)}
-            activeOpacity={0.7}
-            style={{
-              flexDirection: 'row', alignItems: 'center',
-              paddingHorizontal: 16, paddingVertical: 12,
-              backgroundColor: t.bg, gap: 14,
-            }}
-          >
-            <View style={{
-              width: 44, height: 44, borderRadius: 12,
-              
-              alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Text style={{ color: '#F97316', fontWeight: '700', fontSize: 17 }}>
-                {item.charAt(0)}
-              </Text>
-            </View>
-            <Text style={{ flex: 1, fontSize: 15, fontWeight: '500', color: t.text }}>{item}</Text>
-            <Ionicons name="chevron-forward" size={16} color={t.subtext} />
-          </TouchableOpacity>
-        )}
-
-        ItemSeparatorComponent={() => (
-          <View style={{ height: 1, backgroundColor: t.border, marginLeft: 74 }} />
+          <ProductCard
+            product={item}
+            isWishlisted={isWishlisted(item.id)}
+            onWishlistToggle={() => toggleWishlist(item)}
+            onPress={() => handleProductPress(item)}
+            t={t}
+          />
         )}
 
         ListEmptyComponent={() =>
           isSearching ? (
             <View style={{ alignItems: 'center', marginTop: 80, gap: 12 }}>
               <Text style={{ fontSize: 40 }}>🔍</Text>
-              <Text style={{ color: t.subtext, fontSize: 15 }}>No results for "{query}"</Text>
-              <Text style={{ color: t.subtext, fontSize: 13 }}>Try a different keyword</Text>
+              <Text style={{ color: t.subtext, fontSize: 15 }}>{i18nT('search.noResultsFor')} "{query}"</Text>
+              <Text style={{ color: t.subtext, fontSize: 13 }}>{i18nT('search.tryDifferent')}</Text>
             </View>
           ) : null
         }
@@ -329,18 +392,15 @@ export default function SearchScreen() {
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={{
-            fontSize: 18, fontWeight: '700', color: t.text,
-            marginBottom: 24, textAlign: 'center',
-          }}>
-            Filters
+          <Text style={{ fontSize: 18, fontWeight: '700', color: t.text, marginBottom: 24, textAlign: 'center' }}>
+            {i18nT('search.filters')}
           </Text>
 
           {/* Categories */}
           <View style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <Ionicons name="grid-outline" size={16} color={t.accent} />
-              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Categories</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>{i18nT('search.categories')}</Text>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -350,27 +410,15 @@ export default function SearchScreen() {
                     <TouchableOpacity
                       key={cat}
                       onPress={() => setSelectedFilterCat(cat)}
-                      style={{
-                        flexDirection: 'row', alignItems: 'center', gap: 4,
-                        paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-                        backgroundColor: active ? t.accent : t.sheetBg,
-                        borderWidth: 1, borderColor: active ? t.accent : t.border,
-                      }}
+                      style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: active ? t.accent : t.sheetBg, borderWidth: 1, borderColor: active ? t.accent : t.border }}
                     >
                       {active && <Ionicons name="checkmark" size={13} color="#fff" />}
-                      <Text style={{ color: active ? '#fff' : t.chipText, fontSize: 13, fontWeight: '500' }}>
-                        {cat}
-                      </Text>
+                      <Text style={{ color: active ? '#fff' : t.chipText, fontSize: 13, fontWeight: '500' }}>{cat}</Text>
                     </TouchableOpacity>
                   );
                 })}
-                {/* More chip */}
-                <TouchableOpacity style={{
-                  flexDirection: 'row', alignItems: 'center', gap: 4,
-                  paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-                  backgroundColor: t.sheetBg, borderWidth: 1, borderColor: t.border,
-                }}>
-                  <Text style={{ color: t.chipText, fontSize: 13, fontWeight: '500' }}>More</Text>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: t.sheetBg, borderWidth: 1, borderColor: t.border }}>
+                  <Text style={{ color: t.chipText, fontSize: 13, fontWeight: '500' }}>{i18nT('search.more')}</Text>
                   <Ionicons name="chevron-down" size={12} color={t.chipText} />
                 </TouchableOpacity>
               </View>
@@ -379,16 +427,13 @@ export default function SearchScreen() {
 
           {/* Brands */}
           <View style={{ marginBottom: 24 }}>
-            <View style={{
-              flexDirection: 'row', alignItems: 'center',
-              justifyContent: 'space-between', marginBottom: 12,
-            }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Ionicons name="pricetag-outline" size={16} color={t.accent} />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Brands</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>{i18nT('search.brands')}</Text>
               </View>
               <TouchableOpacity>
-                <Text style={{ fontSize: 13, color: t.accent }}>View All</Text>
+                <Text style={{ fontSize: 13, color: t.accent }}>{i18nT('search.viewAll')}</Text>
               </TouchableOpacity>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -399,17 +444,10 @@ export default function SearchScreen() {
                     <TouchableOpacity
                       key={brand}
                       onPress={() => setSelectedBrand(active ? null : brand)}
-                      style={{
-                        width: 64, height: 64, borderRadius: 12,
-                        backgroundColor: t.sheetBg,
-                        alignItems: 'center', justifyContent: 'center',
-                        borderWidth: 2, borderColor: active ? t.accent : t.border,
-                      }}
+                      style={{ width: 64, height: 64, borderRadius: 12, backgroundColor: t.sheetBg, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: active ? t.accent : t.border }}
                     >
                       <Text style={{ fontSize: 20, marginBottom: 2 }}>{brandEmoji[brand]}</Text>
-                      <Text style={{ fontSize: 9, fontWeight: '600', color: t.text, textAlign: 'center' }}>
-                        {brand}
-                      </Text>
+                      <Text style={{ fontSize: 9, fontWeight: '600', color: t.text, textAlign: 'center' }}>{brand}</Text>
                     </TouchableOpacity>
                   );
                 })}
@@ -421,27 +459,19 @@ export default function SearchScreen() {
           <View style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <Ionicons name="cash-outline" size={16} color={t.accent} />
-              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Price Range</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>{i18nT('search.priceRange')}</Text>
             </View>
             <Text style={{ fontSize: 13, color: t.subtext, marginBottom: 8 }}>
               {priceRange[0]} TL – {priceRange[1]} TL
             </Text>
             <MultiSlider
               values={[priceRange[0], priceRange[1]]}
-              min={0}
-              max={5000}
-              step={10}
+              min={0} max={5000} step={10}
               onValuesChange={(vals) => setPriceRange(vals)}
               sliderLength={SCREEN_WIDTH - 80}
               selectedStyle={{ backgroundColor: t.accent }}
               unselectedStyle={{ backgroundColor: t.border }}
-              markerStyle={{
-                backgroundColor: t.accent,
-                width: 22, height: 22, borderRadius: 11,
-                borderWidth: 3, borderColor: '#fff',
-                shadowColor: '#000', shadowOpacity: 0.2,
-                shadowRadius: 4, shadowOffset: { width: 0, height: 2 },
-              }}
+              markerStyle={{ backgroundColor: t.accent, width: 22, height: 22, borderRadius: 11, borderWidth: 3, borderColor: '#fff', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } }}
               containerStyle={{ alignSelf: 'center' }}
             />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 2 }}>
@@ -454,26 +484,19 @@ export default function SearchScreen() {
           <View style={{ marginBottom: 24 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <Ionicons name="checkmark-circle-outline" size={16} color={t.accent} />
-              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Availability</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>{i18nT('search.availability')}</Text>
             </View>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {(['all', 'instock', 'outofstock'] as const).map((opt) => {
                 const active = availability === opt;
-                const label = opt === 'all' ? 'All' : opt === 'instock' ? 'In Stock' : 'Out of Stock';
+                const label = opt === 'all' ? i18nT('search.all') : opt === 'instock' ? i18nT('search.inStock') : i18nT('search.outOfStock');
                 return (
                   <TouchableOpacity
                     key={opt}
                     onPress={() => setAvailability(opt)}
-                    style={{
-                      flex: 1, paddingVertical: 10, borderRadius: 10,
-                      backgroundColor: active ? t.accent : t.sheetBg,
-                      borderWidth: 1, borderColor: active ? t.accent : t.border,
-                      alignItems: 'center',
-                    }}
+                    style={{ flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: active ? t.accent : t.sheetBg, borderWidth: 1, borderColor: active ? t.accent : t.border, alignItems: 'center' }}
                   >
-                    <Text style={{ color: active ? '#fff' : t.chipText, fontSize: 13, fontWeight: '500' }}>
-                      {label}
-                    </Text>
+                    <Text style={{ color: active ? '#fff' : t.chipText, fontSize: 13, fontWeight: '500' }}>{label}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -484,28 +507,20 @@ export default function SearchScreen() {
           <View style={{ marginBottom: 32 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <Ionicons name="swap-vertical-outline" size={16} color={t.accent} />
-              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Sort By</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>{i18nT('search.sortBy')}</Text>
             </View>
-            {sortOptions.map((opt) => {
-              const active = selectedSort === opt;
+            {sortOptionKeys.map(({ key, i18nKey }) => {
+              const active = selectedSort === key;
               return (
                 <TouchableOpacity
-                  key={opt}
-                  onPress={() => setSelectedSort(opt)}
+                  key={key}
+                  onPress={() => setSelectedSort(key)}
                   style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 }}
                 >
-                  <View style={{
-                    width: 18, height: 18, borderRadius: 9,
-                    borderWidth: 2, borderColor: active ? t.accent : t.border,
-                    alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {active && (
-                      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: t.accent }} />
-                    )}
+                  <View style={{ width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: active ? t.accent : t.border, alignItems: 'center', justifyContent: 'center' }}>
+                    {active && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: t.accent }} />}
                   </View>
-                  <Text style={{ color: active ? t.accent : t.text, fontSize: 14, fontWeight: active ? '600' : '400' }}>
-                    {opt}
-                  </Text>
+                  <Text style={{ color: active ? t.accent : t.text, fontSize: 14, fontWeight: active ? '600' : '400' }}>{i18nT(i18nKey)}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -515,27 +530,16 @@ export default function SearchScreen() {
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <TouchableOpacity
               onPress={resetFilters}
-              style={{
-                flex: 1, height: 50, borderRadius: 14,
-                borderWidth: 1, borderColor: t.border,
-                alignItems: 'center', justifyContent: 'center',
-                flexDirection: 'row', gap: 6,
-              }}
+              style={{ flex: 1, height: 50, borderRadius: 14, borderWidth: 1, borderColor: t.border, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6 }}
             >
               <Ionicons name="refresh-outline" size={16} color={t.text} />
-              <Text style={{ color: t.text, fontWeight: '600' }}>Reset</Text>
+              <Text style={{ color: t.text, fontWeight: '600' }}>{i18nT('search.reset')}</Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               onPress={closeFilter}
-              style={{
-                flex: 2, height: 50, borderRadius: 14,
-                backgroundColor: t.accent,
-                alignItems: 'center', justifyContent: 'center',
-                flexDirection: 'row', gap: 6,
-              }}
+              style={{ flex: 2, height: 50, borderRadius: 14, backgroundColor: t.accent, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6 }}
             >
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Apply Filters</Text>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>{i18nT('search.applyFilters')}</Text>
               <Ionicons name="arrow-forward" size={16} color="#fff" />
             </TouchableOpacity>
           </View>

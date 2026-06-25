@@ -15,11 +15,12 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useCart } from '@/context/CartContext';
 import { productSections } from '@/constants/ProductData';
+import { useLocale, t } from '@/lib/i18n';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AMBER = '#f5a623';
 
-// ─── BANNER ───────────────────────────────────────────────────────
+//  Banner slidess
 const bannerSlides = [
   { id: '1', topLabel: 'Power Your',  title: 'PROJECTS',  subtitle: 'Top quality electronics\nfor makers & engineers', backgroundColor: '#0e2a5a', accentColor: AMBER },
   { id: '2', topLabel: 'Explore',     title: 'ARDUINO',   subtitle: 'Boards, modules & sensors\nfor every project',    backgroundColor: '#0a3d2e', accentColor: '#2ecc71' },
@@ -27,7 +28,7 @@ const bannerSlides = [
   { id: '4', topLabel: 'Sound Your',  title: 'WORLD',     subtitle: 'Speakers, mixers &\naudio systems',              backgroundColor: '#1a003a', accentColor: '#a855f7' },
 ];
 
-// ─── CATEGORIES ───────────────────────────────────────────────────
+//categories
 const categories = [
   { id: '1',  name: 'Solar',        icon: 'sunny-outline',            color: '#f5a623' },
   { id: '2',  name: 'Electronics',  icon: 'flash-outline',            color: '#2ecc71' },
@@ -46,7 +47,7 @@ const categories = [
   { id: '15', name: 'Spray Gum',    icon: 'color-fill-outline',       color: '#84cc16' },
 ];
 
-// ─── BRANDS ───────────────────────────────────────────────────────
+// brandes
 const brands = [
   { id: '1', name: 'ARDUINO',   color: '#00979d' },
   { id: '2', name: 'ESPRESSIF', color: '#e3342f' },
@@ -57,14 +58,14 @@ const brands = [
   { id: '7', name: 'MARXLOW',   color: '#06b6d4' },
 ];
 
-// ─── PRODUCT SECTIONS (real prices from alemdarteknik.com) ────────
 
-// ─── REPAIR SERVICE CARD ──────────────────────────────────────────
+
+// ─── REPAIR SERVICE CARD
 const repairSteps = [
-  { icon: 'call-outline',         label: 'You call'          },
-  { icon: 'bicycle-outline',      label: 'We pick it up'     },
-  { icon: 'construct-outline',    label: 'We fix it'         },
-  { icon: 'home-outline',         label: 'Back at your door' },
+  { icon: 'call-outline',         labelKey: 'home.repair.step1' },
+  { icon: 'bicycle-outline',      labelKey: 'home.repair.step2' },
+  { icon: 'construct-outline',    labelKey: 'home.repair.step3' },
+  { icon: 'home-outline',         labelKey: 'home.repair.step4' },
 ];
 
 function RepairServiceCard({ isDark, BORDER }: any) {
@@ -79,21 +80,21 @@ function RepairServiceCard({ isDark, BORDER }: any) {
 
       {/* Title */}
       <Text style={{ fontSize: 18, fontWeight: '800', color: textDark, marginBottom: 2 }}>
-        Runs on electricity?
+        {t('home.repair.title')}
       </Text>
       <Text style={{ fontSize: 18, fontWeight: '800', color: AMBER, marginBottom: 16 }}>
-        We fix it.
+        {t('home.repair.subtitle')}
       </Text>
 
       {/* Steps */}
       <RNView style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 18 }}>
         {repairSteps.map((step, index) => (
-          <RNView key={step.label} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <RNView key={step.labelKey} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
             <RNView style={{ alignItems: 'center', flex: 1 }}>
               <RNView style={{ width: 40, height: 40, borderRadius: 10, borderWidth: 1, borderColor: isDark ? '#3a2a0a' : '#d4c4a0', alignItems: 'center', justifyContent: 'center', marginBottom: 5, backgroundColor: isDark ? '#221a08' : '#ede3ce' }}>
                 <Ionicons name={step.icon as any} size={18} color={AMBER} />
               </RNView>
-              <Text style={{ fontSize: 9, color: subText, textAlign: 'center', fontWeight: '500' }}>{step.label}</Text>
+              <Text style={{ fontSize: 9, color: subText, textAlign: 'center', fontWeight: '500' }}>{t(step.labelKey)}</Text>
             </RNView>
             {index < repairSteps.length - 1 && (
               <Text style={{ color: AMBER, fontSize: 12, marginBottom: 14, opacity: 0.6 }}>→</Text>
@@ -104,7 +105,7 @@ function RepairServiceCard({ isDark, BORDER }: any) {
 
       {/* Phone input */}
       <Text style={{ fontSize: 11, color: subText, marginBottom: 8 }}>
-        Leave your number — we'll call you
+        {t('home.repair.leaveNumber')}
       </Text>
       <RNView style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: inputBg, borderRadius: 10, borderWidth: 1, borderColor: BORDER, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12 }}>
         <Text style={{ fontSize: 13, fontWeight: '700', color: textDark, marginRight: 6 }}>TR +90</Text>
@@ -127,15 +128,16 @@ function RepairServiceCard({ isDark, BORDER }: any) {
         style={{ backgroundColor: AMBER, borderRadius: 10, paddingVertical: 13, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 }}
       >
         <Ionicons name="call-outline" size={16} color="#000" />
-        <Text style={{ fontSize: 14, fontWeight: '800', color: '#000' }}>Call me back · Beni Ara</Text>
+        <Text style={{ fontSize: 14, fontWeight: '800', color: '#000' }}>{t('home.repair.callBack')}</Text>
       </TouchableOpacity>
 
     </RNView>
   );
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────
+//  MAIN COMPONENT 
 export default function HomeScreen() {
+  useLocale();
   const router = useRouter();
   const { addToCart, totalItems } = useCart();
   const scheme  = useColorScheme();
@@ -182,7 +184,7 @@ export default function HomeScreen() {
         <Text style={{ fontSize: 30, fontWeight: '900', color: item.accentColor, letterSpacing: 1, marginTop: 2 }}>{item.title}</Text>
         <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 4, lineHeight: 16 }}>{item.subtitle}</Text>
         <TouchableOpacity style={{ marginTop: 12, alignSelf: 'flex-start', backgroundColor: item.accentColor, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 }}>
-          <Text style={{ color: '#000', fontSize: 11, fontWeight: '700' }}>Shop Now →</Text>
+          <Text style={{ color: '#000', fontSize: 11, fontWeight: '700' }}>{t('shopNow')}</Text>
         </TouchableOpacity>
       </RNView>
       <RNView style={{ width: 90, alignItems: 'center', justifyContent: 'center' }}>
@@ -220,13 +222,13 @@ export default function HomeScreen() {
           }}
           style={{ backgroundColor: AMBER, borderRadius: 8, paddingVertical: 7, alignItems: 'center' }}
         >
-          <Text style={{ color: '#000', fontSize: 10, fontWeight: '700' }}>Add to Cart</Text>
+          <Text style={{ color: '#000', fontSize: 10, fontWeight: '700' }}>{t('addToCart')}</Text>
         </TouchableOpacity>
       </RNView>
     </TouchableOpacity>
   );
 
-  // ── Product Section ──────────────────────────────────────────
+  //  Product Section
   const renderSection = (section: typeof productSections[0]) => (
     <RNView key={section.id} style={{ marginBottom: 32 }}>
       <RNView style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 16, marginBottom: 4 }}>
@@ -238,7 +240,7 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 11, color: SUBTEXT, marginTop: 3, marginLeft: 12 }}>{section.subtitle}</Text>
         </RNView>
         <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}>
-          <Text style={{ fontSize: 12, fontWeight: '600', color: section.accentColor }}>View All</Text>
+          <Text style={{ fontSize: 12, fontWeight: '600', color: section.accentColor }}>{t('viewAll')}</Text>
           <Ionicons name="arrow-forward" size={13} color={section.accentColor} />
         </TouchableOpacity>
       </RNView>
@@ -248,7 +250,7 @@ export default function HomeScreen() {
     </RNView>
   );
 
-  // ─── RENDER ──────────────────────────────────────────────────
+  // RENDER
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: HEADER_BG }} edges={['top']}>
 
@@ -260,7 +262,7 @@ export default function HomeScreen() {
           </Text>
           <RNView style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 2 }}>
             <Ionicons name="location-sharp" size={14} color={AMBER} />
-            <Text style={{ fontSize: 10, color: SUBTEXT }}>Lefkoşa, KKTC</Text>
+            <Text style={{ fontSize: 10, color: SUBTEXT }}>{t('home.location')}</Text>
           </RNView>
         </RNView>
 
@@ -286,7 +288,7 @@ export default function HomeScreen() {
       <RNView style={{ flexDirection: 'row', gap: 8, backgroundColor: HEADER_BG, paddingHorizontal: 16, paddingBottom: 14 }}>
         <RNView style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: SEARCH_BG, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10 }}>
           <Ionicons name="search" size={16} color={SEARCH_PH} style={{ marginRight: 8 }} />
-          <TextInput value={searchText} onChangeText={setSearchText} placeholder="Search Arduino, solar, cables..." placeholderTextColor={SEARCH_PH} style={{ flex: 1, fontSize: 13, color: SEARCH_TC }} />
+          <TextInput value={searchText} onChangeText={setSearchText} placeholder={t('home.searchPlaceholder')} placeholderTextColor={SEARCH_PH} style={{ flex: 1, fontSize: 13, color: SEARCH_TC }} />
         </RNView>
         <TouchableOpacity style={{ width: 42, height: 42, borderRadius: 10, backgroundColor: SEARCH_BG, alignItems: 'center', justifyContent: 'center' }}>
           <Ionicons name="options-outline" size={20} color={ICON_COLOR} />
@@ -315,8 +317,8 @@ export default function HomeScreen() {
 
         {/* CATEGORIES */}
         <RNView style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 16, marginBottom: 12 }}>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: TEXT }}>Categories</Text>
-          <TouchableOpacity><Text style={{ fontSize: 12, fontWeight: '600', color: AMBER }}>View All</Text></TouchableOpacity>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: TEXT }}>{t('home.categories')}</Text>
+          <TouchableOpacity><Text style={{ fontSize: 12, fontWeight: '600', color: AMBER }}>{t('viewAll')}</Text></TouchableOpacity>
         </RNView>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 16 }}>
           {categories.map(cat => (
@@ -331,8 +333,8 @@ export default function HomeScreen() {
 
         {/* BRANDS */}
         <RNView style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 28, marginBottom: 12 }}>
-          <Text style={{ fontSize: 18, fontWeight: '700', color: TEXT }}>Featured Brands</Text>
-          <TouchableOpacity><Text style={{ fontSize: 12, fontWeight: '600', color: AMBER }}>View All</Text></TouchableOpacity>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: TEXT }}>{t('home.brands')}</Text>
+          <TouchableOpacity><Text style={{ fontSize: 12, fontWeight: '600', color: AMBER }}>{t('viewAll')}</Text></TouchableOpacity>
         </RNView>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}>
           {brands.map(brand => (
@@ -357,7 +359,7 @@ export default function HomeScreen() {
         {/* SOCIAL FOOTER */}
         <RNView style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 16 }}>
           <Text style={{ fontSize: 11, color: SUBTEXT, textAlign: 'center', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12 }}>
-            Follow us & find us
+            {t('home.followUs')}
           </Text>
           <RNView style={{ flexDirection: 'row', gap: 10 }}>
             {/* Facebook */}
@@ -411,7 +413,7 @@ export default function HomeScreen() {
 
           {/* Copyright */}
           <Text style={{ fontSize: 11, color: SUBTEXT, textAlign: 'center', marginTop: 16, marginBottom: 8 }}>
-            © 2026 Alemdar Teknik · Lefkoşa, KKTC
+            {t('home.copyright')}
           </Text>
         </RNView>
 

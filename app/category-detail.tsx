@@ -9,8 +9,10 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocale } from '@/lib/i18n';
 
 export default function CategoryDetail() {
+  useLocale();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
