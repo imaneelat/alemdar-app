@@ -101,14 +101,14 @@ export default function SearchScreen() {
   );
   const isSearching = query.length > 0;
 
-  // ── Focus → auto-open keyboard
+  //  Focus → auto opn keyboard
   useFocusEffect(
     useCallback(() => {
       setTimeout(() => inputRef.current?.focus(), 100);
     }, [])
   );
 
-  // ── Handlers
+  //  Handlers
   const handleCategoryPress = (categoryName: string) => {
     router.push({
       pathname: '/category-detail',
