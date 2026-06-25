@@ -92,6 +92,5 @@ export default function TabLayout() {
       </Tabs>
       <PrivacySheet visible={sheet === 'privacy'} onClose={closeSheets} />
       <LanguageSheet visible={sheet === 'language'} onClose={closeSheets} />
-    </GestureHandlerRootView  >
-  );
+</GestureHandlerRootView>);
 }

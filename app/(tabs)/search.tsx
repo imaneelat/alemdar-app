@@ -1,258 +1,551 @@
+import { useState, useRef, useCallback, useMemo } from 'react';
 import {
   View,
-  TextInput,
-  StyleSheet,
   FlatList,
   Text,
   TouchableOpacity,
-  useColorScheme,
   StatusBar,
+  TextInput,
+  ScrollView,
+  useColorScheme,
+  Dimensions,
 } from 'react-native';
-import { useState, useRef, useCallback } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router'; // Changed to useRouter
-import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+} from '@gorhom/bottom-sheet';
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
-// Category data with just names - super clean and easy to maintain
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
 const categories = [
-  'Solar',
-  'Electronics',
-  'Arduino',
-  'Sound',
-  'Chargers',
-  'Adapters',
-  'Lamps',
-  'Filaments',
-  'TV Remotes',
-  'Mexxsun',
-  'Fans',
-  'Electric',
-  'Spray & Gum',
-  'Screwdrivers',
+  'Solar', 'Electronics', 'Arduino', 'Sound', 'Chargers',
+  'Adapters', 'Lamps', 'Filaments', 'TV Remotes', 'Mexxsun',
+  'Fans', 'Electric', 'Spray & Gum', 'Screwdrivers',
 ];
 
-// Color palette for category icons , later replace them with real pictures from wesbite
-const categoryColors: Record<string, string> = {
-  'Solar': '#FF6B35',
-  'Electronics': '#4A90D9',
-  'Arduino': '#00979D',
-  'Sound': '#8B5CF6',
-  'Chargers': '#10B981',
-  'Adapters': '#F59E0B',
-  'Lamps': '#FCD34D',
-  'Filaments': '#EF4444',
-  'TV Remotes': '#6366F1',
-  'Mexxsun': '#F97316',
-  'Fans': '#06B6D4',
-  'Electric': '#8B5CF6',
-  'Spray & Gum': '#EC4899',
-  'Screwdrivers': '#6B7280',
+
+
+const INITIAL_RECENT = ['arduino uno', 'esp32', 'servo motor', 'lcd display'];
+
+const popularSearches = [
+  'Arduino Uno R4', 'Esp32 Dev Kit', 'Raspberry Pi 4',
+  'OLED Display', 'DHT22 Sensor', 'Jumper Wires',
+];
+
+const filterCategories = [
+  'Arduino', 'ESP32', 'Sensors', 'Solar', 'Modules', 'Boards', 'Components',
+];
+
+const brands = ['Arduino', 'Espressif', 'Raspberry', 'ToMaTeD', 'Seeed'];
+
+const brandEmoji: Record<string, string> = {
+  Arduino: '.', Espressif: '.', Raspberry: '.', ToMaTeD: '.', Seeed: '.',
 };
 
-// Sample product data for each category
-const categoryProducts: Record<string, Array<{id: string, name: string, price: string, description: string}>> = {
-  'Solar': [
-    { id: '1', name: 'Solar Panel 100W', price: '$89.99', description: 'High-efficiency monocrystalline solar panel' },
-    { id: '2', name: 'Solar Charge Controller', price: '$34.99', description: 'PWM charge controller for solar systems' },
-    { id: '3', name: 'Solar Inverter', price: '$199.99', description: 'Pure sine wave inverter for solar power' },
-  ],
-  'Electronics': [
-    { id: '4', name: 'Multimeter', price: '$29.99', description: 'Digital multimeter with auto-ranging' },
-    { id: '5', name: 'Oscilloscope', price: '$349.99', description: 'Portable digital oscilloscope' },
-    { id: '6', name: 'Power Supply', price: '$79.99', description: 'Adjustable DC power supply' },
-  ],
-  'Arduino': [
-    { id: '7', name: 'Arduino Uno', price: '$24.99', description: 'Original Arduino Uno R3 board' },
-    { id: '8', name: 'Arduino Mega', price: '$39.99', description: 'Arduino Mega 2560 with more pins' },
-    { id: '9', name: 'Sensor Kit', price: '$49.99', description: '37-in-1 sensor kit for Arduino' },
-  ],
-};
+const sortOptions = [
+  'Popularity',
+  'Price: Low → High',
+  'Price: High → Low',
+  'New Arrivals',
+];
 
-// Fallback products for categories without data
-const getCategoryProducts = (categoryName: string) => {
-  return categoryProducts[categoryName] || [
-    { id: '0', name: `${categoryName} Product 1`, price: '$29.99', description: `Sample ${categoryName} product` },
-    { id: '1', name: `${categoryName} Product 2`, price: '$49.99', description: `Another ${categoryName} product` },
-    { id: '2', name: `${categoryName} Product 3`, price: '$79.99', description: `Premium ${categoryName} product` },
-  ];
-};
+const getCategoryProducts = (categoryName: string) => ([
+  { id: '0', name: `${categoryName} Product 1`, price: '$29.99', description: `Sample ${categoryName} product` },
+  { id: '1', name: `${categoryName} Product 2`, price: '$49.99', description: `Another ${categoryName} product` },
+]);
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function SearchScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const router = useRouter(); // Use Expo Router's useRouter
+  const router = useRouter();
 
+  // ── State
   const [query, setQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [selectedFilterCat, setSelectedFilterCat] = useState('Arduino');
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [availability, setAvailability] = useState<'all' | 'instock' | 'outofstock'>('instock');
+  const [selectedSort, setSelectedSort] = useState('Popularity');
+  const [priceRange, setPriceRange] = useState([160, 2500]);
+
   const inputRef = useRef<TextInput>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ['88%'], []);
 
-  const bg        = isDark ? '#000'    : '#f2f2f7';
-  const cardBg    = isDark ? '#1c1c1e' : '#ffffff';
-  const textColor = isDark ? '#fff'    : '#000';
-  const subText   = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)';
-  const inputBg   = isDark ? '#1c1c1e' : '#ffffff';
-  const separator = isDark ? '#2c2c2e' : '#e5e5e5';
+  // ── Theme tokens
+  const t = {
+    bg:       isDark ? '#0A0A0A' : '#F5F5F5',
+    border:   isDark ? '#2A2A2A' : '#E8E8E8',
+    text:     isDark ? '#FFFFFF' : '#111111',
+    subtext:  '#888888',
+    inputBg:  isDark ? '#1A1A1A' : '#FFFFFF',
+    chipBg:   isDark ? '#252525' : '#EFEFEF',
+    chipText: isDark ? '#CCCCCC' : '#444444',
+    accent:   '#F97316',
+    sheet:    isDark ? '#161616' : '#FFFFFF',
+    sheetBg:  isDark ? '#1E1E1E' : '#F5F5F5',
+  };
 
+  // ── Derived
   const filtered = categories.filter((name) =>
     name.toLowerCase().includes(query.toLowerCase())
   );
+  const isSearching = query.length > 0;
 
+  //  Focus → auto opn keyboard
   useFocusEffect(
     useCallback(() => {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
+      setTimeout(() => inputRef.current?.focus(), 100);
     }, [])
   );
 
-  const isSearching = query.length > 0;
-
-  // Get first letter for the icon
-  const getInitial = (name: string) => {
-    return name.charAt(0).toUpperCase();
-  };
-
-  // Navigate to category detail page using Expo Router
+  //  Handlers
   const handleCategoryPress = (categoryName: string) => {
     router.push({
       pathname: '/category-detail',
       params: {
-        categoryName: categoryName,
-        categoryColor: categoryColors[categoryName] || '#6B7280',
+        categoryName,
+    
         products: JSON.stringify(getCategoryProducts(categoryName)),
-      }
+      },
     });
   };
 
+  const saveSearch = (term: string) => {
+    const trimmed = term.trim();
+    if (!trimmed) return;
+    setRecentSearches((prev) => [trimmed, ...prev.filter((s) => s !== trimmed)].slice(0, 10));
+  };
+
+  const handleCancel = () => {
+    setQuery('');
+    inputRef.current?.blur();
+  };
+
+  const openFilter  = () => bottomSheetRef.current?.expand();
+  const closeFilter = () => bottomSheetRef.current?.close();
+
+  const resetFilters = () => {
+    setSelectedFilterCat('Arduino');
+    setSelectedBrand(null);
+    setAvailability('all');
+    setSelectedSort('Popularity');
+    setPriceRange([160, 2500]);
+  };
+
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+      />
+    ),
+    []
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bg }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
-      {/* Search Bar - Now at the very top */}
-      <View style={[styles.searchContainer, { backgroundColor: inputBg }]}>
-        <Ionicons name="search" size={18} color={subText} style={{ marginRight: 8 }} />
-        <TextInput
-          ref={inputRef}
-          style={[styles.searchInput, { color: textColor }]}
-          placeholder="Search for products, categories..."
-          placeholderTextColor={isDark ? '#555' : '#aaa'}
-          value={query}
-          onChangeText={setQuery}
-        />
-        {query.length > 0 && (
-          <TouchableOpacity onPress={() => setQuery('')}>
-            <Ionicons name="close-circle" size={18} color={isDark ? '#555' : '#aaa'} />
+      {/* ── Search Bar ── */}
+      <View style={{
+        flexDirection: 'row', alignItems: 'center',
+        paddingHorizontal: 16, marginTop: 12, marginBottom: 8, gap: 10,
+      }}>
+        <View style={{
+          flex: 1, flexDirection: 'row', alignItems: 'center',
+          backgroundColor: t.inputBg, borderRadius: 14,
+          paddingHorizontal: 14, height: 48,
+          borderWidth: 1, borderColor: t.border,
+        }}>
+          <Ionicons name="search" size={18} color={t.subtext} style={{ marginRight: 10 }} />
+          <TextInput
+            ref={inputRef}
+            style={{ flex: 1, fontSize: 15, color: t.text }}
+            placeholder="Search products, categories..."
+            placeholderTextColor={t.subtext}
+            value={query}
+            onChangeText={setQuery}
+            onSubmitEditing={() => saveSearch(query)}
+            returnKeyType="search"
+          />
+          {/* Filter trigger inside bar */}
+          <TouchableOpacity onPress={openFilter} style={{ marginLeft: 8 }}>
+            <Ionicons name="options-outline" size={20} color={t.accent} />
           </TouchableOpacity>
-        )}
+        </View>
+
+        {/* Cancel */}
+        <TouchableOpacity onPress={handleCancel} hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}>
+          <Text style={{ color: t.accent, fontSize: 15, fontWeight: '600' }}>Cancel</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Results / Categories List */}
+      {/* ── Content ── */}
       <FlatList
-        data={filtered}
+        data={isSearching ? filtered : []}
         keyExtractor={(item) => item}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+
+        ListHeaderComponent={
+          !isSearching ? (
+            <ScrollView showsVerticalScrollIndicator={false}>
+
+              {/* Recent Searches */}
+              <View style={{ paddingHorizontal: 16, marginTop: 20 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <Text style={{
+                    fontSize: 13, fontWeight: '700', color: t.subtext,
+                    letterSpacing: 0.8, textTransform: 'uppercase',
+                  }}>
+                    Recent Searches
+                  </Text>
+                  {recentSearches.length > 0 && (
+                    <TouchableOpacity onPress={() => setRecentSearches([])}>
+                      <Text style={{ fontSize: 13, color: t.accent, fontWeight: '600' }}>Clear all</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {recentSearches.length === 0 ? (
+                  <Text style={{ color: t.subtext, fontSize: 13 }}>No recent searches</Text>
+                ) : (
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                    {recentSearches.map((item) => (
+                      <TouchableOpacity
+                        key={item}
+                        onPress={() => setQuery(item)}
+                        style={{
+                          flexDirection: 'row', alignItems: 'center', gap: 6,
+                          backgroundColor: t.chipBg, borderRadius: 20,
+                          paddingHorizontal: 14, paddingVertical: 8,
+                        }}
+                      >
+                        <Ionicons name="time-outline" size={14} color={t.subtext} />
+                        <Text style={{ color: t.chipText, fontSize: 13 }}>{item}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Popular Searches */}
+              <View style={{ paddingHorizontal: 16, marginTop: 28 }}>
+                <Text style={{
+                  fontSize: 13, fontWeight: '700', color: t.subtext,
+                  letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 12,
+                }}>
+                  Popular Searches
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {popularSearches.map((item) => (
+                    <TouchableOpacity
+                      key={item}
+                      onPress={() => { setQuery(item); saveSearch(item); }}
+                      style={{
+                        backgroundColor: t.chipBg, borderRadius: 20,
+                        paddingHorizontal: 14, paddingVertical: 8,
+                        borderWidth: 1, borderColor: t.border,
+                      }}
+                    >
+                      <Text style={{ color: t.chipText, fontSize: 13 }}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+            </ScrollView>
+          ) : (
+            <Text style={{ color: t.subtext, fontSize: 13, paddingHorizontal: 16, paddingTop: 12 }}>
+              {filtered.length} results for "{query}"
+            </Text>
+          )
+        }
+
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={[styles.resultRow, { backgroundColor: cardBg }]}
-            activeOpacity={0.7}
             onPress={() => handleCategoryPress(item)}
+            activeOpacity={0.7}
+            style={{
+              flexDirection: 'row', alignItems: 'center',
+              paddingHorizontal: 16, paddingVertical: 12,
+              backgroundColor: t.bg, gap: 14,
+            }}
           >
-            {/* Colorful Icon Box */}
-            <View style={[
-              styles.iconBox, 
-              { backgroundColor: categoryColors[item] || '#6B7280' }
-            ]}>
-              <Text style={styles.iconText}>{getInitial(item)}</Text>
+            <View style={{
+              width: 44, height: 44, borderRadius: 12,
+              
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Text style={{ color: '#F97316', fontWeight: '700', fontSize: 17 }}>
+                {item.charAt(0)}
+              </Text>
             </View>
-
-            {/* Name */}
-            <Text style={[styles.resultText, { color: textColor }]}>{item}</Text>
-
-            {/* Arrow */}
-            <Ionicons name="chevron-forward" size={18} color={isDark ? '#444' : '#ccc'} />
+            <Text style={{ flex: 1, fontSize: 15, fontWeight: '500', color: t.text }}>{item}</Text>
+            <Ionicons name="chevron-forward" size={16} color={t.subtext} />
           </TouchableOpacity>
         )}
+
         ItemSeparatorComponent={() => (
-          <View style={{ height: 1, backgroundColor: separator }} />
+          <View style={{ height: 1, backgroundColor: t.border, marginLeft: 74 }} />
         )}
-        ListEmptyComponent={() => (
-          <View style={styles.emptyContainer}>
-            <Text style={{ fontSize: 40, marginBottom: 12 }}>🔍</Text>
-            <Text style={[styles.emptyText, { color: subText }]}>
-              No results for "{query}"
-            </Text>
-          </View>
-        )}
+
+        ListEmptyComponent={() =>
+          isSearching ? (
+            <View style={{ alignItems: 'center', marginTop: 80, gap: 12 }}>
+              <Text style={{ fontSize: 40 }}>🔍</Text>
+              <Text style={{ color: t.subtext, fontSize: 15 }}>No results for "{query}"</Text>
+              <Text style={{ color: t.subtext, fontSize: 13 }}>Try a different keyword</Text>
+            </View>
+          ) : null
+        }
       />
+
+      {/* ── Filter Bottom Sheet ── */}
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        backdropComponent={renderBackdrop}
+        backgroundStyle={{ backgroundColor: t.sheet }}
+        handleIndicatorStyle={{ backgroundColor: t.border, width: 40 }}
+      >
+        <BottomSheetScrollView
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={{
+            fontSize: 18, fontWeight: '700', color: t.text,
+            marginBottom: 24, textAlign: 'center',
+          }}>
+            Filters
+          </Text>
+
+          {/* Categories */}
+          <View style={{ marginBottom: 24 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <Ionicons name="grid-outline" size={16} color={t.accent} />
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Categories</Text>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {filterCategories.map((cat) => {
+                  const active = selectedFilterCat === cat;
+                  return (
+                    <TouchableOpacity
+                      key={cat}
+                      onPress={() => setSelectedFilterCat(cat)}
+                      style={{
+                        flexDirection: 'row', alignItems: 'center', gap: 4,
+                        paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
+                        backgroundColor: active ? t.accent : t.sheetBg,
+                        borderWidth: 1, borderColor: active ? t.accent : t.border,
+                      }}
+                    >
+                      {active && <Ionicons name="checkmark" size={13} color="#fff" />}
+                      <Text style={{ color: active ? '#fff' : t.chipText, fontSize: 13, fontWeight: '500' }}>
+                        {cat}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+                {/* More chip */}
+                <TouchableOpacity style={{
+                  flexDirection: 'row', alignItems: 'center', gap: 4,
+                  paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
+                  backgroundColor: t.sheetBg, borderWidth: 1, borderColor: t.border,
+                }}>
+                  <Text style={{ color: t.chipText, fontSize: 13, fontWeight: '500' }}>More</Text>
+                  <Ionicons name="chevron-down" size={12} color={t.chipText} />
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* Brands */}
+          <View style={{ marginBottom: 24 }}>
+            <View style={{
+              flexDirection: 'row', alignItems: 'center',
+              justifyContent: 'space-between', marginBottom: 12,
+            }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Ionicons name="pricetag-outline" size={16} color={t.accent} />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Brands</Text>
+              </View>
+              <TouchableOpacity>
+                <Text style={{ fontSize: 13, color: t.accent }}>View All</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                {brands.map((brand) => {
+                  const active = selectedBrand === brand;
+                  return (
+                    <TouchableOpacity
+                      key={brand}
+                      onPress={() => setSelectedBrand(active ? null : brand)}
+                      style={{
+                        width: 64, height: 64, borderRadius: 12,
+                        backgroundColor: t.sheetBg,
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 2, borderColor: active ? t.accent : t.border,
+                      }}
+                    >
+                      <Text style={{ fontSize: 20, marginBottom: 2 }}>{brandEmoji[brand]}</Text>
+                      <Text style={{ fontSize: 9, fontWeight: '600', color: t.text, textAlign: 'center' }}>
+                        {brand}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* Price Range */}
+          <View style={{ marginBottom: 24 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Ionicons name="cash-outline" size={16} color={t.accent} />
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Price Range</Text>
+            </View>
+            <Text style={{ fontSize: 13, color: t.subtext, marginBottom: 8 }}>
+              {priceRange[0]} TL – {priceRange[1]} TL
+            </Text>
+            <MultiSlider
+              values={[priceRange[0], priceRange[1]]}
+              min={0}
+              max={5000}
+              step={10}
+              onValuesChange={(vals) => setPriceRange(vals)}
+              sliderLength={SCREEN_WIDTH - 80}
+              selectedStyle={{ backgroundColor: t.accent }}
+              unselectedStyle={{ backgroundColor: t.border }}
+              markerStyle={{
+                backgroundColor: t.accent,
+                width: 22, height: 22, borderRadius: 11,
+                borderWidth: 3, borderColor: '#fff',
+                shadowColor: '#000', shadowOpacity: 0.2,
+                shadowRadius: 4, shadowOffset: { width: 0, height: 2 },
+              }}
+              containerStyle={{ alignSelf: 'center' }}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 2 }}>
+              <Text style={{ fontSize: 11, color: t.subtext }}>0 TL</Text>
+              <Text style={{ fontSize: 11, color: t.subtext }}>5000 TL</Text>
+            </View>
+          </View>
+
+          {/* Availability */}
+          <View style={{ marginBottom: 24 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <Ionicons name="checkmark-circle-outline" size={16} color={t.accent} />
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Availability</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {(['all', 'instock', 'outofstock'] as const).map((opt) => {
+                const active = availability === opt;
+                const label = opt === 'all' ? 'All' : opt === 'instock' ? 'In Stock' : 'Out of Stock';
+                return (
+                  <TouchableOpacity
+                    key={opt}
+                    onPress={() => setAvailability(opt)}
+                    style={{
+                      flex: 1, paddingVertical: 10, borderRadius: 10,
+                      backgroundColor: active ? t.accent : t.sheetBg,
+                      borderWidth: 1, borderColor: active ? t.accent : t.border,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ color: active ? '#fff' : t.chipText, fontSize: 13, fontWeight: '500' }}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Sort By */}
+          <View style={{ marginBottom: 32 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <Ionicons name="swap-vertical-outline" size={16} color={t.accent} />
+              <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>Sort By</Text>
+            </View>
+            {sortOptions.map((opt) => {
+              const active = selectedSort === opt;
+              return (
+                <TouchableOpacity
+                  key={opt}
+                  onPress={() => setSelectedSort(opt)}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 }}
+                >
+                  <View style={{
+                    width: 18, height: 18, borderRadius: 9,
+                    borderWidth: 2, borderColor: active ? t.accent : t.border,
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {active && (
+                      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: t.accent }} />
+                    )}
+                  </View>
+                  <Text style={{ color: active ? t.accent : t.text, fontSize: 14, fontWeight: active ? '600' : '400' }}>
+                    {opt}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* Buttons */}
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <TouchableOpacity
+              onPress={resetFilters}
+              style={{
+                flex: 1, height: 50, borderRadius: 14,
+                borderWidth: 1, borderColor: t.border,
+                alignItems: 'center', justifyContent: 'center',
+                flexDirection: 'row', gap: 6,
+              }}
+            >
+              <Ionicons name="refresh-outline" size={16} color={t.text} />
+              <Text style={{ color: t.text, fontWeight: '600' }}>Reset</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={closeFilter}
+              style={{
+                flex: 2, height: 50, borderRadius: 14,
+                backgroundColor: t.accent,
+                alignItems: 'center', justifyContent: 'center',
+                flexDirection: 'row', gap: 6,
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Apply Filters</Text>
+              <Ionicons name="arrow-forward" size={16} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+        </BottomSheetScrollView>
+      </BottomSheet>
 
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    height: 50,
-    marginTop: 20,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
-  },
-
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-  },
-
-  resultRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 30,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    gap: 14,
-  },
-
-  iconBox: {
-    width: 60,
-    height: 55,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  iconText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-
-  resultText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-  },
-
-  emptyContainer: {
-    alignItems: 'center',
-    marginTop: 60,
-  },
-
-  emptyText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-});
 
 
 
