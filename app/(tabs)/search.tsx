@@ -13,44 +13,31 @@ import {
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import BottomSheet, {
+import {
+  BottomSheetModal,
   BottomSheetScrollView,
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import { Card, Text as PaperText, Button, IconButton } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
-import { productSections } from '@/constants/ProductData';
 import { useWishlist } from '@/context/WishlistContext';
 import { useLocale, t as i18nT } from '@/lib/i18n';
+import { useSearchProducts } from '@/hooks/useSearchProducts';
+import { formatTL } from '@/lib/price';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Flatten all products from productSections 
 
-type FlatProduct = {
-  id: string;
-  name: string;
-  price: string;
-  dec: string;
-  stock: string;
-  low: boolean;
-  sectionId: string;
-  sectionTitle: string;
-  accentColor: string;
+type ApiProduct = {
+  id: number;
+  english_name: string | null;
+  turkish_name: string | null;
+  price: string | null;
+  image_filename: string | null;
+  category: string | null;
 };
-
-const allProducts: FlatProduct[] = productSections.flatMap((section) =>
-  section.products.map((p) => ({
-    ...p,
-    sectionId: section.id,
-    sectionTitle: section.title,
-    accentColor: section.accentColor,
-  }))
-);
-
-// Data
 
 const popularSearches = [
   'Arduino Uno R4', 'Esp32 Dev Kit', 'Raspberry Pi 4',
@@ -74,84 +61,7 @@ const sortOptionKeys = [
   { key: 'New Arrivals',       i18nKey: 'search.newArrivals'  },
 ];
 
-// ─ Product Card 
-function ProductCard({
-  product,
-  isWishlisted,
-  onWishlistToggle,
-  onPress,
-  t,
-}: {
-  product: FlatProduct;
-  isWishlisted: boolean;
-  onWishlistToggle: () => void;
-  onPress: () => void;
-  t: Record<string, string>;
-}) {
-  return (
-    <Card
-      mode="contained"
-      onPress={onPress}
-      style={{ marginHorizontal: 16, marginBottom: 12, backgroundColor: t.cardBg, borderRadius: 14 }}
-    >
-      <View style={{ flexDirection: 'row' }}>
-        {/* Image placeholder + heart */}
-        <View style={{
-          width: 120, height: 130,
-          backgroundColor: t.imageBg,
-          borderTopLeftRadius: 14, borderBottomLeftRadius: 14,
-          overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Ionicons name="image-outline" size={36} color={t.imagePlaceholder} />
-          <IconButton
-            icon={isWishlisted ? 'heart' : 'heart-outline'}
-            iconColor={isWishlisted ? '#e8375a' : '#ccc'}
-            size={20}
-            onPress={(e) => { (e as any).stopPropagation?.(); onWishlistToggle(); }}
-            style={{ position: 'absolute', top: 0, left: 0, backgroundColor: t.cardBg, margin: 6, borderRadius: 20 }}
-          />
-        </View>
-
-        {/* Details */}
-        <Card.Content style={{ flex: 1, paddingVertical: 12, paddingHorizontal: 12, gap: 4 }}>
-          {/* Stock status */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-            <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: product.low ? '#f5a623' : '#4caf50' }} />
-            <PaperText variant="labelSmall" style={{ color: product.low ? '#f5a623' : '#4caf50' }}>
-              {product.stock}
-            </PaperText>
-          </View>
-
-          {/* Name */}
-          <PaperText variant="bodyMedium" style={{ color: t.text }} numberOfLines={2}>
-            {product.name}
-          </PaperText>
-
-          {/* Price */}
-          <PaperText variant="titleMedium" style={{ color: t.accent, fontWeight: '700' }}>
-            {product.price}.{product.dec} TL
-          </PaperText>
-
-          {/* Shop Now */}
-          <Button
-            mode="contained"
-            buttonColor={t.accent}
-            textColor="#fff"
-            compact
-            onPress={onPress}
-            icon="arrow-right"
-            contentStyle={{ flexDirection: 'row-reverse' }}
-            labelStyle={{ fontSize: 13 }}
-          >
-            {i18nT('shopNow')}
-          </Button>
-        </Card.Content>
-      </View>
-    </Card>
-  );
-}
-
-// components
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function SearchScreen() {
   useLocale();
@@ -170,7 +80,7 @@ export default function SearchScreen() {
   const [priceRange, setPriceRange] = useState([160, 2500]);
 
   const inputRef = useRef<TextInput>(null);
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['88%'], []);
 
   //  Theme tokens
@@ -190,18 +100,10 @@ export default function SearchScreen() {
     imagePlaceholder: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
   };
 
-  //  filter products by query (name or section title)
-  const filtered = useMemo(
-    () =>
-      allProducts.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query.toLowerCase()) ||
-          p.sectionTitle.toLowerCase().includes(query.toLowerCase())
-      ),
-    [query]
-  );
-
-  const isSearching = query.length > 0;
+  // ── Derived (live API search)
+  const isSearching = query.trim().length > 0;
+  const { data: searchData, isLoading: searchLoading, isError: searchError } = useSearchProducts(query);
+  const results = (searchData?.data ?? []) as unknown as ApiProduct[];
 
   // ── Focus → auto-open keyboard
   useFocusEffect(
@@ -210,13 +112,20 @@ export default function SearchScreen() {
     }, [])
   );
 
-  //  Handlers  , change..
-
-  const handleProductPress = (product: FlatProduct) => {
+  //  Handlers
+  const openProduct = (item: ApiProduct) => {
+    saveSearch(query);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
       pathname: '/product-detail',
-      params: { productId: product.id, categoryId: product.sectionId },
+      params: {
+        productId: String(item.id),
+        section: 'main',
+        name: item.english_name ?? item.turkish_name ?? 'Product',
+        price: item.price ?? '',
+        image: item.image_filename ?? '',
+        category: item.category ?? '',
+      },
     });
   };
 
@@ -231,8 +140,8 @@ export default function SearchScreen() {
     inputRef.current?.blur();
   };
 
-  const openFilter  = () => bottomSheetRef.current?.expand();
-  const closeFilter = () => bottomSheetRef.current?.close();
+  const openFilter  = () => bottomSheetRef.current?.present();
+  const closeFilter = () => bottomSheetRef.current?.dismiss();
 
   const resetFilters = () => {
     setSelectedFilterCat('Arduino');
@@ -289,8 +198,8 @@ export default function SearchScreen() {
 
       {/* ── Content ── */}
       <FlatList
-        data={isSearching ? filtered : []}
-        keyExtractor={(item) => `${item.sectionId}-${item.id}`}
+        data={isSearching ? results : []}
+        keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 24 }}
@@ -349,29 +258,65 @@ export default function SearchScreen() {
 
             </ScrollView>
           ) : (
-            /* ── Results header ── */
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
               <Text style={{ color: t.text, fontSize: 15, fontWeight: '600' }}>{i18nT('search.resultsTitle')}</Text>
-              <Text style={{ color: t.subtext, fontSize: 13 }}>{filtered.length} {i18nT('search.results')}</Text>
+              <Text style={{ color: t.subtext, fontSize: 13 }}>
+                {searchLoading ? '…' : `${results.length} ${i18nT('search.results')}`}
+              </Text>
             </View>
           )
         }
 
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            isWishlisted={isWishlisted(item.id)}
-            onWishlistToggle={() => toggleWishlist(item)}
-            onPress={() => handleProductPress(item)}
-            t={t}
-          />
+        renderItem={({ item }) => {
+          const name = item.english_name ?? item.turkish_name ?? 'Product';
+          const wishlisted = isWishlisted(String(item.id));
+          return (
+            <TouchableOpacity
+              onPress={() => openProduct(item)}
+              activeOpacity={0.7}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: t.bg, gap: 14 }}
+            >
+              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: t.chipBg, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="cube-outline" size={20} color={t.accent} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text numberOfLines={2} style={{ fontSize: 15, fontWeight: '500', color: t.text }}>{name}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: t.accent, marginTop: 2 }}>{formatTL(item.price)}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  toggleWishlist({
+                    id: String(item.id),
+                    name,
+                    price: item.price?.split('.')[0] ?? '0',
+                    dec: item.price?.split('.')[1]?.slice(0, 2) ?? '00',
+                    stock: 'In Stock',
+                    low: false,
+                    sectionId: item.category ?? 'main',
+                    sectionTitle: item.category ?? 'Products',
+                    accentColor: '#f5a623',
+                  });
+                }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name={wishlisted ? 'heart' : 'heart-outline'} size={20} color={wishlisted ? '#e8375a' : t.subtext} />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          );
+        }}
+
+        ItemSeparatorComponent={() => (
+          <View style={{ height: 1, backgroundColor: t.border, marginLeft: 74 }} />
         )}
 
         ListEmptyComponent={() =>
-          isSearching ? (
+          isSearching && !searchLoading ? (
             <View style={{ alignItems: 'center', marginTop: 80, gap: 12 }}>
               <Text style={{ fontSize: 40 }}>🔍</Text>
-              <Text style={{ color: t.subtext, fontSize: 15 }}>{i18nT('search.noResultsFor')} "{query}"</Text>
+              <Text style={{ color: t.subtext, fontSize: 15 }}>
+                {searchError ? 'Search failed. Try again.' : `${i18nT('search.noResultsFor')} "${query}"`}
+              </Text>
               <Text style={{ color: t.subtext, fontSize: 13 }}>{i18nT('search.tryDifferent')}</Text>
             </View>
           ) : null
@@ -379,9 +324,8 @@ export default function SearchScreen() {
       />
 
       {/* ── Filter Bottom Sheet ── */}
-      <BottomSheet
+      <BottomSheetModal
         ref={bottomSheetRef}
-        index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose
         backdropComponent={renderBackdrop}
@@ -545,7 +489,7 @@ export default function SearchScreen() {
           </View>
 
         </BottomSheetScrollView>
-      </BottomSheet>
+      </BottomSheetModal>
 
     </SafeAreaView>
   );
@@ -553,3 +497,4 @@ export default function SearchScreen() {
 
 
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        

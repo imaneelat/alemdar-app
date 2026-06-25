@@ -1,0 +1,428 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model account_membership_profile {
+  user_id            String   @id
+  first_name         String?
+  last_name          String?
+  phone_country_code String   @default("+90")
+  phone_local        String?
+  country            String?
+  city               String?
+  address            String?
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model account_security_preferences {
+  user_id                  String    @id
+  password_last_changed_at DateTime? @db.Timestamptz(6)
+  created_at               DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime  @default(now()) @db.Timestamptz(6)
+}
+
+model account_subscription_preferences {
+  user_id      String   @id
+  email_opt_in Boolean  @default(true)
+  sms_opt_in   Boolean  @default(true)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model adapters {
+  id             Int     @id @default(autoincrement())
+  english_names  String?
+  turkish_names  String?
+  category       String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+  barcode        String?
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model arduino {
+  id               Int      @id @default(autoincrement())
+  english_names    String?  @db.VarChar(255)
+  turkish_names    String?  @db.VarChar(255)
+  category         String?  @db.VarChar(255)
+  barcode          String?  @db.VarChar(255)
+  quantity         Int?
+  price            Decimal? @db.Decimal(10, 2)
+  image_filename   String?
+  description      String?
+  category_layer_1 String?  @db.VarChar
+  category_layer_2 String?  @db.VarChar
+
+  @@index([category], map: "idx_arduino_category", where: raw("((category IS NOT NULL) AND ((category)::text <> ''::text))"))
+  @@index([id, english_names, image_filename, category, quantity, price, description], map: "idx_arduino_id_covering")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model arduino_category_options {
+  id               Int      @id @default(autoincrement())
+  field_name       String
+  label            String
+  normalized_label String?  @default(dbgenerated("lower(btrim(label))"))
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([field_name, normalized_label], map: "arduino_category_options_field_normalized_unique")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model batteries {
+  id             Int      @id @default(autoincrement())
+  model          String   @db.VarChar(255)
+  volt           Decimal  @db.Decimal(4, 1)
+  image_filename String?  @db.VarChar(255)
+  quantity       Int?
+  price          Decimal? @db.Decimal(10, 2)
+  barcode        String?  @db.VarChar
+
+  @@index([barcode], map: "idx_batteries_barcode")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model chargers {
+  id             Int     @id @default(autoincrement())
+  english_names  String?
+  turkish_names  String?
+  category       String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+  barcode        String?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model deployment_updates {
+  id             Int      @id @default(1) @db.SmallInt
+  deployment_key String
+  app_version    String
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model electric {
+  id             Int     @id @default(autoincrement())
+  english_names  String?
+  turkish_names  String?
+  category       String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+  barcode        String? @db.VarChar
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model fans {
+  id             Int     @id @default(autoincrement())
+  english_names  String?
+  turkish_names  String?
+  category       String?
+  barcode        String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model filaments {
+  id             Int      @id @default(autoincrement())
+  name           String
+  brand          String
+  material       String
+  variant        String?
+  color          String
+  net_weight_kg  Decimal  @db.Decimal
+  diameter_mm    Decimal  @db.Decimal
+  quantity       Int?     @default(0)
+  price          Decimal? @db.Decimal
+  image_filename String?
+  barcode        String?  @db.VarChar
+}
+
+model invoice_items {
+  id               Int       @id @default(autoincrement())
+  invoice_id       Int?
+  product_id       Int
+  product_name     String    @db.VarChar(255)
+  quantity         Int
+  unit_price       Decimal   @db.Decimal(10, 2)
+  total_price      Decimal   @db.Decimal(10, 2)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  barcode          String?   @db.VarChar
+  source_table_key String?   @db.VarChar
+  invoices         invoices? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([invoice_id], map: "idx_invoice_items_invoice_id")
+  @@index([invoice_id, source_table_key], map: "idx_invoice_items_invoice_id_source_table_key")
+}
+
+model invoices {
+  id             Int             @id @default(autoincrement())
+  invoice_number String          @db.VarChar(50)
+  date_created   DateTime?       @default(now()) @db.Timestamp(6)
+  total_amount   Decimal         @db.Decimal(10, 2)
+  status         String?         @default("completed") @db.VarChar(20)
+  created_at     DateTime?       @default(now()) @db.Timestamp(6)
+  printed        Boolean         @default(false)
+  undone_at      DateTime?       @db.Timestamp(6)
+  invoice_items  invoice_items[]
+
+  @@index([date_created], map: "idx_invoice_date")
+  @@index([invoice_number], map: "idx_invoice_number")
+  @@index([status, undone_at], map: "idx_invoices_status_undone_at")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model lamps {
+  id             Int     @id @default(autoincrement())
+  english_names  String?
+  turkish_names  String?
+  category       String?
+  barcode        String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+
+  @@index([category], map: "idx_lamps_category", where: raw("((category IS NOT NULL) AND (category <> ''::text))"))
+  @@index([id], map: "idx_lamps_id")
+  @@index([id, english_names, image_filename, category, quantity, price, description], map: "idx_lamps_id_covering")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model main {
+  id                  Int       @id
+  english_name        String?   @db.VarChar
+  turkish_name        String?   @db.VarChar
+  barcode             String?   @db.VarChar
+  kodu                String?
+  price               Decimal?  @db.Decimal(10, 2)
+  whole_price         Decimal?  @db.Decimal
+  bought_price        Decimal?  @db.Decimal
+  doller_bought_price Decimal?  @db.Decimal
+  bought_time         DateTime? @db.Date
+  kalan_miktar        Decimal?  @db.Decimal
+  image_filename      String?
+  category            String?
+  sub_category        String?
+  subsub_category     String?
+  quantity            Decimal?  @db.Decimal
+  description         String?
+
+  @@index([category], map: "idx_main_category", where: raw("(category IS NOT NULL)"))
+  @@index([category], map: "idx_main_category_sound", where: raw("(category = 'Sound'::text)"))
+  @@index([id, english_name, image_filename, category, sub_category, quantity, price, description], map: "idx_main_id_covering", where: raw("(category = 'Sound'::text)"))
+  @@index([sub_category], map: "idx_main_sub_category", where: raw("(sub_category IS NOT NULL)"))
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model mainled {
+  id             Int      @id
+  english_name   String?  @db.VarChar
+  turkish_name   String?  @db.VarChar
+  category       String?  @db.VarChar
+  barcode        String?  @db.VarChar
+  quantity       Int?
+  price          Decimal? @db.Decimal
+  image_filename String?
+  description    String?
+
+  @@index([category], map: "idx_mainled_category", where: raw("((category IS NOT NULL) AND ((category)::text <> ''::text))"))
+  @@index([id], map: "idx_mainled_id")
+  @@index([id, english_name, image_filename, category, quantity, price, description], map: "idx_mainled_id_covering")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model mexxsun {
+  id                Int      @id @default(autoincrement())
+  name              String   @db.VarChar
+  rating            String?  @db.VarChar
+  factory_price     Decimal? @db.Decimal
+  wholesale_price   Decimal? @db.Decimal
+  min_selling_price Decimal? @db.Decimal
+  selling_price     Decimal? @db.Decimal
+  category          String?  @db.VarChar
+  quantity          Int?     @default(0)
+  image_filename    String?  @db.VarChar
+  description       String?  @db.VarChar
+  factor            Float?
+  cost_price        Decimal? @db.Decimal
+  is_new            Boolean? @default(false)
+  barcode           String?  @db.VarChar
+
+  @@index([category], map: "idx_mexxsun_category")
+  @@index([id, name, image_filename, category, quantity, selling_price, description], map: "idx_mexxsun_id_covering")
+  @@index([name], map: "idx_mexxsun_name")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model others {
+  id             Int     @id @default(autoincrement())
+  english_names  String?
+  turkish_names  String?
+  category       String?
+  barcode        String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+}
+
+model product_similars {
+  id                 Int    @id @default(autoincrement())
+  source_section     String
+  source_product_id  Int
+  similar_section    String
+  similar_product_id Int
+
+  @@unique([source_section, source_product_id, similar_section, similar_product_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model repair_callback_requests {
+  id         BigInt   @id @default(autoincrement())
+  phone_e164 String
+  locale     String   @default("en")
+  source     String   @default("home_repair_section")
+  ip_hash    String?
+  user_agent String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([created_at(sort: Desc)])
+  @@index([phone_e164])
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model scrawesdriver {
+  id             Int     @id @default(autoincrement())
+  english_names  String?
+  turkish_names  String?
+  category       String?
+  barcode        String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+
+  @@index([category], map: "idx_scrawesdriver_category", where: raw("((category IS NOT NULL) AND (category <> ''::text))"))
+  @@index([id], map: "idx_scrawesdriver_id")
+  @@index([id, english_names, image_filename, category, quantity, price, description], map: "idx_scrawesdriver_id_covering")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model semantic_embeddings {
+  id           BigInt                 @id @default(autoincrement())
+  source_table String
+  source_id    String
+  name         String
+  description  String?
+  category     String?
+  price        Decimal?               @db.Decimal
+  image_url    String?
+  search_text  String
+  embedding    Unsupported("vector")?
+  content_hash String
+  created_at   DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime               @default(now()) @db.Timestamptz(6)
+
+  @@unique([source_table, source_id], map: "semantic_embeddings_source_unique")
+  @@index([id, source_table, source_id, name, description, category, search_text, price, image_url], map: "idx_semantic_embeddings_bm25")
+  @@index([category])
+  @@index([embedding], map: "semantic_embeddings_embedding_hnsw_idx")
+  @@index([name(ops: raw("gin_trgm_ops"))], map: "semantic_embeddings_name_trgm_idx", type: Gin)
+  @@index([source_table, source_id], map: "semantic_embeddings_source_idx")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model solardb {
+  id                Int      @id @default(autoincrement())
+  name              String   @db.VarChar(255)
+  rating            String?  @db.VarChar(255)
+  factory_price     Decimal? @db.Decimal(10, 2)
+  wholesale_price   Decimal? @db.Decimal(10, 2)
+  min_selling_price Decimal? @db.Decimal(10, 2)
+  selling_price     Decimal? @db.Decimal(10, 2)
+  category          String?  @db.VarChar(100)
+  quantity          Int?     @default(0)
+  image_filename    String?  @db.VarChar
+  description       String?  @db.VarChar
+  factor            Float?
+  cost_price        Decimal? @db.Decimal(10, 2)
+  is_new            Boolean? @default(false)
+  barcode           String?  @db.VarChar
+
+  @@index([category], map: "idx_solardb_category")
+  @@index([id, name, image_filename, category, quantity, selling_price, description], map: "idx_solardb_id_covering")
+  @@index([name], map: "idx_solardb_name")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model sound {
+  english_name        String?   @db.VarChar
+  turkish_name        String?   @db.VarChar
+  barcode             String?   @db.VarChar
+  kodu                String?
+  price               Decimal?  @db.Decimal(10, 2)
+  whole_price         Decimal?  @db.Decimal
+  bought_price        Decimal?  @db.Decimal
+  doller_bought_price Decimal?  @db.Decimal
+  bought_time         DateTime? @db.Date
+  kalan_miktar        Decimal?  @db.Decimal
+  image_filename      String?
+  category            String?
+  sub_category        String?
+  subsub_category     String?
+  quantity            Decimal?  @db.Decimal
+  description         String?
+  id                  Int       @id @default(autoincrement())
+
+  @@index([category], map: "idx_sound_category", where: raw("(category IS NOT NULL)"))
+  @@index([sub_category], map: "idx_sound_sub_category", where: raw("(sub_category IS NOT NULL)"))
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model spray_gum {
+  id             Int     @id @default(autoincrement())
+  english_name   String?
+  turkish_name   String?
+  category       String?
+  barcode        String?
+  quantity       Int?    @default(0)
+  price          String?
+  image_filename String?
+  description    String?
+
+  @@index([category], map: "idx_spray_gum_category", where: raw("((category IS NOT NULL) AND (category <> ''::text))"))
+  @@index([id], map: "idx_spray_gum_id")
+  @@index([id, english_name, image_filename, category, quantity, price, description], map: "idx_spray_gum_id_covering")
+}
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model tv_remotes {
+  id             Int      @id @default(autoincrement())
+  name           String
+  brand          String
+  category       String
+  description    String?
+  specs          Json
+  image_filename String?
+  quantity       Int?     @default(0)
+  price          Decimal? @db.Decimal
+  barcode        String?  @db.VarChar
+}
