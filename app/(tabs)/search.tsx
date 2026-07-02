@@ -9,13 +9,13 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
+  Keyboard,
   ScrollView,
   StatusBar,
   Text,
@@ -24,6 +24,12 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import RangeSlider from "react-native-fast-range-slider";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -38,6 +44,8 @@ type ApiProduct = {
   image_filename: string | null;
   category: string | null;
 };
+
+type AvailabilityFilter = "all" | "instock" | "outofstock";
 
 const popularSearches = [
   "Arduino Uno R4",
@@ -89,9 +97,8 @@ export default function SearchScreen() {
   const { toggleWishlist, isWishlisted } = useWishlist();
   const [selectedFilterCat, setSelectedFilterCat] = useState("Arduino");
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-  const [availability, setAvailability] = useState<
-    "all" | "instock" | "outofstock"
-  >("instock");
+  const [availability, setAvailability] =
+    useState<AvailabilityFilter>("instock");
   const [selectedSort, setSelectedSort] = useState("Popularity");
   const [priceRange, setPriceRange] = useState([160, 2500]);
 
@@ -129,6 +136,7 @@ export default function SearchScreen() {
   useFocusEffect(
     useCallback(() => {
       setTimeout(() => inputRef.current?.focus(), 100);
+      return () => Keyboard.dismiss();
     }, []),
   );
 
@@ -162,7 +170,10 @@ export default function SearchScreen() {
     inputRef.current?.blur();
   };
 
-  const openFilter = () => bottomSheetRef.current?.present();
+  const openFilter = () => {
+    Keyboard.dismiss();
+    bottomSheetRef.current?.present();
+  };
   const closeFilter = () => bottomSheetRef.current?.dismiss();
 
   const resetFilters = () => {
@@ -202,7 +213,8 @@ export default function SearchScreen() {
           gap: 10,
         }}
       >
-        <View
+        <Animated.View
+          layout={LinearTransition.duration(250)}
           style={{
             flex: 1,
             flexDirection: "row",
@@ -234,16 +246,25 @@ export default function SearchScreen() {
           <TouchableOpacity onPress={openFilter} style={{ marginLeft: 8 }}>
             <Ionicons name="options-outline" size={20} color={t.accent} />
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
-        <TouchableOpacity
-          onPress={handleCancel}
-          hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
-        >
-          <Text style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}>
-            {i18nT("search.cancel")}
-          </Text>
-        </TouchableOpacity>
+        {isSearching && (
+          <Animated.View
+            entering={FadeIn.duration(200)}
+            exiting={FadeOut.duration(150)}
+          >
+            <TouchableOpacity
+              onPress={handleCancel}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+            >
+              <Text
+                style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}
+              >
+                {i18nT("search.cancel")}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
       </View>
 
       {/* ── Content ── */}
@@ -254,17 +275,89 @@ export default function SearchScreen() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 24 }}
         ListHeaderComponent={
-          !isSearching ? (
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {/* Recent Searches */}
-              <View style={{ paddingHorizontal: 16, marginTop: 20 }}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginBottom: 12,
-                  }}
-                >
+          <Animated.View
+            key={isSearching ? "results-header" : "idle-header"}
+            entering={FadeIn.duration(250)}
+            exiting={FadeOut.duration(200)}
+          >
+            {!isSearching ? (
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {/* Recent Searches */}
+                <View style={{ paddingHorizontal: 16, marginTop: 20 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      marginBottom: 12,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "700",
+                        color: t.subtext,
+                        letterSpacing: 0.8,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {i18nT("search.recentSearches")}
+                    </Text>
+                    {recentSearches.length > 0 && (
+                      <TouchableOpacity onPress={() => setRecentSearches([])}>
+                        <Text
+                          style={{
+                            fontSize: 13,
+                            color: t.accent,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {i18nT("search.clearAll")}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  {recentSearches.length === 0 ? (
+                    <Text style={{ color: t.subtext, fontSize: 13 }}>
+                      {i18nT("search.noRecent")}
+                    </Text>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        gap: 8,
+                      }}
+                    >
+                      {recentSearches.slice(0, 8).map((item) => (
+                        <TouchableOpacity
+                          key={item}
+                          onPress={() => setQuery(item)}
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 6,
+                            backgroundColor: t.chipBg,
+                            borderRadius: 20,
+                            paddingHorizontal: 14,
+                            paddingVertical: 8,
+                          }}
+                        >
+                          <Ionicons
+                            name="time-outline"
+                            size={14}
+                            color={t.subtext}
+                          />
+                          <Text style={{ color: t.chipText, fontSize: 13 }}>
+                            {item}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
+
+                {/* Popular Searches */}
+                <View style={{ paddingHorizontal: 16, marginTop: 28 }}>
                   <Text
                     style={{
                       fontSize: 13,
@@ -272,122 +365,62 @@ export default function SearchScreen() {
                       color: t.subtext,
                       letterSpacing: 0.8,
                       textTransform: "uppercase",
+                      marginBottom: 12,
                     }}
                   >
-                    {i18nT("search.recentSearches")}
+                    {i18nT("search.popularSearches")}
                   </Text>
-                  {recentSearches.length > 0 && (
-                    <TouchableOpacity onPress={() => setRecentSearches([])}>
-                      <Text
-                        style={{
-                          fontSize: 13,
-                          color: t.accent,
-                          fontWeight: "600",
-                        }}
-                      >
-                        {i18nT("search.clearAll")}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                {recentSearches.length === 0 ? (
-                  <Text style={{ color: t.subtext, fontSize: 13 }}>
-                    {i18nT("search.noRecent")}
-                  </Text>
-                ) : (
                   <View
                     style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}
                   >
-                    {recentSearches.map((item) => (
+                    {popularSearches.map((item) => (
                       <TouchableOpacity
                         key={item}
-                        onPress={() => setQuery(item)}
+                        onPress={() => {
+                          setQuery(item);
+                          saveSearch(item);
+                        }}
                         style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: 6,
                           backgroundColor: t.chipBg,
                           borderRadius: 20,
                           paddingHorizontal: 14,
                           paddingVertical: 8,
+                          borderWidth: 1,
+                          borderColor: t.border,
                         }}
                       >
-                        <Ionicons
-                          name="time-outline"
-                          size={14}
-                          color={t.subtext}
-                        />
                         <Text style={{ color: t.chipText, fontSize: 13 }}>
                           {item}
                         </Text>
                       </TouchableOpacity>
                     ))}
                   </View>
-                )}
-              </View>
-
-              {/* Popular Searches */}
-              <View style={{ paddingHorizontal: 16, marginTop: 28 }}>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontWeight: "700",
-                    color: t.subtext,
-                    letterSpacing: 0.8,
-                    textTransform: "uppercase",
-                    marginBottom: 12,
-                  }}
-                >
-                  {i18nT("search.popularSearches")}
-                </Text>
-                <View
-                  style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}
-                >
-                  {popularSearches.map((item) => (
-                    <TouchableOpacity
-                      key={item}
-                      onPress={() => {
-                        setQuery(item);
-                        saveSearch(item);
-                      }}
-                      style={{
-                        backgroundColor: t.chipBg,
-                        borderRadius: 20,
-                        paddingHorizontal: 14,
-                        paddingVertical: 8,
-                        borderWidth: 1,
-                        borderColor: t.border,
-                      }}
-                    >
-                      <Text style={{ color: t.chipText, fontSize: 13 }}>
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
                 </View>
+              </ScrollView>
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingHorizontal: 16,
+                  paddingTop: 12,
+                  paddingBottom: 8,
+                }}
+              >
+                <Text
+                  style={{ color: t.text, fontSize: 15, fontWeight: "600" }}
+                >
+                  {i18nT("search.resultsTitle")}
+                </Text>
+                <Text style={{ color: t.subtext, fontSize: 13 }}>
+                  {searchLoading
+                    ? "…"
+                    : `${results.length} ${i18nT("search.results")}`}
+                </Text>
               </View>
-            </ScrollView>
-          ) : (
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingHorizontal: 16,
-                paddingTop: 12,
-                paddingBottom: 8,
-              }}
-            >
-              <Text style={{ color: t.text, fontSize: 15, fontWeight: "600" }}>
-                {i18nT("search.resultsTitle")}
-              </Text>
-              <Text style={{ color: t.subtext, fontSize: 13 }}>
-                {searchLoading
-                  ? "…"
-                  : `${results.length} ${i18nT("search.results")}`}
-              </Text>
-            </View>
-          )
+            )}
+          </Animated.View>
         }
         renderItem={({ item }) => {
           const name = item.english_name ?? item.turkish_name ?? "Product";
@@ -437,6 +470,7 @@ export default function SearchScreen() {
               </View>
               <TouchableOpacity
                 onPress={() => {
+                  Keyboard.dismiss();
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   toggleWishlist({
                     id: String(item.id),
@@ -669,29 +703,36 @@ export default function SearchScreen() {
             <Text style={{ fontSize: 13, color: t.subtext, marginBottom: 8 }}>
               {priceRange[0]} TL – {priceRange[1]} TL
             </Text>
-            <MultiSlider
-              values={[priceRange[0], priceRange[1]]}
-              min={0}
-              max={5000}
-              step={10}
-              onValuesChange={(vals) => setPriceRange(vals)}
-              sliderLength={SCREEN_WIDTH - 80}
-              selectedStyle={{ backgroundColor: t.accent }}
-              unselectedStyle={{ backgroundColor: t.border }}
-              markerStyle={{
-                backgroundColor: t.accent,
-                width: 22,
-                height: 22,
-                borderRadius: 11,
-                borderWidth: 3,
-                borderColor: "#fff",
-                shadowColor: "#000",
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                shadowOffset: { width: 0, height: 2 },
-              }}
-              containerStyle={{ alignSelf: "center" }}
-            />
+            <View style={{ alignItems: "center" }}>
+              <RangeSlider
+                min={0}
+                max={5000}
+                step={10}
+                initialMinValue={priceRange[0]}
+                initialMaxValue={priceRange[1]}
+                width={SCREEN_WIDTH - 80}
+                thumbSize={24}
+                trackHeight={4}
+                minimumDistance={50}
+                selectedTrackStyle={{ backgroundColor: t.accent }}
+                unselectedTrackStyle={{ backgroundColor: t.border }}
+                thumbStyle={{
+                  backgroundColor: t.accent,
+                  borderWidth: 3,
+                  borderColor: "#fff",
+                  shadowColor: "#000",
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  shadowOffset: { width: 0, height: 2 },
+                }}
+                pressedThumbStyle={{ transform: [{ scale: 1.15 }] }}
+                onValuesChange={(vals: [number, number]) =>
+                  setPriceRange([Math.round(vals[0]), Math.round(vals[1])])
+                }
+                leftThumbAccessibilityLabel="Minimum price"
+                rightThumbAccessibilityLabel="Maximum price"
+              />
+            </View>
             <View
               style={{
                 flexDirection: "row",
