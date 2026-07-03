@@ -15,6 +15,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const PAGE_SIZE = 20;
 
@@ -50,7 +51,7 @@ export default function CategoryDetail() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={[styles.container, { backgroundColor: bg }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: bg }]} edges={["top"]}>
         <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
         {/* Header */}
@@ -127,13 +128,13 @@ export default function CategoryDetail() {
             }
           />
         )}
-      </View>
+      </SafeAreaView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 40 },
+  container: { flex: 1 },
   center: {
     flex: 1,
     alignItems: "center",
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 8,
     marginBottom: 8,
-    marginTop: 20,
+    marginTop: 4,
     paddingHorizontal: 16,
   },
   backButton: { padding: 4, marginRight: 8 },

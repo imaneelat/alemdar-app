@@ -14,6 +14,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import "react-native-reanimated";
 
 export { ErrorBoundary } from "expo-router";
@@ -52,44 +53,46 @@ function RootLayoutNav() {
   const [queryClient] = useState(createQueryClient);
 
   return (
-    <LanguageProvider>
-      <PersistQueryClientProvider
-        client={queryClient}
-        persistOptions={persistOptions}
-      >
-        <WishlistProvider>
-          <CartProvider>
-            <ThemeProvider
-              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="product-detail"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen name="cart" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="help-center"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="help/faq"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="address-edit"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="modal"
-                  options={{ presentation: "modal" }}
-                />
-              </Stack>
-            </ThemeProvider>
-          </CartProvider>
-        </WishlistProvider>
-      </PersistQueryClientProvider>
-    </LanguageProvider>
+    <SafeAreaProvider>
+      <LanguageProvider>
+        <PersistQueryClientProvider
+          client={queryClient}
+          persistOptions={persistOptions}
+        >
+          <WishlistProvider>
+            <CartProvider>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                <Stack>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="product-detail"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen name="cart" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="help-center"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="help/faq"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="address-edit"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="modal"
+                    options={{ presentation: "modal" }}
+                  />
+                </Stack>
+              </ThemeProvider>
+            </CartProvider>
+          </WishlistProvider>
+        </PersistQueryClientProvider>
+      </LanguageProvider>
+    </SafeAreaProvider>
   );
 }
