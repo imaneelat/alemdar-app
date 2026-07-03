@@ -8,8 +8,8 @@ export async function GET(request: Request) {
   const section = url.searchParams.get('section');
   const limit = parseIntParam(url.searchParams.get('limit'), 20, { max: 100 });
 
-  if (q.length < 2) {
-    return error('Query "q" must be at least 2 characters', 400);
+  if (q.length < 1) {
+    return error('Query "q" must be at least 1 character', 400);
   }
 
   try {
