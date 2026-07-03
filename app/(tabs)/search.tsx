@@ -13,6 +13,7 @@ import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   Keyboard,
@@ -128,7 +129,9 @@ export default function SearchScreen() {
   const {
     data: searchData,
     isLoading: searchLoading,
+    isRefetching: searchRefetching,
     isError: searchError,
+    refetch: refetchSearch,
   } = useSearchProducts(query);
   const results = (searchData?.data ?? []) as unknown as ApiProduct[];
 
@@ -274,6 +277,12 @@ export default function SearchScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 24 }}
+        refreshing={isSearching && searchRefetching}
+        onRefresh={() => {
+          if (isSearching) {
+            void refetchSearch();
+          }
+        }}
         ListHeaderComponent={
           <Animated.View
             key={isSearching ? "results-header" : "idle-header"}
@@ -415,7 +424,7 @@ export default function SearchScreen() {
                 </Text>
                 <Text style={{ color: t.subtext, fontSize: 13 }}>
                   {searchLoading
-                    ? "…"
+                    ? "..."
                     : `${results.length} ${i18nT("search.results")}`}
                 </Text>
               </View>
@@ -501,7 +510,14 @@ export default function SearchScreen() {
           />
         )}
         ListEmptyComponent={() =>
-          isSearching && !searchLoading ? (
+          isSearching && searchLoading ? (
+            <View style={{ alignItems: "center", marginTop: 80, gap: 12 }}>
+              <ActivityIndicator size="large" color={t.accent} />
+              <Text style={{ color: t.subtext, fontSize: 13 }}>
+                Searching...
+              </Text>
+            </View>
+          ) : isSearching ? (
             <View style={{ alignItems: "center", marginTop: 80, gap: 12 }}>
               <Text style={{ fontSize: 40 }}>🔍</Text>
               <Text style={{ color: t.subtext, fontSize: 15 }}>

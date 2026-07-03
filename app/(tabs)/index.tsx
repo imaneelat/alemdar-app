@@ -1,3 +1,5 @@
+import FacebookIcon from "@/assets/icons/facebook.svg";
+import InstagramIcon from "@/assets/icons/instagram.svg";
 import { HomeProductSection } from "@/components/HomeProductSection";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
@@ -6,20 +8,29 @@ import { HOME_SECTIONS } from "@/lib/section-meta";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dimensions,
-  FlatList,
   View as RNView,
   ScrollView,
   TextInput,
   TouchableOpacity,
   useColorScheme,
 } from "react-native";
+import {
+  Extrapolation,
+  interpolate,
+  useSharedValue,
+} from "react-native-reanimated";
+import Carousel, {
+  ICarouselInstance,
+  Pagination,
+} from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const AMBER = "#f5a623";
+const BANNER_HEIGHT = 200;
 
 //  Banner slidess
 const bannerSlides = [
@@ -360,23 +371,16 @@ export default function HomeScreen() {
   const SEARCH_BG = isDark ? "#0B1525" : "#f0f0f5";
   const ICON_COLOR = isDark ? "#ffffff" : "#111111";
   const SEARCH_PH = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
-  const SEARCH_TC = isDark ? "#ffffff" : "#111111";
+  // const SEARCH_TC = isDark ? "#ffffff" : "#111111";
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const bannerRef = useRef<FlatList>(null);
+  const bannerProgress = useSharedValue(0);
+  const bannerRef = useRef<ICarouselInstance>(null);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const next = (currentSlide + 1) % bannerSlides.length;
-      bannerRef.current?.scrollToIndex({ index: next, animated: true });
-      setCurrentSlide(next);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [currentSlide]);
-
-  const onBannerScroll = (e: any) => {
-    const idx = Math.round(e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 32));
-    setCurrentSlide(idx);
+  const onPressBannerPagination = (index: number) => {
+    bannerRef.current?.scrollTo({
+      count: index - bannerProgress.value,
+      animated: true,
+    });
   };
 
   // ── Banner Slide ─────────────────────────────────────────────
@@ -384,7 +388,7 @@ export default function HomeScreen() {
     <RNView
       style={{
         width: SCREEN_WIDTH - 32,
-        height: 170,
+        height: BANNER_HEIGHT,
         borderRadius: 12,
         backgroundColor: item.backgroundColor,
         flexDirection: "row",
@@ -596,46 +600,69 @@ export default function HomeScreen() {
       >
         {/* BANNER */}
         <RNView style={{ marginHorizontal: 16, marginBottom: 4 }}>
-          <FlatList
+          <Carousel
             ref={bannerRef}
+            loop
+            autoPlay
+            pagingEnabled
+            snapEnabled
+            width={SCREEN_WIDTH - 32}
+            height={BANNER_HEIGHT}
+            autoPlayInterval={3500}
             data={bannerSlides}
-            horizontal
-            pagingEnabled={false}
-            snapToInterval={SCREEN_WIDTH - 32}
-            decelerationRate="fast"
-            showsHorizontalScrollIndicator={false}
-            onScroll={onBannerScroll}
-            scrollEventThrottle={16}
-            keyExtractor={(item) => item.id}
+            onProgressChange={(_, absoluteProgress) => {
+              bannerProgress.value = absoluteProgress;
+            }}
             renderItem={renderBannerSlide}
-            getItemLayout={(_, index) => ({
-              length: SCREEN_WIDTH - 32,
-              offset: (SCREEN_WIDTH - 32) * index,
-              index,
-            })}
           />
-          <RNView
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
+          <Pagination.Custom
+            progress={bannerProgress}
+            data={bannerSlides}
+            size={7}
+            dotStyle={{
+              width: 7,
+              height: 7,
+              borderRadius: 4,
+              backgroundColor: isDark ? "#3a3a3a" : "#ccc",
+            }}
+            activeDotStyle={{
+              width: 20,
+              height: 7,
+              borderRadius: 4,
+              backgroundColor: AMBER,
+            }}
+            containerStyle={{
               gap: 6,
               paddingTop: 10,
               paddingBottom: 4,
+              alignItems: "center",
+              justifyContent: "center",
             }}
-          >
-            {bannerSlides.map((_, i) => (
-              <RNView
-                key={i}
-                style={{
-                  height: 7,
-                  borderRadius: 4,
-                  width: i === currentSlide ? 20 : 7,
-                  backgroundColor:
-                    i === currentSlide ? AMBER : isDark ? "#3a3a3a" : "#ccc",
-                }}
-              />
-            ))}
-          </RNView>
+            horizontal
+            onPress={onPressBannerPagination}
+            customReanimatedStyle={(progress, index, length) => {
+              "worklet";
+
+              let distance = Math.abs(progress - index);
+
+              if (index === 0 && progress > length - 1) {
+                distance = Math.abs(progress - length);
+              }
+
+              return {
+                transform: [
+                  {
+                    scale: interpolate(
+                      distance,
+                      [0, 1],
+                      [1.08, 1],
+                      Extrapolation.CLAMP,
+                    ),
+                  },
+                ],
+              };
+            }}
+          />
         </RNView>
 
         {/* CATEGORIES */}
@@ -827,22 +854,8 @@ export default function HomeScreen() {
                 borderColor: BORDER,
               }}
             >
-              <RNView
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  backgroundColor: "#1877F2",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={{ fontSize: 16, fontWeight: "800", color: "#fff" }}
-                >
-                  f
-                </Text>
-              </RNView>
+              <FacebookIcon width={32} height={32} />
+
               <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
                 Facebook
               </Text>
@@ -871,18 +884,8 @@ export default function HomeScreen() {
                 borderColor: BORDER,
               }}
             >
-              <RNView
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  backgroundColor: "#E1306C",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Ionicons name="logo-instagram" size={18} color="#fff" />
-              </RNView>
+              <InstagramIcon width={32} height={32} />
+
               <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
                 Instagram
               </Text>
