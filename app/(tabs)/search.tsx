@@ -1,8 +1,8 @@
 import { CachedImage } from "@/components/CachedImage";
 import { useWishlist } from "@/context/WishlistContext";
 import { useSearchProducts } from "@/hooks/useSearchProducts";
-import { t as i18nT, useLocale } from "@/lib/i18n";
 import type { UniversalSearchItem } from "@/lib/api-types";
+import { t as i18nT, useLocale } from "@/lib/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import {
   BottomSheetBackdrop,
@@ -708,7 +708,7 @@ export default function SearchScreen() {
             </ScrollView>
           </View>
 
-          {/* Brands — no background color, just logo + border */}
+          {/* Brands — no background color, just logo + border
           <View style={{ marginBottom: 24 }}>
             <View
               style={{
@@ -793,7 +793,7 @@ export default function SearchScreen() {
               </View>
             </ScrollView>
           </View>
-
+ */}
           {/* Price Range */}
           <View style={{ marginBottom: 24 }}>
             <View
