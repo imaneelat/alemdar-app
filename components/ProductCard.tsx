@@ -55,10 +55,6 @@ function ProductCardBase({ product, sectionTitle, accentColor = AMBER, width = 1
       params: {
         productId: id,
         section: product.section,
-        name,
-        price: product.price ?? '',
-        image: imageUrl ?? '',
-        category: categoryLabel,
       },
     });
   };
