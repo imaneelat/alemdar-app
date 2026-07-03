@@ -225,7 +225,6 @@ export default function SearchScreen() {
 
   //  Handlers
   const openProduct = (item: ApiProduct) => {
-    const imageUrl = resolveImageUrl(item.image_filename);
     saveSearch(query);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
