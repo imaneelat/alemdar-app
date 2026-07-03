@@ -1,3 +1,5 @@
+import FacebookIcon from "@/assets/icons/facebook.svg";
+import InstagramIcon from "@/assets/icons/instagram.svg";
 import { HomeProductSection } from "@/components/HomeProductSection";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
@@ -827,22 +829,8 @@ export default function HomeScreen() {
                 borderColor: BORDER,
               }}
             >
-              <RNView
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  backgroundColor: "#1877F2",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={{ fontSize: 16, fontWeight: "800", color: "#fff" }}
-                >
-                  f
-                </Text>
-              </RNView>
+              <FacebookIcon width={32} height={32} />
+
               <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
                 Facebook
               </Text>
@@ -871,18 +859,8 @@ export default function HomeScreen() {
                 borderColor: BORDER,
               }}
             >
-              <RNView
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  backgroundColor: "#E1306C",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Ionicons name="logo-instagram" size={18} color="#fff" />
-              </RNView>
+              <InstagramIcon width={32} height={32} />
+
               <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
                 Instagram
               </Text>
