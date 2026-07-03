@@ -9,6 +9,7 @@ export { useSections } from './useSections';
 export { useSectionProducts } from './useSectionProducts';
 export { useProducts, type ProductsFilters } from './useProducts';
 export { useProduct } from './useProduct';
+export { useProductDetail } from './useProductDetail';
 export { useSearchProducts } from './useSearchProducts';
 export { useCategories } from './useCategories';
 export { useSectionCategories } from './useSectionCategories';

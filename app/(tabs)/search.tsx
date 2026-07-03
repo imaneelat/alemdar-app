@@ -2,8 +2,7 @@ import { CachedImage } from "@/components/CachedImage";
 import { useWishlist } from "@/context/WishlistContext";
 import { useSearchProducts } from "@/hooks/useSearchProducts";
 import { t as i18nT, useLocale } from "@/lib/i18n";
-import { resolveImageUrl } from "@/lib/image-url";
-import { formatTL } from "@/lib/price";
+import type { UniversalSearchItem } from "@/lib/api-types";
 import { Ionicons } from "@expo/vector-icons";
 import {
   BottomSheetBackdrop,
@@ -55,16 +54,7 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-// Flatten all products from productSections
-
-type ApiProduct = {
-  id: number;
-  english_name: string | null;
-  turkish_name: string | null;
-  price: string | null;
-  image_filename: string | null;
-  category: string | null;
-};
+type ApiProduct = UniversalSearchItem;
 
 type AvailabilityFilter = "all" | "instock" | "outofstock";
 
@@ -208,41 +198,22 @@ export default function SearchScreen() {
     if (selectedCategories.length > 0) {
       list = list.filter((item) =>
         selectedCategories.some(
-          (cat) => item.category?.toLowerCase() === cat.toLowerCase(),
+          (cat) => item.section.toLowerCase() === cat.toLowerCase(),
         ),
       );
     }
 
     if (selectedBrands.length > 0) {
       list = list.filter((item) => {
-        const name = (
-          item.english_name ??
-          item.turkish_name ??
-          ""
-        ).toLowerCase();
+        const name = item.title.toLowerCase();
         return selectedBrands.some((brand) =>
           name.includes(brand.toLowerCase()),
         );
       });
     }
 
-    list = list.filter((item) => {
-      const price = parseFloat(item.price ?? "0");
-      return price >= priceRange[0] && price <= priceRange[1];
-    });
-
-    if (selectedSort === "Price: Low → High") {
-      list.sort(
-        (a, b) => parseFloat(a.price ?? "0") - parseFloat(b.price ?? "0"),
-      );
-    } else if (selectedSort === "Price: High → Low") {
-      list.sort(
-        (a, b) => parseFloat(b.price ?? "0") - parseFloat(a.price ?? "0"),
-      );
-    }
-
     return list;
-  }, [results, selectedCategories, selectedBrands, priceRange, selectedSort]);
+  }, [results, selectedCategories, selectedBrands]);
 
   // ── Focus → auto-open keyboard
   useFocusEffect(
@@ -254,18 +225,13 @@ export default function SearchScreen() {
 
   //  Handlers
   const openProduct = (item: ApiProduct) => {
-    const imageUrl = resolveImageUrl(item.image_filename);
     saveSearch(query);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
       pathname: "/product-detail",
       params: {
         productId: String(item.id),
-        section: "main",
-        name: item.english_name ?? item.turkish_name ?? "Product",
-        price: item.price ?? "",
-        image: imageUrl ?? "",
-        category: item.category ?? "",
+        section: item.tableKey,
       },
     });
   };
@@ -542,9 +508,8 @@ export default function SearchScreen() {
           </Animated.View>
         }
         renderItem={({ item }) => {
-          const name = item.english_name ?? item.turkish_name ?? "Product";
-          const imageUrl = resolveImageUrl(item.image_filename);
-          console.log(imageUrl);
+          const name = item.title;
+          const imageUrl = item.image;
           const wishlisted = isWishlisted(String(item.id));
           return (
             <TouchableOpacity
@@ -591,12 +556,12 @@ export default function SearchScreen() {
                 <Text
                   style={{
                     fontSize: 13,
-                    fontWeight: "700",
-                    color: t.accent,
+                    fontWeight: "600",
+                    color: t.subtext,
                     marginTop: 2,
                   }}
                 >
-                  {formatTL(item.price)}
+                  {item.section}
                 </Text>
               </View>
               <TouchableOpacity
@@ -606,12 +571,12 @@ export default function SearchScreen() {
                   toggleWishlist({
                     id: String(item.id),
                     name,
-                    price: item.price?.split(".")[0] ?? "0",
-                    dec: item.price?.split(".")[1]?.slice(0, 2) ?? "00",
+                    price: "0",
+                    dec: "00",
                     stock: "In Stock",
                     low: false,
-                    sectionId: item.category ?? "main",
-                    sectionTitle: item.category ?? "Products",
+                    sectionId: item.tableKey,
+                    sectionTitle: item.section,
                     accentColor: "#f5a623",
                   });
                 }}
