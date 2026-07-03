@@ -24,6 +24,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { Chip, RadioButton, SegmentedButtons } from "react-native-paper";
 import RangeSlider from "react-native-fast-range-slider";
 import Animated, {
   FadeIn,
@@ -31,6 +32,23 @@ import Animated, {
   LinearTransition,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Path } from "react-native-svg";
+import {
+  siAdafruit,
+  siAmd,
+  siApple,
+  siArduino,
+  siAsus,
+  siBosch,
+  siBroadcom,
+  siDell,
+  siEspressif,
+  siHp,
+  siHuawei,
+  siIntel,
+  siJbl,
+  siRaspberrypi,
+} from "simple-icons";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -66,15 +84,48 @@ const filterCategories = [
   "Components",
 ];
 
-const brands = ["Arduino", "Espressif", "Raspberry", "ToMaTeD", "Seeed"];
+const brands = [
+  "Arduino",
+  "Espressif",
+  "Raspberry Pi",
+  "Adafruit",
+  "Apple",
+  "Dell",
+  "HP",
+  "Huawei",
+  "ASUS",
+  "Intel",
+  "AMD",
+  "Bosch",
+  "Broadcom",
+  "JBL",
+];
 
-const brandEmoji: Record<string, string> = {
-  Arduino: ".",
-  Espressif: ".",
-  Raspberry: ".",
-  ToMaTeD: ".",
-  Seeed: ".",
+const brandLogos: Record<string, { path: string; hex: string }> = {
+  Arduino: siArduino,
+  Espressif: siEspressif,
+  "Raspberry Pi": siRaspberrypi,
+  Adafruit: siAdafruit,
+  Apple: siApple,
+  Dell: siDell,
+  HP: siHp,
+  Huawei: siHuawei,
+  ASUS: siAsus,
+  Intel: siIntel,
+  AMD: siAmd,
+  Bosch: siBosch,
+  Broadcom: siBroadcom,
+  JBL: siJbl,
 };
+
+function BrandLogo({ brand, size }: { brand: string; size: number }) {
+  const icon = brandLogos[brand];
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d={icon.path} fill={`#${icon.hex}`} />
+    </Svg>
+  );
+}
 
 const sortOptionKeys = [
   { key: "Popularity", i18nKey: "search.popularity" },
@@ -95,8 +146,8 @@ export default function SearchScreen() {
   const [query, setQuery] = useState("");
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const { toggleWishlist, isWishlisted } = useWishlist();
-  const [selectedFilterCat, setSelectedFilterCat] = useState("Arduino");
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [availability, setAvailability] =
     useState<AvailabilityFilter>("instock");
   const [selectedSort, setSelectedSort] = useState("Popularity");
@@ -115,12 +166,27 @@ export default function SearchScreen() {
     inputBg: isDark ? "#1A1A1A" : "#FFFFFF",
     chipBg: isDark ? "#252525" : "#EFEFEF",
     chipText: isDark ? "#CCCCCC" : "#444444",
-    accent: "#F97316",
+    accent: "#FF6B00",
     sheet: isDark ? "#161616" : "#FFFFFF",
     sheetBg: isDark ? "#1E1E1E" : "#F5F5F5",
     cardBg: isDark ? "#1A1A1A" : "#FFFFFF",
     imageBg: isDark ? "#242424" : "#F0F0F0",
     imagePlaceholder: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+  };
+
+  // ── Toggle helpers for multi-select
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
+    );
+  };
+
+  const toggleBrand = (brand: string) => {
+    setSelectedBrands((prev) =>
+      prev.includes(brand)
+        ? prev.filter((b) => b !== brand)
+        : [...prev, brand],
+    );
   };
 
   // ── Derived (live API search)
@@ -131,6 +197,49 @@ export default function SearchScreen() {
     isError: searchError,
   } = useSearchProducts(query);
   const results = (searchData?.data ?? []) as unknown as ApiProduct[];
+
+  // ── Live filtering + sorting, applied on top of the raw search results
+  const filteredResults = useMemo(() => {
+    let list = [...results];
+
+    if (selectedCategories.length > 0) {
+      list = list.filter((item) =>
+        selectedCategories.some(
+          (cat) => item.category?.toLowerCase() === cat.toLowerCase(),
+        ),
+      );
+    }
+
+    if (selectedBrands.length > 0) {
+      list = list.filter((item) => {
+        const name = (
+          item.english_name ??
+          item.turkish_name ??
+          ""
+        ).toLowerCase();
+        return selectedBrands.some((brand) =>
+          name.includes(brand.toLowerCase()),
+        );
+      });
+    }
+
+    list = list.filter((item) => {
+      const price = parseFloat(item.price ?? "0");
+      return price >= priceRange[0] && price <= priceRange[1];
+    });
+
+    if (selectedSort === "Price: Low → High") {
+      list.sort(
+        (a, b) => parseFloat(a.price ?? "0") - parseFloat(b.price ?? "0"),
+      );
+    } else if (selectedSort === "Price: High → Low") {
+      list.sort(
+        (a, b) => parseFloat(b.price ?? "0") - parseFloat(a.price ?? "0"),
+      );
+    }
+
+    return list;
+  }, [results, selectedCategories, selectedBrands, priceRange, selectedSort]);
 
   // ── Focus → auto-open keyboard
   useFocusEffect(
@@ -177,8 +286,8 @@ export default function SearchScreen() {
   const closeFilter = () => bottomSheetRef.current?.dismiss();
 
   const resetFilters = () => {
-    setSelectedFilterCat("Arduino");
-    setSelectedBrand(null);
+    setSelectedCategories([]);
+    setSelectedBrands([]);
     setAvailability("all");
     setSelectedSort("Popularity");
     setPriceRange([160, 2500]);
@@ -269,7 +378,7 @@ export default function SearchScreen() {
 
       {/* ── Content ── */}
       <FlatList
-        data={isSearching ? results : []}
+        data={isSearching ? filteredResults : []}
         keyExtractor={(item) => String(item.id)}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -416,7 +525,7 @@ export default function SearchScreen() {
                 <Text style={{ color: t.subtext, fontSize: 13 }}>
                   {searchLoading
                     ? "…"
-                    : `${results.length} ${i18nT("search.results")}`}
+                    : `${filteredResults.length} ${i18nT("search.results")}`}
                 </Text>
               </View>
             )}
@@ -560,67 +669,48 @@ export default function SearchScreen() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={{ flexDirection: "row", gap: 8 }}>
                 {filterCategories.map((cat) => {
-                  const active = selectedFilterCat === cat;
+                  const active = selectedCategories.includes(cat);
                   return (
-                    <TouchableOpacity
+                    <Chip
                       key={cat}
-                      onPress={() => setSelectedFilterCat(cat)}
+                      selected={active}
+                      onPress={() => toggleCategory(cat)}
+                      mode={active ? "flat" : "outlined"}
+                      showSelectedCheck
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 4,
-                        paddingHorizontal: 14,
-                        paddingVertical: 8,
-                        borderRadius: 20,
                         backgroundColor: active ? t.accent : t.sheetBg,
-                        borderWidth: 1,
                         borderColor: active ? t.accent : t.border,
                       }}
+                      textStyle={{
+                        color: active ? "#fff" : t.chipText,
+                        fontSize: 13,
+                        fontWeight: "500",
+                      }}
                     >
-                      {active && (
-                        <Ionicons name="checkmark" size={13} color="#fff" />
-                      )}
-                      <Text
-                        style={{
-                          color: active ? "#fff" : t.chipText,
-                          fontSize: 13,
-                          fontWeight: "500",
-                        }}
-                      >
-                        {cat}
-                      </Text>
-                    </TouchableOpacity>
+                      {cat}
+                    </Chip>
                   );
                 })}
-                <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 4,
-                    paddingHorizontal: 14,
-                    paddingVertical: 8,
-                    borderRadius: 20,
-                    backgroundColor: t.sheetBg,
-                    borderWidth: 1,
-                    borderColor: t.border,
+                <Chip
+                  mode="outlined"
+                  onPress={() => {}}
+                  style={{ backgroundColor: t.sheetBg, borderColor: t.border }}
+                  textStyle={{
+                    color: t.chipText,
+                    fontSize: 13,
+                    fontWeight: "500",
                   }}
+                  icon={() => (
+                    <Ionicons name="chevron-down" size={12} color={t.chipText} />
+                  )}
                 >
-                  <Text
-                    style={{
-                      color: t.chipText,
-                      fontSize: 13,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {i18nT("search.more")}
-                  </Text>
-                  <Ionicons name="chevron-down" size={12} color={t.chipText} />
-                </TouchableOpacity>
+                  {i18nT("search.more")}
+                </Chip>
               </View>
             </ScrollView>
           </View>
 
-          {/* Brands */}
+          {/* Brands — no background color, just logo + border */}
           <View style={{ marginBottom: 24 }}>
             <View
               style={{
@@ -640,40 +730,61 @@ export default function SearchScreen() {
                   {i18nT("search.brands")}
                 </Text>
               </View>
-              <TouchableOpacity>
-                <Text style={{ fontSize: 13, color: t.accent }}>
-                  {i18nT("search.viewAll")}
-                </Text>
-              </TouchableOpacity>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={{ flexDirection: "row", gap: 10 }}>
                 {brands.map((brand) => {
-                  const active = selectedBrand === brand;
+                  const active = selectedBrands.includes(brand);
                   return (
                     <TouchableOpacity
                       key={brand}
-                      onPress={() => setSelectedBrand(active ? null : brand)}
+                      onPress={() => toggleBrand(brand)}
                       style={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: 12,
-                        backgroundColor: t.sheetBg,
+                        width: 70,
                         alignItems: "center",
-                        justifyContent: "center",
-                        borderWidth: 2,
-                        borderColor: active ? t.accent : t.border,
                       }}
                     >
-                      <Text style={{ fontSize: 20, marginBottom: 2 }}>
-                        {brandEmoji[brand]}
-                      </Text>
-                      <Text
+                      <View
                         style={{
-                          fontSize: 9,
+                          width: 70,
+                          height: 70,
+                          borderRadius: 14,
+                          backgroundColor: "transparent",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderWidth: active ? 2 : 1,
+                          borderColor: active ? t.accent : t.border,
+                        }}
+                      >
+                        {active && (
+                          <View
+                            style={{
+                              position: "absolute",
+                              top: 4,
+                              right: 4,
+                              width: 16,
+                              height: 16,
+                              borderRadius: 8,
+                              backgroundColor: t.accent,
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <Ionicons name="checkmark" size={10} color="#fff" />
+                          </View>
+                        )}
+                        <BrandLogo brand={brand} size={40} />
+                      </View>
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          fontSize: 10,
                           fontWeight: "600",
-                          color: t.text,
+                          color: active ? t.accent : t.text,
                           textAlign: "center",
+                          marginTop: 4,
+                          width: 70,
                         }}
                       >
                         {brand}
@@ -764,42 +875,23 @@ export default function SearchScreen() {
                 {i18nT("search.availability")}
               </Text>
             </View>
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              {(["all", "instock", "outofstock"] as const).map((opt) => {
-                const active = availability === opt;
-                const label =
-                  opt === "all"
-                    ? i18nT("search.all")
-                    : opt === "instock"
-                      ? i18nT("search.inStock")
-                      : i18nT("search.outOfStock");
-                return (
-                  <TouchableOpacity
-                    key={opt}
-                    onPress={() => setAvailability(opt)}
-                    style={{
-                      flex: 1,
-                      paddingVertical: 10,
-                      borderRadius: 10,
-                      backgroundColor: active ? t.accent : t.sheetBg,
-                      borderWidth: 1,
-                      borderColor: active ? t.accent : t.border,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: active ? "#fff" : t.chipText,
-                        fontSize: 13,
-                        fontWeight: "500",
-                      }}
-                    >
-                      {label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            <SegmentedButtons
+              value={availability}
+              onValueChange={(val) => setAvailability(val as AvailabilityFilter)}
+              theme={{
+                colors: {
+                  secondaryContainer: t.accent,
+                  onSecondaryContainer: "#fff",
+                  outline: t.border,
+                  onSurface: t.chipText,
+                },
+              }}
+              buttons={[
+                { value: "all", label: i18nT("search.all") },
+                { value: "instock", label: i18nT("search.inStock") },
+                { value: "outofstock", label: i18nT("search.outOfStock") },
+              ]}
+            />
           </View>
 
           {/* Sort By */}
@@ -821,53 +913,27 @@ export default function SearchScreen() {
                 {i18nT("search.sortBy")}
               </Text>
             </View>
-            {sortOptionKeys.map(({ key, i18nKey }) => {
-              const active = selectedSort === key;
-              return (
-                <TouchableOpacity
+            <RadioButton.Group
+              onValueChange={(val) => setSelectedSort(val)}
+              value={selectedSort}
+            >
+              {sortOptionKeys.map(({ key, i18nKey }) => (
+                <RadioButton.Item
                   key={key}
-                  onPress={() => setSelectedSort(key)}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 10,
-                    paddingVertical: 10,
+                  label={i18nT(i18nKey)}
+                  value={key}
+                  color={t.accent}
+                  labelStyle={{
+                    color: selectedSort === key ? t.accent : t.text,
+                    fontSize: 14,
+                    fontWeight: selectedSort === key ? "600" : "400",
+                    textAlign: "left",
                   }}
-                >
-                  <View
-                    style={{
-                      width: 18,
-                      height: 18,
-                      borderRadius: 9,
-                      borderWidth: 2,
-                      borderColor: active ? t.accent : t.border,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {active && (
-                      <View
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: 4,
-                          backgroundColor: t.accent,
-                        }}
-                      />
-                    )}
-                  </View>
-                  <Text
-                    style={{
-                      color: active ? t.accent : t.text,
-                      fontSize: 14,
-                      fontWeight: active ? "600" : "400",
-                    }}
-                  >
-                    {i18nT(i18nKey)}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+                  style={{ paddingHorizontal: 0, paddingVertical: 4 }}
+                  position="trailing"
+                />
+              ))}
+            </RadioButton.Group>
           </View>
 
           {/* Buttons */}
