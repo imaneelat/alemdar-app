@@ -140,7 +140,7 @@ const categories = [
     id: "12",
     name: "Electric",
     icon: "construct-outline",
-    color: "#f97316",
+    color: "#FF6B00",
     section: "electric",
   },
   {
