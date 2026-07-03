@@ -11,4 +11,4 @@
 11. Add splash screen.
 12. No auth; modify account screen.
 13. [x] Add rate limiting.
-14. Home screen: use carousel package.
+14. [x] Home screen: use carousel package.
