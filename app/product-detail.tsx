@@ -16,6 +16,7 @@ import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
+  StatusBar,
   View as RNView,
   ScrollView,
   TouchableOpacity,
@@ -60,8 +61,9 @@ export default function ProductDetail() {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const PAGE_BG = isDark ? "#0d0d0d" : "#f2f2f7";
-  const CARD_BG = isDark ? "#131825" : "#ffffff";
+  // Fix 1: unified background (no two-layer split)
+  const PAGE_BG = isDark ? "#0d0d0d" : "#ffffff";
+  const CARD_BG = isDark ? "#0d0d0d" : "#ffffff";
   const TEXT = isDark ? "#ffffff" : "#111111";
   const SUBTEXT = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.4)";
   const BORDER = isDark ? "#1e2433" : "#ebebeb";
@@ -110,7 +112,14 @@ export default function ProductDetail() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: PAGE_BG }} edges={["top"]}>
-      {/* HEADER */}
+
+      {/* Fix 3: status bar matches page color */}
+      <StatusBar
+        barStyle={isDark ? "light-content" : "dark-content"}
+        backgroundColor={PAGE_BG}
+      />
+
+      {/* HEADER — Fix 2: show product name not category */}
       <RNView
         style={{
           flexDirection: "row",
@@ -118,7 +127,7 @@ export default function ProductDetail() {
           justifyContent: "space-between",
           paddingHorizontal: 16,
           paddingVertical: 12,
-          backgroundColor: isDark ? "#0d0d0d" : "#ffffff",
+          backgroundColor: PAGE_BG,
           borderBottomWidth: 1,
           borderBottomColor: BORDER,
         }}
@@ -133,10 +142,11 @@ export default function ProductDetail() {
             color: TEXT,
             flex: 1,
             textAlign: "center",
+            marginHorizontal: 8,
           }}
           numberOfLines={1}
         >
-          {meta.title}
+          {productLoading ? meta.title : name}
         </Text>
         <TouchableOpacity
           onPress={() => router.push("/cart")}
@@ -150,15 +160,13 @@ export default function ProductDetail() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {/* PRODUCT IMAGE */}
+        {/* PRODUCT IMAGE — Fix 1: same background as page */}
         <RNView
           style={{
             height: 280,
             backgroundColor: CARD_BG,
             alignItems: "center",
             justifyContent: "center",
-            borderBottomWidth: 1,
-            borderBottomColor: BORDER,
           }}
         >
           {productLoading ? (
@@ -178,6 +186,9 @@ export default function ProductDetail() {
             />
           )}
         </RNView>
+
+        {/* Subtle divider */}
+        <RNView style={{ height: 1, backgroundColor: BORDER, marginHorizontal: 16 }} />
 
         {/* PRODUCT INFO */}
         <RNView
@@ -428,7 +439,7 @@ export default function ProductDetail() {
           bottom: 0,
           left: 0,
           right: 0,
-          backgroundColor: isDark ? "#0d0d0d" : "#ffffff",
+          backgroundColor: PAGE_BG,
           borderTopWidth: 1,
           borderTopColor: BORDER,
           paddingHorizontal: 16,
