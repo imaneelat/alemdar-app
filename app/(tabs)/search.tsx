@@ -1,7 +1,8 @@
+import { CachedImage } from "@/components/CachedImage";
 import { useWishlist } from "@/context/WishlistContext";
 import { useSearchProducts } from "@/hooks/useSearchProducts";
 import { t as i18nT, useLocale } from "@/lib/i18n";
-import { formatTL } from "@/lib/price";
+import type { UniversalSearchItem } from "@/lib/api-types";
 import { Ionicons } from "@expo/vector-icons";
 import {
   BottomSheetBackdrop,
@@ -25,8 +26,8 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { Chip, RadioButton, SegmentedButtons } from "react-native-paper";
 import RangeSlider from "react-native-fast-range-slider";
+import { Chip, RadioButton, SegmentedButtons } from "react-native-paper";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -53,16 +54,7 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-// Flatten all products from productSections
-
-type ApiProduct = {
-  id: number;
-  english_name: string | null;
-  turkish_name: string | null;
-  price: string | null;
-  image_filename: string | null;
-  category: string | null;
-};
+type ApiProduct = UniversalSearchItem;
 
 type AvailabilityFilter = "all" | "instock" | "outofstock";
 
@@ -184,9 +176,7 @@ export default function SearchScreen() {
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
-      prev.includes(brand)
-        ? prev.filter((b) => b !== brand)
-        : [...prev, brand],
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
     );
   };
 
@@ -208,41 +198,22 @@ export default function SearchScreen() {
     if (selectedCategories.length > 0) {
       list = list.filter((item) =>
         selectedCategories.some(
-          (cat) => item.category?.toLowerCase() === cat.toLowerCase(),
+          (cat) => item.section.toLowerCase() === cat.toLowerCase(),
         ),
       );
     }
 
     if (selectedBrands.length > 0) {
       list = list.filter((item) => {
-        const name = (
-          item.english_name ??
-          item.turkish_name ??
-          ""
-        ).toLowerCase();
+        const name = item.title.toLowerCase();
         return selectedBrands.some((brand) =>
           name.includes(brand.toLowerCase()),
         );
       });
     }
 
-    list = list.filter((item) => {
-      const price = parseFloat(item.price ?? "0");
-      return price >= priceRange[0] && price <= priceRange[1];
-    });
-
-    if (selectedSort === "Price: Low → High") {
-      list.sort(
-        (a, b) => parseFloat(a.price ?? "0") - parseFloat(b.price ?? "0"),
-      );
-    } else if (selectedSort === "Price: High → Low") {
-      list.sort(
-        (a, b) => parseFloat(b.price ?? "0") - parseFloat(a.price ?? "0"),
-      );
-    }
-
     return list;
-  }, [results, selectedCategories, selectedBrands, priceRange, selectedSort]);
+  }, [results, selectedCategories, selectedBrands]);
 
   // ── Focus → auto-open keyboard
   useFocusEffect(
@@ -260,11 +231,7 @@ export default function SearchScreen() {
       pathname: "/product-detail",
       params: {
         productId: String(item.id),
-        section: "main",
-        name: item.english_name ?? item.turkish_name ?? "Product",
-        price: item.price ?? "",
-        image: item.image_filename ?? "",
-        category: item.category ?? "",
+        section: item.tableKey,
       },
     });
   };
@@ -541,7 +508,8 @@ export default function SearchScreen() {
           </Animated.View>
         }
         renderItem={({ item }) => {
-          const name = item.english_name ?? item.turkish_name ?? "Product";
+          const name = item.title;
+          const imageUrl = item.image;
           const wishlisted = isWishlisted(String(item.id));
           return (
             <TouchableOpacity
@@ -558,15 +526,25 @@ export default function SearchScreen() {
             >
               <View
                 style={{
-                  width: 44,
-                  height: 44,
+                  width: 56,
+                  height: 56,
                   borderRadius: 12,
-                  backgroundColor: t.chipBg,
+                  backgroundColor: t.imageBg,
                   alignItems: "center",
                   justifyContent: "center",
+                  overflow: "hidden",
                 }}
               >
-                <Ionicons name="cube-outline" size={20} color={t.accent} />
+                {imageUrl ? (
+                  <CachedImage
+                    source={{ uri: imageUrl }}
+                    style={{ width: "100%", height: "100%" }}
+                    contentFit="cover"
+                    recyclingKey={String(item.id)}
+                  />
+                ) : (
+                  <Ionicons name="cube-outline" size={20} color={t.accent} />
+                )}
               </View>
               <View style={{ flex: 1 }}>
                 <Text
@@ -578,12 +556,12 @@ export default function SearchScreen() {
                 <Text
                   style={{
                     fontSize: 13,
-                    fontWeight: "700",
-                    color: t.accent,
+                    fontWeight: "600",
+                    color: t.subtext,
                     marginTop: 2,
                   }}
                 >
-                  {formatTL(item.price)}
+                  {item.section}
                 </Text>
               </View>
               <TouchableOpacity
@@ -593,12 +571,12 @@ export default function SearchScreen() {
                   toggleWishlist({
                     id: String(item.id),
                     name,
-                    price: item.price?.split(".")[0] ?? "0",
-                    dec: item.price?.split(".")[1]?.slice(0, 2) ?? "00",
+                    price: "0",
+                    dec: "00",
                     stock: "In Stock",
                     low: false,
-                    sectionId: item.category ?? "main",
-                    sectionTitle: item.category ?? "Products",
+                    sectionId: item.tableKey,
+                    sectionTitle: item.section,
                     accentColor: "#f5a623",
                   });
                 }}
@@ -717,7 +695,11 @@ export default function SearchScreen() {
                     fontWeight: "500",
                   }}
                   icon={() => (
-                    <Ionicons name="chevron-down" size={12} color={t.chipText} />
+                    <Ionicons
+                      name="chevron-down"
+                      size={12}
+                      color={t.chipText}
+                    />
                   )}
                 >
                   {i18nT("search.more")}
@@ -893,7 +875,9 @@ export default function SearchScreen() {
             </View>
             <SegmentedButtons
               value={availability}
-              onValueChange={(val) => setAvailability(val as AvailabilityFilter)}
+              onValueChange={(val) =>
+                setAvailability(val as AvailabilityFilter)
+              }
               theme={{
                 colors: {
                   secondaryContainer: t.accent,

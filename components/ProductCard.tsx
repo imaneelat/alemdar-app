@@ -55,10 +55,6 @@ function ProductCardBase({ product, sectionTitle, accentColor = AMBER, width = 1
       params: {
         productId: id,
         section: product.section,
-        name,
-        price: product.price ?? '',
-        image: imageUrl ?? '',
-        category: categoryLabel,
       },
     });
   };
@@ -84,7 +80,7 @@ function ProductCardBase({ product, sectionTitle, accentColor = AMBER, width = 1
     >
       <RNView style={{ height: 120, backgroundColor: IMG_BG, alignItems: 'center', justifyContent: 'center' }}>
         {imageUrl ? (
-          <CachedImage source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="contain" recyclingKey={id} />
+          <CachedImage source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" recyclingKey={id} />
         ) : (
           <Ionicons name="image-outline" size={30} color={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'} />
         )}

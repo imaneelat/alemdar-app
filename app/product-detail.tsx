@@ -3,6 +3,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
 import { usePrefetchImages } from "@/hooks/usePrefetchImages";
+import { useProductDetail } from "@/hooks/useProductDetail";
 import { useSimilarProducts } from "@/hooks/useSimilarProducts";
 import { t, useLocale } from "@/lib/i18n";
 import { resolveImageUrl } from "@/lib/image-url";
@@ -13,6 +14,7 @@ import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   View as RNView,
   ScrollView,
@@ -32,20 +34,26 @@ export default function ProductDetail() {
 
   const productId = (params.productId as string) ?? "";
   const section = (params.section as string) ?? "main";
-  const name = (params.name as string) || "Product";
-  const priceRaw = (params.price as string) ?? "";
-  const image = resolveImageUrl((params.image as string) || "") ?? "";
-  const category = (params.category as string) || "";
-
-  const meta = getSectionMeta(section);
   const numericId = Number(productId);
+  const detailId = Number.isInteger(numericId) ? numericId : null;
+  const meta = getSectionMeta(section);
+  const {
+    data: product,
+    isLoading: productLoading,
+    isError: productError,
+    refetch: refetchProduct,
+  } = useProductDetail(section, detailId);
   const { data: similar } = useSimilarProducts(
     section,
-    Number.isInteger(numericId) ? numericId : null,
+    detailId,
   );
   const relatedProducts = similar?.data ?? [];
   usePrefetchImages(relatedProducts.map((p) => p.image_filename));
 
+  const name = product?.name ?? "Product";
+  const priceRaw = product?.price ?? "";
+  const image = resolveImageUrl(product?.image_filename) ?? "";
+  const category = product?.category ?? "";
   const { whole, dec } = splitPrice(priceRaw);
 
   const [, setAdded] = useState(false);
@@ -57,8 +65,10 @@ export default function ProductDetail() {
   const TEXT = isDark ? "#ffffff" : "#111111";
   const SUBTEXT = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.4)";
   const BORDER = isDark ? "#1e2433" : "#ebebeb";
+  const SKELETON = isDark ? "#1e2433" : "#e5e5ea";
 
   const handleAddToCart = () => {
+    if (!product) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     addToCart({
       id: productId,
@@ -151,11 +161,13 @@ export default function ProductDetail() {
             borderBottomColor: BORDER,
           }}
         >
-          {image ? (
+          {productLoading ? (
+            <ActivityIndicator size="large" color={meta.accentColor} />
+          ) : image ? (
             <CachedImage
               source={{ uri: image }}
               style={{ width: "100%", height: "100%" }}
-              contentFit="contain"
+              contentFit="cover"
               recyclingKey={productId}
             />
           ) : (
@@ -171,6 +183,69 @@ export default function ProductDetail() {
         <RNView
           style={{ backgroundColor: CARD_BG, padding: 20, marginBottom: 8 }}
         >
+          {productLoading ? (
+            <>
+              <RNView
+                style={{
+                  height: 28,
+                  width: "85%",
+                  borderRadius: 8,
+                  backgroundColor: SKELETON,
+                  marginBottom: 12,
+                }}
+              />
+              <RNView
+                style={{
+                  height: 22,
+                  width: 100,
+                  borderRadius: 6,
+                  backgroundColor: SKELETON,
+                  marginBottom: 16,
+                }}
+              />
+              <RNView
+                style={{
+                  height: 42,
+                  width: 150,
+                  borderRadius: 8,
+                  backgroundColor: SKELETON,
+                  marginBottom: 20,
+                }}
+              />
+              <RNView
+                style={{
+                  height: 120,
+                  borderRadius: 12,
+                  backgroundColor: isDark ? "#0d1120" : "#f8f8fc",
+                }}
+              />
+            </>
+          ) : productError ? (
+            <RNView
+              style={{
+                alignItems: "center",
+                paddingVertical: 24,
+                gap: 12,
+              }}
+            >
+              <Ionicons name="alert-circle-outline" size={36} color={SUBTEXT} />
+              <Text style={{ color: TEXT, fontSize: 16, fontWeight: "700" }}>
+                Failed to load product
+              </Text>
+              <TouchableOpacity
+                onPress={() => refetchProduct()}
+                style={{
+                  backgroundColor: AMBER,
+                  borderRadius: 10,
+                  paddingHorizontal: 18,
+                  paddingVertical: 10,
+                }}
+              >
+                <Text style={{ color: "#000", fontWeight: "800" }}>Retry</Text>
+              </TouchableOpacity>
+            </RNView>
+          ) : (
+            <>
           <Text
             style={{
               fontSize: 20,
@@ -295,6 +370,8 @@ export default function ProductDetail() {
               </RNView>
             ))}
           </RNView>
+            </>
+          )}
         </RNView>
 
         {/* RELATED PRODUCTS */}
@@ -369,9 +446,10 @@ export default function ProductDetail() {
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
           <TouchableOpacity
             onPress={handleAddToCart}
+            disabled={!product || productLoading || productError}
             activeOpacity={0.85}
             style={{
-              backgroundColor: AMBER,
+              backgroundColor: product && !productError ? AMBER : SKELETON,
               borderRadius: 14,
               paddingVertical: 15,
               alignItems: "center",
@@ -382,7 +460,7 @@ export default function ProductDetail() {
           >
             <Ionicons name="cart-outline" size={20} color="#000" />
             <Text style={{ fontSize: 16, fontWeight: "800", color: "#000" }}>
-              {t("addToCart")}
+              {productLoading ? "Loading..." : t("addToCart")}
             </Text>
           </TouchableOpacity>
         </Animated.View>

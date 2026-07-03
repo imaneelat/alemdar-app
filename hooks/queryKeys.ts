@@ -7,6 +7,8 @@ export const queryKeys = {
   products: (filters: Record<string, unknown>) =>
     ["products", filters] as const,
   product: (id: number) => ["products", id] as const,
+  productDetail: (section: string, id: number) =>
+    ["products", "detail", section, id] as const,
   searchProducts: (q: string, section: string | undefined, limit: number) =>
     ["products", "search", { q, section, limit }] as const,
   categories: () => ["categories"] as const,

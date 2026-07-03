@@ -40,6 +40,15 @@ export type NormalizedProduct = {
   category: string | null;
 };
 
+export type UniversalSearchItem = {
+  tableKey: string;
+  section: string;
+  id: number;
+  title: string;
+  image: string | null;
+  href: string;
+};
+
 export type SectionCount = {
   section: string;
   table: string;

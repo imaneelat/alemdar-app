@@ -48,7 +48,7 @@ function WishlistCard({ item, onRemove, isDark, CARD_BG, TEXT, SUBTEXT, BORDER }
       activeOpacity={0.85}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        router.push({ pathname: '/product-detail', params: { productId: item.id, categoryId: item.sectionId } });
+        router.push({ pathname: '/product-detail', params: { productId: item.id, section: item.sectionId } });
       }}
       style={{ backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}
     >
