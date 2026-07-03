@@ -1,19 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/api-client';
-import type { MainProduct, NormalizedProduct } from '@/lib/api-types';
+import type { UniversalSearchItem } from '@/lib/api-types';
 import { queryKeys } from './queryKeys';
 
 type SearchResponse = {
   q: string;
-  section?: string;
-  data: MainProduct[] | NormalizedProduct[];
+  data: UniversalSearchItem[];
 };
 
 type Options = { section?: string; limit?: number; enabled?: boolean };
 
 /**
- * Search products by name/barcode.
- * Defaults to the master catalog; pass `section` to search a specific section.
+ * Search products through the live website search backend.
  * Query is disabled until at least 1 character is entered.
  */
 export function useSearchProducts(q: string, options: Options = {}) {
