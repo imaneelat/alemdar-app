@@ -1,6 +1,8 @@
+import { CachedImage } from "@/components/CachedImage";
 import { useWishlist } from "@/context/WishlistContext";
 import { useSearchProducts } from "@/hooks/useSearchProducts";
 import { t as i18nT, useLocale } from "@/lib/i18n";
+import { resolveImageUrl } from "@/lib/image-url";
 import { formatTL } from "@/lib/price";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -25,8 +27,8 @@ import {
   useColorScheme,
   View,
 } from "react-native";
-import { Chip, RadioButton, SegmentedButtons } from "react-native-paper";
 import RangeSlider from "react-native-fast-range-slider";
+import { Chip, RadioButton, SegmentedButtons } from "react-native-paper";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -184,9 +186,7 @@ export default function SearchScreen() {
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands((prev) =>
-      prev.includes(brand)
-        ? prev.filter((b) => b !== brand)
-        : [...prev, brand],
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand],
     );
   };
 
@@ -254,6 +254,7 @@ export default function SearchScreen() {
 
   //  Handlers
   const openProduct = (item: ApiProduct) => {
+    const imageUrl = resolveImageUrl(item.image_filename);
     saveSearch(query);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
@@ -263,7 +264,7 @@ export default function SearchScreen() {
         section: "main",
         name: item.english_name ?? item.turkish_name ?? "Product",
         price: item.price ?? "",
-        image: item.image_filename ?? "",
+        image: imageUrl ?? "",
         category: item.category ?? "",
       },
     });
@@ -542,6 +543,8 @@ export default function SearchScreen() {
         }
         renderItem={({ item }) => {
           const name = item.english_name ?? item.turkish_name ?? "Product";
+          const imageUrl = resolveImageUrl(item.image_filename);
+          console.log(imageUrl);
           const wishlisted = isWishlisted(String(item.id));
           return (
             <TouchableOpacity
@@ -558,15 +561,25 @@ export default function SearchScreen() {
             >
               <View
                 style={{
-                  width: 44,
-                  height: 44,
+                  width: 56,
+                  height: 56,
                   borderRadius: 12,
-                  backgroundColor: t.chipBg,
+                  backgroundColor: t.imageBg,
                   alignItems: "center",
                   justifyContent: "center",
+                  overflow: "hidden",
                 }}
               >
-                <Ionicons name="cube-outline" size={20} color={t.accent} />
+                {imageUrl ? (
+                  <CachedImage
+                    source={{ uri: imageUrl }}
+                    style={{ width: "100%", height: "100%" }}
+                    contentFit="cover"
+                    recyclingKey={String(item.id)}
+                  />
+                ) : (
+                  <Ionicons name="cube-outline" size={20} color={t.accent} />
+                )}
               </View>
               <View style={{ flex: 1 }}>
                 <Text
@@ -717,7 +730,11 @@ export default function SearchScreen() {
                     fontWeight: "500",
                   }}
                   icon={() => (
-                    <Ionicons name="chevron-down" size={12} color={t.chipText} />
+                    <Ionicons
+                      name="chevron-down"
+                      size={12}
+                      color={t.chipText}
+                    />
                   )}
                 >
                   {i18nT("search.more")}
@@ -893,7 +910,9 @@ export default function SearchScreen() {
             </View>
             <SegmentedButtons
               value={availability}
-              onValueChange={(val) => setAvailability(val as AvailabilityFilter)}
+              onValueChange={(val) =>
+                setAvailability(val as AvailabilityFilter)
+              }
               theme={{
                 colors: {
                   secondaryContainer: t.accent,

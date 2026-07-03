@@ -1,4 +1,5 @@
 import FacebookIcon from "@/assets/icons/facebook.svg";
+import GoogleMapIcon from "@/assets/icons/google_map.svg";
 import InstagramIcon from "@/assets/icons/instagram.svg";
 import { HomeProductSection } from "@/components/HomeProductSection";
 import { Text } from "@/components/Themed";
@@ -914,7 +915,7 @@ export default function HomeScreen() {
                 borderColor: BORDER,
               }}
             >
-              <RNView
+              {/* <RNView
                 style={{
                   width: 32,
                   height: 32,
@@ -925,7 +926,9 @@ export default function HomeScreen() {
                 }}
               >
                 <Ionicons name="location" size={18} color="#fff" />
-              </RNView>
+              </RNView> */}
+
+              <GoogleMapIcon width={32} height={32} />
               <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
                 Location
               </Text>
