@@ -3,7 +3,7 @@
 3. Add pull-to-refresh on categories.
 4. Add notifications screen and APIs.
 5. [x] Delete all subtitles and product counts (category details screen)
-6. Add spinner on search function + send search algorithm to Lamin.
+6. [-] Add spinner on search function + send search algorithm to Lamin.
 7. Add safe area to all screens.
 8. Salah: unify the background colors for ID screen and delete the badges.
 9. Close keyboard when swiping.
