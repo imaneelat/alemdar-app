@@ -129,7 +129,9 @@ export default function SearchScreen() {
   const {
     data: searchData,
     isLoading: searchLoading,
+    isRefetching: searchRefetching,
     isError: searchError,
+    refetch: refetchSearch,
   } = useSearchProducts(query);
   const results = (searchData?.data ?? []) as unknown as ApiProduct[];
 
@@ -275,6 +277,12 @@ export default function SearchScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 24 }}
+        refreshing={isSearching && searchRefetching}
+        onRefresh={() => {
+          if (isSearching) {
+            void refetchSearch();
+          }
+        }}
         ListHeaderComponent={
           <Animated.View
             key={isSearching ? "results-header" : "idle-header"}

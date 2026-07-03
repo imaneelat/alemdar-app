@@ -33,8 +33,10 @@ export default function CategoryDetail() {
     isLoading,
     isError,
     isFetchingNextPage,
+    isRefetching,
     hasNextPage,
     fetchNextPage,
+    refetch,
   } = useSectionProducts(section, { limit: PAGE_SIZE });
 
   const products = data?.pages.flatMap((p) => p.data) ?? [];
@@ -76,20 +78,22 @@ export default function CategoryDetail() {
           <View style={styles.center}>
             <ActivityIndicator color={meta.accentColor} />
           </View>
-        ) : isError ? (
-          <View style={styles.center}>
-            <Text style={{ color: subText }}>
-              Couldn&apos;t load products. Pull to retry.
-            </Text>
-          </View>
         ) : (
           <FlatList
-            data={products}
+            data={isError ? [] : products}
             keyExtractor={(item) => `${item.section}-${item.id}`}
             numColumns={2}
             columnWrapperStyle={{ gap: 12, paddingHorizontal: 16 }}
-            contentContainerStyle={{ paddingBottom: 40, gap: 12 }}
+            contentContainerStyle={{
+              flexGrow: isError || products.length === 0 ? 1 : undefined,
+              paddingBottom: 40,
+              gap: 12,
+            }}
             showsVerticalScrollIndicator={false}
+            refreshing={isRefetching && !isFetchingNextPage}
+            onRefresh={() => {
+              void refetch();
+            }}
             renderItem={({ item }) => (
               <View style={{ flex: 1 }}>
                 <ProductCard
@@ -115,7 +119,9 @@ export default function CategoryDetail() {
             ListEmptyComponent={
               <View style={styles.center}>
                 <Text style={{ color: subText }}>
-                  No products in this category.
+                  {isError
+                    ? "Couldn't load products. Pull to retry."
+                    : "No products in this category."}
                 </Text>
               </View>
             }
