@@ -38,7 +38,6 @@ export default function CategoryDetail() {
   } = useSectionProducts(section, { limit: PAGE_SIZE });
 
   const products = data?.pages.flatMap((p) => p.data) ?? [];
-  const total = data?.pages[0]?.total ?? 0;
 
   usePrefetchImages(products.map((p) => p.image_filename));
 
@@ -70,11 +69,6 @@ export default function CategoryDetail() {
             <Text style={[styles.headerTitle, { color: textColor }]}>
               {meta.title}
             </Text>
-            {total > 0 && (
-              <Text style={{ color: subText, fontSize: 12 }}>
-                {total} products
-              </Text>
-            )}
           </View>
         </View>
 
