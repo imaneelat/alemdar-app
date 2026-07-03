@@ -725,7 +725,7 @@ export default function HomeScreen() {
                   color: TEXT,
                   textAlign: "center",
                 }}
-                numberOfLines={2}
+                numberOfLines={1}
               >
                 {cat.name}
               </Text>
