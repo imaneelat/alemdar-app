@@ -1,3 +1,4 @@
+ import { useColorScheme } from "@/components/useColorScheme";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Alert, ScrollView } from "react-native";
 import { router } from "expo-router";
@@ -16,7 +17,7 @@ import { openSheet } from "./_layout";
 import * as StoreReview from "expo-store-review";
 import { t, useLocale } from "@/lib/i18n";
 
-const C = {
+const darkColors = {
   bg:          "#02060E",
   panel:       "#101928",
   panelBorder: "#26344C",
@@ -27,8 +28,21 @@ const C = {
   danger:      "#FF3B30",
 };
 
+const lightColors = {
+  bg:          "#F5F6F8",
+  panel:       "#FFFFFF",
+  panelBorder: "#E3E6EC",
+  divider:     "#ECEEF2",
+  text:        "#0B1220",
+  muted:       "#6B7280",
+  orange:      "#FF6B00",
+  danger:      "#D92D20",
+};
+
 export default function AccountScreen() {
   useLocale();
+  const colorScheme = useColorScheme();
+  const C = colorScheme === "dark" ? darkColors : lightColors;
 
   const quickLinks = [
     { icon: "shopping-bag", label: t("myOrders"),  value: t("ordersCount")  },
