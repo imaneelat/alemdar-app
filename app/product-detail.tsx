@@ -155,7 +155,7 @@ export default function ProductDetail() {
             <CachedImage
               source={{ uri: image }}
               style={{ width: "100%", height: "100%" }}
-              contentFit="contain"
+              contentFit="cover"
               recyclingKey={productId}
             />
           ) : (
