@@ -278,7 +278,7 @@ export default function SearchScreen() {
   // ─────────────────────────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
       {/* ── Search Bar ── */}
@@ -349,9 +349,10 @@ export default function SearchScreen() {
       {/* ── Content ── */}
       <FlatList
         data={isSearching ? filteredResults : []}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => `${item.tableKey}-${item.id}`}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 24 }}
         refreshing={isSearching && searchRefetching}
         onRefresh={() => {

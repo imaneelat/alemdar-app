@@ -578,7 +578,7 @@ export default function HomeScreen() {
             {t("home.searchPlaceholder")}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => router.push("/search")}
           style={{
             width: 42,
@@ -590,14 +590,14 @@ export default function HomeScreen() {
           }}
         >
           <Ionicons name="options-outline" size={20} color={ICON_COLOR} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </RNView>
 
       {/* BODY */}
       <ScrollView
         style={{ flex: 1, backgroundColor: PAGE_BG }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 8, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 24 }}
       >
         {/* BANNER */}
         <RNView style={{ marginHorizontal: 16, marginBottom: 4 }}>
@@ -818,9 +818,7 @@ export default function HomeScreen() {
         ))}
 
         {/* SOCIAL FOOTER */}
-        <RNView
-          style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 16 }}
-        >
+        <RNView style={{ marginHorizontal: 16 }}>
           <Text
             style={{
               fontSize: 11,
@@ -942,7 +940,7 @@ export default function HomeScreen() {
               color: SUBTEXT,
               textAlign: "center",
               marginTop: 16,
-              marginBottom: 8,
+              // marginBottom: 8,
             }}
           >
             {t("home.copyright")}

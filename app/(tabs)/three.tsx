@@ -159,7 +159,7 @@ export default function WishlistScreen() {
           data={items}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
           style={{ backgroundColor: PAGE_BG }}
         />

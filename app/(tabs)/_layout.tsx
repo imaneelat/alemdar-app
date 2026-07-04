@@ -1,5 +1,5 @@
 import LanguageSheet from "@/components/LanguageSheet";
-import { NAVBAR_V2_STYLE, NavbarV2Background } from "@/components/NavbarV2";
+import { NavbarV2 } from "@/components/NavbarV2";
 import PrivacySheet from "@/components/PrivacySheet";
 import { useColorScheme } from "@/components/useColorScheme";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -7,7 +7,6 @@ import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
 let _set: ((s: string | null) => void) | null = null;
@@ -17,7 +16,6 @@ export const closeSheets = () => _set?.(null);
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const insets = useSafeAreaInsets();
   const [sheet, setSheet] = useState<string | null>(null);
   useEffect(() => {
     _set = setSheet;
@@ -36,24 +34,14 @@ export default function TabLayout() {
           translucent
         />
         <Tabs
+          tabBar={(props) => (
+            <NavbarV2 {...props} tint={isDark ? "dark" : "light"} />
+          )}
           screenOptions={{
             headerShown: false,
             tabBarActiveTintColor: ACTIVE_COLOR,
             tabBarInactiveTintColor: isDark ? INACTIVE_DARK : INACTIVE_LIGHT,
             tabBarShowLabel: false,
-            tabBarBackground: NavbarV2Background(isDark ? "dark" : "light"),
-            tabBarStyle: {
-              ...NAVBAR_V2_STYLE,
-              backgroundColor: "transparent",
-              // height: NAVBAR_V2_STYLE.height + insets.bottom,
-              paddingBottom: insets.bottom + 48,
-            },
-            tabBarIconStyle: {
-              marginTop: 8,
-            },
-            tabBarItemStyle: {
-              borderRadius: 34,
-            },
           }}
         >
           <Tabs.Screen

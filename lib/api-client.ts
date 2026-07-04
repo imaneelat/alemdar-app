@@ -55,10 +55,15 @@ function buildQuery(params?: Record<string, string | number | boolean | null | u
 export async function apiGet<T>(
   path: string,
   params?: Record<string, string | number | boolean | null | undefined>,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  options: { noStore?: boolean } = {}
 ): Promise<T> {
   const res = await fetch(`${BASE_URL}/api${path}${buildQuery(params)}`, {
-    headers: { Accept: 'application/json' },
+    cache: options.noStore ? 'no-store' : undefined,
+    headers: {
+      Accept: 'application/json',
+      ...(options.noStore ? { 'Cache-Control': 'no-store' } : {}),
+    },
     signal,
   });
 

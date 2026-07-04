@@ -16,9 +16,9 @@ import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  StatusBar,
   View as RNView,
   ScrollView,
+  StatusBar,
   TouchableOpacity,
   useColorScheme,
 } from "react-native";
@@ -44,10 +44,7 @@ export default function ProductDetail() {
     isError: productError,
     refetch: refetchProduct,
   } = useProductDetail(section, detailId);
-  const { data: similar } = useSimilarProducts(
-    section,
-    detailId,
-  );
+  const { data: similar } = useSimilarProducts(section, detailId);
   const relatedProducts = similar?.data ?? [];
   usePrefetchImages(relatedProducts.map((p) => p.image_filename));
 
@@ -111,8 +108,10 @@ export default function ProductDetail() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: PAGE_BG }} edges={["top"]}>
-
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: PAGE_BG }}
+      edges={["top", "bottom"]}
+    >
       {/* Fix 3: status bar matches page color */}
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
@@ -157,8 +156,9 @@ export default function ProductDetail() {
       </RNView>
 
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
+        // contentContainerStyle={{ paddingBottom: 24 }}
       >
         {/* PRODUCT IMAGE — Fix 1: same background as page */}
         <RNView
@@ -188,7 +188,9 @@ export default function ProductDetail() {
         </RNView>
 
         {/* Subtle divider */}
-        <RNView style={{ height: 1, backgroundColor: BORDER, marginHorizontal: 16 }} />
+        <RNView
+          style={{ height: 1, backgroundColor: BORDER, marginHorizontal: 16 }}
+        />
 
         {/* PRODUCT INFO */}
         <RNView
@@ -257,130 +259,135 @@ export default function ProductDetail() {
             </RNView>
           ) : (
             <>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "800",
-              color: TEXT,
-              lineHeight: 28,
-              marginBottom: 12,
-            }}
-          >
-            {name}
-          </Text>
-
-          {/* Category tag */}
-          <RNView
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              marginBottom: 16,
-            }}
-          >
-            <RNView
-              style={{
-                backgroundColor: isDark ? "#1e2433" : "#f0f0f5",
-                borderRadius: 6,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-              }}
-            >
               <Text
                 style={{
-                  fontSize: 11,
-                  color: meta.accentColor,
-                  fontWeight: "600",
+                  fontSize: 20,
+                  fontWeight: "800",
+                  color: TEXT,
+                  lineHeight: 28,
+                  marginBottom: 12,
                 }}
               >
-                {category || meta.title}
+                {name}
               </Text>
-            </RNView>
-          </RNView>
 
-          {/* Price */}
-          <RNView
-            style={{
-              flexDirection: "row",
-              alignItems: "flex-end",
-              gap: 4,
-              marginBottom: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 36,
-                fontWeight: "900",
-                color: AMBER,
-                lineHeight: 40,
-              }}
-            >
-              {whole}
-            </Text>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: "700",
-                color: AMBER,
-                marginBottom: 4,
-              }}
-            >
-              .{dec}
-            </Text>
-            <Text style={{ fontSize: 16, color: SUBTEXT, marginBottom: 6 }}>
-              TL
-            </Text>
-          </RNView>
-
-          {/* Details */}
-          <RNView
-            style={{
-              backgroundColor: isDark ? "#0d1120" : "#f8f8fc",
-              borderRadius: 12,
-              padding: 14,
-              marginBottom: 4,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 13,
-                fontWeight: "700",
-                color: TEXT,
-                marginBottom: 10,
-              }}
-            >
-              {t("product.details")}
-            </Text>
-            {[
-              { label: t("product.category"), value: category || meta.title },
-              {
-                label: t("product.sku"),
-                value: `AT-${section.toUpperCase()}-${productId.padStart(3, "0")}`,
-              },
-              {
-                label: t("product.shipping"),
-                value: t("product.shippingValue"),
-              },
-            ].map((row) => (
+              {/* Category tag */}
               <RNView
-                key={row.label}
                 style={{
                   flexDirection: "row",
-                  justifyContent: "space-between",
-                  paddingVertical: 7,
-                  borderBottomWidth: 1,
-                  borderBottomColor: BORDER,
+                  alignItems: "center",
+                  gap: 6,
+                  marginBottom: 16,
                 }}
               >
-                <Text style={{ fontSize: 12, color: SUBTEXT }}>
-                  {row.label}
+                <RNView
+                  style={{
+                    backgroundColor: isDark ? "#1e2433" : "#f0f0f5",
+                    borderRadius: 6,
+                    paddingHorizontal: 10,
+                    paddingVertical: 4,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      color: meta.accentColor,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {category || meta.title}
+                  </Text>
+                </RNView>
+              </RNView>
+
+              {/* Price */}
+              <RNView
+                style={{
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  gap: 4,
+                  marginBottom: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 36,
+                    fontWeight: "900",
+                    color: AMBER,
+                    lineHeight: 40,
+                  }}
+                >
+                  {whole}
                 </Text>
-                <Text style={{ fontSize: 12, fontWeight: "600", color: TEXT }}>
-                  {row.value}
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "700",
+                    color: AMBER,
+                    marginBottom: 4,
+                  }}
+                >
+                  .{dec}
+                </Text>
+                <Text style={{ fontSize: 16, color: SUBTEXT, marginBottom: 6 }}>
+                  TL
                 </Text>
               </RNView>
-            ))}
-          </RNView>
+
+              {/* Details */}
+              <RNView
+                style={{
+                  backgroundColor: isDark ? "#0d1120" : "#f8f8fc",
+                  borderRadius: 12,
+                  padding: 14,
+                  marginBottom: 4,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "700",
+                    color: TEXT,
+                    marginBottom: 10,
+                  }}
+                >
+                  {t("product.details")}
+                </Text>
+                {[
+                  {
+                    label: t("product.category"),
+                    value: category || meta.title,
+                  },
+                  {
+                    label: t("product.sku"),
+                    value: `AT-${section.toUpperCase()}-${productId.padStart(3, "0")}`,
+                  },
+                  {
+                    label: t("product.shipping"),
+                    value: t("product.shippingValue"),
+                  },
+                ].map((row) => (
+                  <RNView
+                    key={row.label}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      paddingVertical: 7,
+                      borderBottomWidth: 1,
+                      borderBottomColor: BORDER,
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: SUBTEXT }}>
+                      {row.label}
+                    </Text>
+                    <Text
+                      style={{ fontSize: 12, fontWeight: "600", color: TEXT }}
+                    >
+                      {row.value}
+                    </Text>
+                  </RNView>
+                ))}
+              </RNView>
             </>
           )}
         </RNView>
@@ -435,21 +442,14 @@ export default function ProductDetail() {
       {/* BOTTOM BAR */}
       <RNView
         style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
           backgroundColor: PAGE_BG,
           borderTopWidth: 1,
           borderTopColor: BORDER,
           paddingHorizontal: 16,
-          paddingTop: 12,
-          paddingBottom: 28,
+          // paddingVertical: 8,
         }}
       >
-        <Animated.View
-          style={{ opacity: fadeAnim, alignItems: "center", marginBottom: 8 }}
-        >
+        <Animated.View style={{ opacity: fadeAnim, alignItems: "center" }}>
           <Text style={{ fontSize: 12, color: "#2ecc71", fontWeight: "600" }}>
             ✓ {t("product.addedToCart")}
           </Text>

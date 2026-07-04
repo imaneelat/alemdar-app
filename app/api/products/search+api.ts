@@ -1,7 +1,24 @@
-import { error, json, parseIntParam } from '@/lib/http';
+import { parseIntParam } from '@/lib/http';
 import type { UniversalSearchItem } from '@/lib/api-types';
 
 const LIVE_SEARCH_URL = 'https://alemdarteknik.com/live-search';
+const NO_STORE_HEADERS = {
+  'Content-Type': 'application/json',
+  'Cache-Control': 'no-store, no-cache, max-age=0, must-revalidate',
+  Pragma: 'no-cache',
+  Expires: '0',
+};
+
+function noStoreJson(data: unknown, status = 200): Response {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: NO_STORE_HEADERS,
+  });
+}
+
+function noStoreError(message: string, status = 400): Response {
+  return noStoreJson({ error: message }, status);
+}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -9,7 +26,7 @@ export async function GET(request: Request) {
   const limit = parseIntParam(url.searchParams.get('limit'), 20, { max: 100 });
 
   if (q.length < 1) {
-    return json({ q, data: [] });
+    return noStoreJson({ q, data: [] });
   }
 
   try {
@@ -18,20 +35,21 @@ export async function GET(request: Request) {
     liveUrl.searchParams.set('limit', String(limit));
 
     const response = await fetch(liveUrl, {
+      cache: 'no-store',
       headers: { Accept: 'application/json' },
     });
 
     if (!response.ok) {
-      return error('Search failed', response.status);
+      return noStoreError('Search failed', response.status);
     }
 
     const data = (await response.json()) as UniversalSearchItem[];
     if (!Array.isArray(data)) {
-      return error('Invalid search response', 502);
+      return noStoreError('Invalid search response', 502);
     }
 
-    return json({ q, data });
+    return noStoreJson({ q, data });
   } catch (e) {
-    return error('Search failed', 500);
+    return noStoreError('Search failed', 500);
   }
 }
