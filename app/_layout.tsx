@@ -51,9 +51,12 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const [queryClient] = useState(createQueryClient);
+  const isDark = colorScheme === "dark";
+  const appBackground = isDark ? "#0d0d0d" : "#ffffff";
+  const navigationTheme = isDark ? DarkTheme : DefaultTheme;
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider style={{ flex: 1, backgroundColor: appBackground }}>
       <LanguageProvider>
         <PersistQueryClientProvider
           client={queryClient}
@@ -62,9 +65,20 @@ function RootLayoutNav() {
           <WishlistProvider>
             <CartProvider>
               <ThemeProvider
-                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+                value={{
+                  ...navigationTheme,
+                  colors: {
+                    ...navigationTheme.colors,
+                    background: appBackground,
+                    card: appBackground,
+                  },
+                }}
               >
-                <Stack>
+                <Stack
+                  screenOptions={{
+                    contentStyle: { backgroundColor: appBackground },
+                  }}
+                >
                   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                   <Stack.Screen
                     name="product-detail"

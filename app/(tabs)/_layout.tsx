@@ -24,13 +24,14 @@ export default function TabLayout() {
   const ACTIVE_COLOR = "#FF6B00";
   const INACTIVE_DARK = "#8A8A9A";
   const INACTIVE_LIGHT = "#6B6B80";
+  const backgroundColor = isDark ? "#0d0d0d" : "#ffffff";
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor }}>
       <BottomSheetModalProvider>
         <StatusBar
           style={isDark ? "light" : "dark"}
-          backgroundColor="transparent"
+          backgroundColor={backgroundColor}
           translucent
         />
         <Tabs
@@ -39,6 +40,7 @@ export default function TabLayout() {
           )}
           screenOptions={{
             headerShown: false,
+            sceneStyle: { backgroundColor },
             tabBarActiveTintColor: ACTIVE_COLOR,
             tabBarInactiveTintColor: isDark ? INACTIVE_DARK : INACTIVE_LIGHT,
             tabBarShowLabel: false,
