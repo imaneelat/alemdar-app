@@ -505,7 +505,10 @@ export default function HomeScreen() {
 
         {/* Right: Notifications + Cart */}
         <RNView style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <TouchableOpacity style={{ padding: 6 }}>
+          <TouchableOpacity
+            style={{ padding: 6 }}
+            onPress={() => router.push("/notifications")}
+          >
             <Ionicons
               name="notifications-outline"
               size={22}
@@ -913,19 +916,6 @@ export default function HomeScreen() {
                 borderColor: BORDER,
               }}
             >
-              {/* <RNView
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  backgroundColor: "#34A853",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Ionicons name="location" size={18} color="#fff" />
-              </RNView> */}
-
               <GoogleMapIcon width={32} height={32} />
               <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
                 Location
@@ -940,7 +930,6 @@ export default function HomeScreen() {
               color: SUBTEXT,
               textAlign: "center",
               marginTop: 16,
-              // marginBottom: 8,
             }}
           >
             {t("home.copyright")}
