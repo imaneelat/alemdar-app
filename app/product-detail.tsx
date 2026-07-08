@@ -24,7 +24,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const AMBER = "#f5a623";
+const AMBER = "#FF6B00";
 
 export default function ProductDetail() {
   useLocale();
@@ -58,7 +58,6 @@ export default function ProductDetail() {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Fix 1: unified background (no two-layer split)
   const PAGE_BG = isDark ? "#0d0d0d" : "#ffffff";
   const CARD_BG = isDark ? "#0d0d0d" : "#ffffff";
   const TEXT = isDark ? "#ffffff" : "#111111";
@@ -112,13 +111,12 @@ export default function ProductDetail() {
       style={{ flex: 1, backgroundColor: PAGE_BG }}
       edges={["top", "bottom"]}
     >
-      {/* Fix 3: status bar matches page color */}
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
         backgroundColor={PAGE_BG}
       />
 
-      {/* HEADER — Fix 2: show product name not category */}
+      {/* HEADER */}
       <RNView
         style={{
           flexDirection: "row",
@@ -155,12 +153,8 @@ export default function ProductDetail() {
         </TouchableOpacity>
       </RNView>
 
-      <ScrollView
-        style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-        // contentContainerStyle={{ paddingBottom: 24 }}
-      >
-        {/* PRODUCT IMAGE — Fix 1: same background as page */}
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+        {/* PRODUCT IMAGE */}
         <RNView
           style={{
             height: 280,
@@ -187,7 +181,6 @@ export default function ProductDetail() {
           )}
         </RNView>
 
-        {/* Subtle divider */}
         <RNView
           style={{ height: 1, backgroundColor: BORDER, marginHorizontal: 16 }}
         />
@@ -198,61 +191,20 @@ export default function ProductDetail() {
         >
           {productLoading ? (
             <>
-              <RNView
-                style={{
-                  height: 28,
-                  width: "85%",
-                  borderRadius: 8,
-                  backgroundColor: SKELETON,
-                  marginBottom: 12,
-                }}
-              />
-              <RNView
-                style={{
-                  height: 22,
-                  width: 100,
-                  borderRadius: 6,
-                  backgroundColor: SKELETON,
-                  marginBottom: 16,
-                }}
-              />
-              <RNView
-                style={{
-                  height: 42,
-                  width: 150,
-                  borderRadius: 8,
-                  backgroundColor: SKELETON,
-                  marginBottom: 20,
-                }}
-              />
-              <RNView
-                style={{
-                  height: 120,
-                  borderRadius: 12,
-                  backgroundColor: isDark ? "#0d1120" : "#f8f8fc",
-                }}
-              />
+              <RNView style={{ height: 28, width: "85%", borderRadius: 8, backgroundColor: SKELETON, marginBottom: 12 }} />
+              <RNView style={{ height: 22, width: 100, borderRadius: 6, backgroundColor: SKELETON, marginBottom: 16 }} />
+              <RNView style={{ height: 42, width: 150, borderRadius: 8, backgroundColor: SKELETON, marginBottom: 20 }} />
+              <RNView style={{ height: 120, borderRadius: 12, backgroundColor: isDark ? "#0d1120" : "#f8f8fc" }} />
             </>
           ) : productError ? (
-            <RNView
-              style={{
-                alignItems: "center",
-                paddingVertical: 24,
-                gap: 12,
-              }}
-            >
+            <RNView style={{ alignItems: "center", paddingVertical: 24, gap: 12 }}>
               <Ionicons name="alert-circle-outline" size={36} color={SUBTEXT} />
               <Text style={{ color: TEXT, fontSize: 16, fontWeight: "700" }}>
                 Failed to load product
               </Text>
               <TouchableOpacity
                 onPress={() => refetchProduct()}
-                style={{
-                  backgroundColor: AMBER,
-                  borderRadius: 10,
-                  paddingHorizontal: 18,
-                  paddingVertical: 10,
-                }}
+                style={{ backgroundColor: AMBER, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 10 }}
               >
                 <Text style={{ color: "#000", fontWeight: "800" }}>Retry</Text>
               </TouchableOpacity>
@@ -272,14 +224,7 @@ export default function ProductDetail() {
               </Text>
 
               {/* Category tag */}
-              <RNView
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                  marginBottom: 16,
-                }}
-              >
+              <RNView style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 16 }}>
                 <RNView
                   style={{
                     backgroundColor: isDark ? "#1e2433" : "#f0f0f5",
@@ -288,50 +233,17 @@ export default function ProductDetail() {
                     paddingVertical: 4,
                   }}
                 >
-                  <Text
-                    style={{
-                      fontSize: 11,
-                      color: meta.accentColor,
-                      fontWeight: "600",
-                    }}
-                  >
+                  <Text style={{ fontSize: 11, color: meta.accentColor, fontWeight: "600" }}>
                     {category || meta.title}
                   </Text>
                 </RNView>
               </RNView>
 
               {/* Price */}
-              <RNView
-                style={{
-                  flexDirection: "row",
-                  alignItems: "flex-end",
-                  gap: 4,
-                  marginBottom: 20,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 36,
-                    fontWeight: "900",
-                    color: AMBER,
-                    lineHeight: 40,
-                  }}
-                >
-                  {whole}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "700",
-                    color: AMBER,
-                    marginBottom: 4,
-                  }}
-                >
-                  .{dec}
-                </Text>
-                <Text style={{ fontSize: 16, color: SUBTEXT, marginBottom: 6 }}>
-                  TL
-                </Text>
+              <RNView style={{ flexDirection: "row", alignItems: "flex-end", gap: 4, marginBottom: 20 }}>
+                <Text style={{ fontSize: 36, fontWeight: "900", color: AMBER, lineHeight: 40 }}>{whole}</Text>
+                <Text style={{ fontSize: 18, fontWeight: "700", color: AMBER, marginBottom: 4 }}>.{dec}</Text>
+                <Text style={{ fontSize: 16, color: SUBTEXT, marginBottom: 6 }}>TL</Text>
               </RNView>
 
               {/* Details */}
@@ -343,29 +255,13 @@ export default function ProductDetail() {
                   marginBottom: 4,
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontWeight: "700",
-                    color: TEXT,
-                    marginBottom: 10,
-                  }}
-                >
+                <Text style={{ fontSize: 13, fontWeight: "700", color: TEXT, marginBottom: 10 }}>
                   {t("product.details")}
                 </Text>
                 {[
-                  {
-                    label: t("product.category"),
-                    value: category || meta.title,
-                  },
-                  {
-                    label: t("product.sku"),
-                    value: `AT-${section.toUpperCase()}-${productId.padStart(3, "0")}`,
-                  },
-                  {
-                    label: t("product.shipping"),
-                    value: t("product.shippingValue"),
-                  },
+                  { label: t("product.category"), value: category || meta.title },
+                  { label: t("product.sku"), value: `AT-${section.toUpperCase()}-${productId.padStart(3, "0")}` },
+                  { label: t("product.shipping"), value: t("product.shippingValue") },
                 ].map((row) => (
                   <RNView
                     key={row.label}
@@ -377,14 +273,8 @@ export default function ProductDetail() {
                       borderBottomColor: BORDER,
                     }}
                   >
-                    <Text style={{ fontSize: 12, color: SUBTEXT }}>
-                      {row.label}
-                    </Text>
-                    <Text
-                      style={{ fontSize: 12, fontWeight: "600", color: TEXT }}
-                    >
-                      {row.value}
-                    </Text>
+                    <Text style={{ fontSize: 12, color: SUBTEXT }}>{row.label}</Text>
+                    <Text style={{ fontSize: 12, fontWeight: "600", color: TEXT }}>{row.value}</Text>
                   </RNView>
                 ))}
               </RNView>
@@ -404,26 +294,15 @@ export default function ProductDetail() {
                 marginBottom: 12,
               }}
             >
-              <RNView
-                style={{
-                  width: 4,
-                  height: 18,
-                  borderRadius: 2,
-                  backgroundColor: meta.accentColor,
-                }}
-              />
+              <RNView style={{ width: 4, height: 18, borderRadius: 2, backgroundColor: meta.accentColor }} />
               <Text style={{ fontSize: 17, fontWeight: "700", color: TEXT }}>
                 {t("product.moreFrom", { title: meta.title })}
               </Text>
             </RNView>
-
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingHorizontal: 16,
-                paddingBottom: 4,
-              }}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 4 }}
             >
               {relatedProducts.map((rel) => (
                 <ProductCard
@@ -446,35 +325,57 @@ export default function ProductDetail() {
           borderTopWidth: 1,
           borderTopColor: BORDER,
           paddingHorizontal: 16,
-          // paddingVertical: 8,
+          paddingVertical: 12,
         }}
       >
-        <Animated.View style={{ opacity: fadeAnim, alignItems: "center" }}>
+        <Animated.View style={{ opacity: fadeAnim, alignItems: "center", marginBottom: 4 }}>
           <Text style={{ fontSize: 12, color: "#2ecc71", fontWeight: "600" }}>
             ✓ {t("product.addedToCart")}
           </Text>
         </Animated.View>
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <TouchableOpacity
-            onPress={handleAddToCart}
-            disabled={!product || productLoading || productError}
-            activeOpacity={0.85}
+
+        <RNView style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          {/* Price pill — bigger */}
+          <RNView
             style={{
-              backgroundColor: product && !productError ? AMBER : SKELETON,
+              flex: 2,
+              height: 52,
+              backgroundColor: isDark ? "#1e2433" : "#f0f0f5",
               borderRadius: 14,
-              paddingVertical: 15,
               alignItems: "center",
-              flexDirection: "row",
               justifyContent: "center",
-              gap: 8,
             }}
           >
-            <Ionicons name="cart-outline" size={20} color="#000" />
-            <Text style={{ fontSize: 16, fontWeight: "800", color: "#000" }}>
-              {productLoading ? "Loading..." : t("addToCart")}
+            <Text style={{ fontSize: 20, fontWeight: "900", color: AMBER }}>
+              {whole}
+              <Text style={{ fontSize: 13, fontWeight: "700", color: AMBER }}>.{dec}</Text>
+              <Text style={{ fontSize: 12, color: SUBTEXT, fontWeight: "400" }}> TL</Text>
             </Text>
-          </TouchableOpacity>
-        </Animated.View>
+          </RNView>
+
+          {/* Add to Cart button — smaller */}
+          <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
+            <TouchableOpacity
+              onPress={handleAddToCart}
+              disabled={!product || productLoading || productError}
+              activeOpacity={0.85}
+              style={{
+                backgroundColor: product && !productError ? AMBER : "#ccc",
+                borderRadius: 14,
+                height: 52,
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "center",
+                gap: 6,
+              }}
+            >
+              <Ionicons name="cart-outline" size={18} color="#000" />
+              <Text style={{ fontSize: 13, fontWeight: "800", color: "#000" }}>
+                {productLoading ? "..." : t("addToCart")}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </RNView>
       </RNView>
     </SafeAreaView>
   );
