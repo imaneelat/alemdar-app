@@ -5,7 +5,7 @@ import { Image, Text, TouchableOpacity, View, useColorScheme } from "react-nativ
 import { Divider } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const AMBER = "#f5a623";
+const AMBER = "#FF6B00";
 
 type NotificationItem = {
   id: string;

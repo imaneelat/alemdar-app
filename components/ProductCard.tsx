@@ -9,9 +9,8 @@ import { useCart } from '@/context/CartContext';
 import { splitPrice } from '@/lib/price';
 import { resolveImageUrl } from '@/lib/image-url';
 
-const AMBER = '#f5a623';
+const AMBER = '#FF6B00';
 
-/** Minimal product shape rendered by the card (matches the API NormalizedProduct). */
 export type CardProduct = {
   id: number | string;
   section: string;
@@ -23,11 +22,9 @@ export type CardProduct = {
 
 type Props = {
   product: CardProduct;
-  /** Section title used as the cart category label + tag. */
   sectionTitle?: string;
   accentColor?: string;
   width?: number;
-  /** Fill the parent width (for grids) instead of a fixed carousel width. */
   fluid?: boolean;
 };
 
@@ -76,15 +73,36 @@ function ProductCardBase({ product, sectionTitle, accentColor = AMBER, width = 1
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={goToDetail}
-      style={{ width: fluid ? '100%' : width, backgroundColor: CARD_BG, borderRadius: 12, borderWidth: 1, borderColor: BORDER, marginRight: fluid ? 0 : 12, overflow: 'hidden' }}
+      style={{
+        width: fluid ? '100%' : width,
+        backgroundColor: CARD_BG,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: BORDER,
+        marginRight: fluid ? 0 : 12,
+        overflow: 'hidden',
+      }}
     >
-      <RNView style={{ height: 120, backgroundColor: IMG_BG, alignItems: 'center', justifyContent: 'center' }}>
+      {/* Image — no fixed height, fills naturally */}
+      <RNView style={{ backgroundColor: IMG_BG, minHeight: 120 }}>
         {imageUrl ? (
-          <CachedImage source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} contentFit="cover" recyclingKey={id} />
+          <CachedImage
+            source={{ uri: imageUrl }}
+            style={{ width: '100%', aspectRatio: 1 }}
+            contentFit="cover"
+            recyclingKey={id}
+          />
         ) : (
-          <Ionicons name="image-outline" size={30} color={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'} />
+          <RNView style={{ height: 120, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons
+              name="image-outline"
+              size={30}
+              color={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}
+            />
+          </RNView>
         )}
       </RNView>
+
       <RNView style={{ padding: 10 }}>
         {!!categoryLabel && (
           <Text numberOfLines={1} style={{ fontSize: 9, fontWeight: '700', marginBottom: 4, color: accentColor }}>
@@ -99,8 +117,20 @@ function ProductCardBase({ product, sectionTitle, accentColor = AMBER, width = 1
           <Text style={{ fontSize: 10, fontWeight: '600', color: TEXT, marginBottom: 1 }}>.{dec}</Text>
           <Text style={{ fontSize: 10, color: SUBTEXT, marginBottom: 1, marginLeft: 2 }}>TL</Text>
         </RNView>
-        <TouchableOpacity onPress={handleAdd} style={{ backgroundColor: AMBER, borderRadius: 8, paddingVertical: 7, alignItems: 'center' }}>
-          <Text style={{ color: '#000', fontSize: 10, fontWeight: '700' }}>Add to Cart</Text>
+        <TouchableOpacity
+          onPress={handleAdd}
+          style={{
+            backgroundColor: '#FF6B00',
+            borderRadius: 8,
+            paddingVertical: 8,
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: 4,
+          }}
+        >
+          <Ionicons name="cart-outline" size={11} color="#fff" />
+          <Text style={{ color: '#fff', fontSize: 10, fontWeight: '700' }}>Add to Cart</Text>
         </TouchableOpacity>
       </RNView>
     </TouchableOpacity>

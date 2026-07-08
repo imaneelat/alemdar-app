@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Dimensions,
+  Linking,
   View as RNView,
   ScrollView,
   TextInput,
@@ -30,7 +31,7 @@ import Carousel, {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const AMBER = "#f5a623";
+const AMBER = "#FF6B00";
 const BANNER_HEIGHT = 200;
 
 //  Banner slidess
@@ -71,104 +72,20 @@ const bannerSlides = [
 
 //categories
 const categories = [
-  {
-    id: "1",
-    name: "Solar",
-    icon: "sunny-outline",
-    color: "#f5a623",
-    section: "solardb",
-  },
-  {
-    id: "2",
-    name: "Arduino",
-    icon: "hardware-chip-outline",
-    color: "#00979d",
-    section: "arduino",
-  },
-  {
-    id: "3",
-    name: "Sound",
-    icon: "musical-notes-outline",
-    color: "#a855f7",
-    section: "sound",
-  },
-  {
-    id: "4",
-    name: "Batteries",
-    icon: "battery-charging-outline",
-    color: "#e3342f",
-    section: "batteries",
-  },
-  {
-    id: "5",
-    name: "Chargers",
-    icon: "phone-portrait-outline",
-    color: "#3b82f6",
-    section: "chargers",
-  },
-  {
-    id: "6",
-    name: "Adapters",
-    icon: "swap-horizontal-outline",
-    color: "#f5a623",
-    section: "adapters",
-  },
-  {
-    id: "7",
-    name: "Lamps",
-    icon: "bulb-outline",
-    color: "#fbbf24",
-    section: "lamps",
-  },
-  {
-    id: "8",
-    name: "Mexxsun",
-    icon: "leaf-outline",
-    color: "#10b981",
-    section: "mexxsun",
-  },
-  {
-    id: "9",
-    name: "Filaments",
-    icon: "layers-outline",
-    color: "#ec4899",
-    section: "filaments",
-  },
-  {
-    id: "10",
-    name: "TV Remotes",
-    icon: "tv-outline",
-    color: "#6366f1",
-    section: "tv_remotes",
-  },
-  {
-    id: "11",
-    name: "Fans",
-    icon: "thermometer-outline",
-    color: "#06b6d4",
-    section: "fans",
-  },
-  {
-    id: "12",
-    name: "Electric",
-    icon: "construct-outline",
-    color: "#f97316",
-    section: "electric",
-  },
-  {
-    id: "13",
-    name: "Screwdrivers",
-    icon: "settings-outline",
-    color: "#78716c",
-    section: "scrawesdriver",
-  },
-  {
-    id: "14",
-    name: "Spray Gum",
-    icon: "color-fill-outline",
-    color: "#84cc16",
-    section: "spray_gum",
-  },
+  { id: "1", name: "Solar", icon: "sunny-outline", color: "#f5a623", section: "solardb" },
+  { id: "2", name: "Arduino", icon: "hardware-chip-outline", color: "#00979d", section: "arduino" },
+  { id: "3", name: "Sound", icon: "musical-notes-outline", color: "#a855f7", section: "sound" },
+  { id: "4", name: "Batteries", icon: "battery-charging-outline", color: "#e3342f", section: "batteries" },
+  { id: "5", name: "Chargers", icon: "phone-portrait-outline", color: "#3b82f6", section: "chargers" },
+  { id: "6", name: "Adapters", icon: "swap-horizontal-outline", color: "#f5a623", section: "adapters" },
+  { id: "7", name: "Lamps", icon: "bulb-outline", color: "#fbbf24", section: "lamps" },
+  { id: "8", name: "Mexxsun", icon: "leaf-outline", color: "#10b981", section: "mexxsun" },
+  { id: "9", name: "Filaments", icon: "layers-outline", color: "#ec4899", section: "filaments" },
+  { id: "10", name: "TV Remotes", icon: "tv-outline", color: "#6366f1", section: "tv_remotes" },
+  { id: "11", name: "Fans", icon: "thermometer-outline", color: "#06b6d4", section: "fans" },
+  { id: "12", name: "Electric", icon: "construct-outline", color: "#f97316", section: "electric" },
+  { id: "13", name: "Screwdrivers", icon: "settings-outline", color: "#78716c", section: "scrawesdriver" },
+  { id: "14", name: "Spray Gum", icon: "color-fill-outline", color: "#84cc16", section: "spray_gum" },
 ];
 
 // brandes
@@ -210,37 +127,16 @@ function RepairServiceCard({ isDark, BORDER }: any) {
         padding: 18,
       }}
     >
-      {/* Title */}
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "800",
-          color: textDark,
-          marginBottom: 2,
-        }}
-      >
+      <Text style={{ fontSize: 18, fontWeight: "800", color: textDark, marginBottom: 2 }}>
         {t("home.repair.title")}
       </Text>
-      <Text
-        style={{
-          fontSize: 18,
-          fontWeight: "800",
-          color: AMBER,
-          marginBottom: 16,
-        }}
-      >
+      <Text style={{ fontSize: 18, fontWeight: "800", color: AMBER, marginBottom: 16 }}>
         {t("home.repair.subtitle")}
       </Text>
 
-      {/* Steps */}
-      <RNView
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 18 }}
-      >
+      <RNView style={{ flexDirection: "row", alignItems: "center", marginBottom: 18 }}>
         {repairSteps.map((step, index) => (
-          <RNView
-            key={step.labelKey}
-            style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
-          >
+          <RNView key={step.labelKey} style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
             <RNView style={{ alignItems: "center", flex: 1 }}>
               <RNView
                 style={{
@@ -257,34 +153,17 @@ function RepairServiceCard({ isDark, BORDER }: any) {
               >
                 <Ionicons name={step.icon as any} size={18} color={AMBER} />
               </RNView>
-              <Text
-                style={{
-                  fontSize: 9,
-                  color: subText,
-                  textAlign: "center",
-                  fontWeight: "500",
-                }}
-              >
+              <Text style={{ fontSize: 9, color: subText, textAlign: "center", fontWeight: "500" }}>
                 {t(step.labelKey)}
               </Text>
             </RNView>
             {index < repairSteps.length - 1 && (
-              <Text
-                style={{
-                  color: AMBER,
-                  fontSize: 12,
-                  marginBottom: 14,
-                  opacity: 0.6,
-                }}
-              >
-                →
-              </Text>
+              <Text style={{ color: AMBER, fontSize: 12, marginBottom: 14, opacity: 0.6 }}>→</Text>
             )}
           </RNView>
         ))}
       </RNView>
 
-      {/* Phone input */}
       <Text style={{ fontSize: 11, color: subText, marginBottom: 8 }}>
         {t("home.repair.leaveNumber")}
       </Text>
@@ -301,38 +180,19 @@ function RepairServiceCard({ isDark, BORDER }: any) {
           marginBottom: 12,
         }}
       >
-        <Text
-          style={{
-            fontSize: 13,
-            fontWeight: "700",
-            color: textDark,
-            marginRight: 6,
-          }}
-        >
-          TR +90
-        </Text>
-        <RNView
-          style={{
-            width: 1,
-            height: 16,
-            backgroundColor: BORDER,
-            marginRight: 10,
-          }}
-        />
+        <Text style={{ fontSize: 13, fontWeight: "700", color: textDark, marginRight: 6 }}>TR +90</Text>
+        <RNView style={{ width: 1, height: 16, backgroundColor: BORDER, marginRight: 10 }} />
         <TextInput
           value={phone}
           onChangeText={setPhone}
           placeholder="5__ __ __ __"
-          placeholderTextColor={
-            isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"
-          }
+          placeholderTextColor={isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)"}
           keyboardType="phone-pad"
           maxLength={10}
           style={{ flex: 1, fontSize: 14, color: textDark }}
         />
       </RNView>
 
-      {/* CTA Button */}
       <TouchableOpacity
         onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
         activeOpacity={0.85}
@@ -372,7 +232,6 @@ export default function HomeScreen() {
   const SEARCH_BG = isDark ? "#0B1525" : "#f0f0f5";
   const ICON_COLOR = isDark ? "#ffffff" : "#111111";
   const SEARCH_PH = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
-  // const SEARCH_TC = isDark ? "#ffffff" : "#111111";
 
   const bannerProgress = useSharedValue(0);
   const bannerRef = useRef<ICarouselInstance>(null);
@@ -384,7 +243,6 @@ export default function HomeScreen() {
     });
   };
 
-  // ── Banner Slide ─────────────────────────────────────────────
   const renderBannerSlide = ({ item }: { item: (typeof bannerSlides)[0] }) => (
     <RNView
       style={{
@@ -446,24 +304,14 @@ export default function HomeScreen() {
           </Text>
         </TouchableOpacity>
       </RNView>
-      <RNView
-        style={{ width: 90, alignItems: "center", justifyContent: "center" }}
-      >
-        <Ionicons
-          name="image-outline"
-          size={40}
-          color="rgba(255,255,255,0.1)"
-        />
+      <RNView style={{ width: 90, alignItems: "center", justifyContent: "center" }}>
+        <Ionicons name="image-outline" size={40} color="rgba(255,255,255,0.1)" />
       </RNView>
     </RNView>
   );
 
-  // ─── RENDER ──────────────────────────────────────────────────
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: HEADER_BG }}
-      edges={["top"]}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: HEADER_BG }} edges={["top"]}>
       {/* HEADER */}
       <RNView
         style={{
@@ -478,47 +326,30 @@ export default function HomeScreen() {
         }}
       >
         <RNView>
-          <Text
-            style={{
-              fontSize: 22,
-              fontWeight: "700",
-              color: TEXT,
-              letterSpacing: 0.3,
-            }}
-          >
+          <Text style={{ fontSize: 22, fontWeight: "700", color: TEXT, letterSpacing: 0.3 }}>
             Alemdar <Text style={{ color: AMBER }}>Teknik</Text>
           </Text>
-          <RNView
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 3,
-              marginTop: 2,
+          <TouchableOpacity
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Linking.openURL(
+                "https://www.google.com/maps?q=Alemdar+Teknik,+Polis+Sk,+Lefko%C5%9Fa+5000&ftid=0x14de17339227c4f7:0x4bb7a378a71dcdc7"
+              );
             }}
+            activeOpacity={0.7}
+            style={{ flexDirection: "row", alignItems: "center", gap: 3, marginTop: 2 }}
           >
             <Ionicons name="location-sharp" size={14} color={AMBER} />
-            <Text style={{ fontSize: 10, color: SUBTEXT }}>
-              {t("home.location")}
-            </Text>
-          </RNView>
+            <Text style={{ fontSize: 10, color: SUBTEXT }}>{t("home.location")}</Text>
+          </TouchableOpacity>
         </RNView>
 
         {/* Right: Notifications + Cart */}
         <RNView style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <TouchableOpacity
-            style={{ padding: 6 }}
-            onPress={() => router.push("/notifications")}
-          >
-            <Ionicons
-              name="notifications-outline"
-              size={22}
-              color={ICON_COLOR}
-            />
+          <TouchableOpacity style={{ padding: 6 }} onPress={() => router.push("/notifications")}>
+            <Ionicons name="notifications-outline" size={22} color={ICON_COLOR} />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => router.push("/cart")}
-            style={{ padding: 6 }}
-          >
+          <TouchableOpacity onPress={() => router.push("/cart")} style={{ padding: 6 }}>
             <RNView>
               <Ionicons name="cart-outline" size={22} color={ICON_COLOR} />
               {totalItems > 0 && (
@@ -536,11 +367,7 @@ export default function HomeScreen() {
                     paddingHorizontal: 3,
                   }}
                 >
-                  <Text
-                    style={{ fontSize: 9, fontWeight: "800", color: "#fff" }}
-                  >
-                    {totalItems}
-                  </Text>
+                  <Text style={{ fontSize: 9, fontWeight: "800", color: "#fff" }}>{totalItems}</Text>
                 </RNView>
               )}
             </RNView>
@@ -571,29 +398,11 @@ export default function HomeScreen() {
             paddingVertical: 10,
           }}
         >
-          <Ionicons
-            name="search"
-            size={16}
-            color={SEARCH_PH}
-            style={{ marginRight: 8 }}
-          />
+          <Ionicons name="search" size={16} color={SEARCH_PH} style={{ marginRight: 8 }} />
           <Text style={{ flex: 1, fontSize: 13, color: SEARCH_PH }}>
             {t("home.searchPlaceholder")}
           </Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => router.push("/search")}
-          style={{
-            width: 42,
-            height: 42,
-            borderRadius: 10,
-            backgroundColor: SEARCH_BG,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Ionicons name="options-outline" size={20} color={ICON_COLOR} />
-        </TouchableOpacity> */}
       </RNView>
 
       {/* BODY */}
@@ -646,13 +455,10 @@ export default function HomeScreen() {
             onPress={onPressBannerPagination}
             customReanimatedStyle={(progress, index, length) => {
               "worklet";
-
               let distance = Math.abs(progress - index);
-
               if (index === 0 && progress > length - 1) {
                 distance = Math.abs(progress - length);
               }
-
               return {
                 transform: [
                   {
@@ -660,7 +466,7 @@ export default function HomeScreen() {
                       distance,
                       [0, 1],
                       [1.08, 1],
-                      Extrapolation.CLAMP,
+                      Extrapolation.CLAMP
                     ),
                   },
                 ],
@@ -672,9 +478,6 @@ export default function HomeScreen() {
         {/* CATEGORIES */}
         <RNView
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
             paddingHorizontal: 16,
             marginTop: 16,
             marginBottom: 12,
@@ -683,11 +486,6 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 18, fontWeight: "700", color: TEXT }}>
             {t("home.categories")}
           </Text>
-          <TouchableOpacity>
-            <Text style={{ fontSize: 12, fontWeight: "600", color: AMBER }}>
-              {t("viewAll")}
-            </Text>
-          </TouchableOpacity>
         </RNView>
         <ScrollView
           horizontal
@@ -700,10 +498,7 @@ export default function HomeScreen() {
               style={{ alignItems: "center", width: 62 }}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push({
-                  pathname: "/category-detail",
-                  params: { section: cat.section },
-                });
+                router.push({ pathname: "/category-detail", params: { section: cat.section } });
               }}
             >
               <RNView
@@ -722,12 +517,7 @@ export default function HomeScreen() {
                 <Ionicons name={cat.icon as any} size={22} color={cat.color} />
               </RNView>
               <Text
-                style={{
-                  fontSize: 10,
-                  fontWeight: "600",
-                  color: TEXT,
-                  textAlign: "center",
-                }}
+                style={{ fontSize: 10, fontWeight: "600", color: TEXT, textAlign: "center" }}
                 numberOfLines={1}
               >
                 {cat.name}
@@ -739,9 +529,6 @@ export default function HomeScreen() {
         {/* BRANDS */}
         <RNView
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
             paddingHorizontal: 16,
             marginTop: 28,
             marginBottom: 12,
@@ -750,11 +537,6 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 18, fontWeight: "700", color: TEXT }}>
             {t("home.brands")}
           </Text>
-          <TouchableOpacity>
-            <Text style={{ fontSize: 12, fontWeight: "600", color: AMBER }}>
-              {t("viewAll")}
-            </Text>
-          </TouchableOpacity>
         </RNView>
         <ScrollView
           horizontal
@@ -777,22 +559,8 @@ export default function HomeScreen() {
                 gap: 6,
               }}
             >
-              <RNView
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: 4,
-                  backgroundColor: brand.color,
-                }}
-              />
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: "700",
-                  color: TEXT,
-                  letterSpacing: 0.8,
-                }}
-              >
+              <RNView style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: brand.color }} />
+              <Text style={{ fontSize: 11, fontWeight: "700", color: TEXT, letterSpacing: 0.8 }}>
                 {brand.name}
               </Text>
             </TouchableOpacity>
@@ -839,7 +607,6 @@ export default function HomeScreen() {
             <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                const { Linking } = require("react-native");
                 Linking.openURL("https://www.facebook.com/AlemdarTeknikLtd");
               }}
               activeOpacity={0.8}
@@ -857,19 +624,15 @@ export default function HomeScreen() {
               }}
             >
               <FacebookIcon width={32} height={32} />
-
-              <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
-                Facebook
-              </Text>
+              <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>Facebook</Text>
             </TouchableOpacity>
 
             {/* Instagram */}
             <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                const { Linking } = require("react-native");
                 Linking.openURL(
-                  "https://www.instagram.com/alemdarteknik?igsh=MTV3enhzczUxMGFiYg%3D%3D&utm_source=qr",
+                  "https://www.instagram.com/alemdarteknik?igsh=MTV3enhzczUxMGFiYg%3D%3D&utm_source=qr"
                 );
               }}
               activeOpacity={0.8}
@@ -887,19 +650,15 @@ export default function HomeScreen() {
               }}
             >
               <InstagramIcon width={32} height={32} />
-
-              <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
-                Instagram
-              </Text>
+              <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>Instagram</Text>
             </TouchableOpacity>
 
             {/* Location */}
             <TouchableOpacity
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                const { Linking } = require("react-native");
                 Linking.openURL(
-                  "https://www.google.com/maps?q=Alemdar+Teknik,+Polis+Sk,+Lefko%C5%9Fa+5000&ftid=0x14de17339227c4f7:0x4bb7a378a71dcdc7&entry=gps&shh=CAE&lucs=,94297699,94275415,94231188,94280568,47071704,94218641,94282134,94286869&g_ep=CAISEjI2LjA1LjEuODYxMzIyMjEwMBgAIMi8BypILDk0Mjk3Njk5LDk0Mjc1NDE1LDk0MjMxMTg4LDk0MjgwNTY4LDQ3MDcxNzA0LDk0MjE4NjQxLDk0MjgyMTM0LDk0Mjg2ODY5QgJDWQ%3D%3D&skid=6b7c7b7d-a985-4e3a-92a6-6e0ec7205e39&g_st=ic",
+                  "https://www.google.com/maps?q=Alemdar+Teknik,+Polis+Sk,+Lefko%C5%9Fa+5000&ftid=0x14de17339227c4f7:0x4bb7a378a71dcdc7&entry=gps&shh=CAE&lucs=,94297699,94275415,94231188,94280568,47071704,94218641,94282134,94286869&g_ep=CAISEjI2LjA1LjEuODYxMzIyMjEwMBgAIMi8BypILDk0Mjk3Njk5LDk0Mjc1NDE1LDk0MjMxMTg4LDk0MjgwNTY4LDQ3MDcxNzA0LDk0MjE4NjQxLDk0MjgyMTM0LDk0Mjg2ODY5QgJDWQ%3D%3D&skid=6b7c7b7d-a985-4e3a-92a6-6e0ec7205e39&g_st=ic"
                 );
               }}
               activeOpacity={0.8}
@@ -917,20 +676,13 @@ export default function HomeScreen() {
               }}
             >
               <GoogleMapIcon width={32} height={32} />
-              <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>
-                Location
-              </Text>
+              <Text style={{ fontSize: 11, fontWeight: "600", color: TEXT }}>Location</Text>
             </TouchableOpacity>
           </RNView>
 
           {/* Copyright */}
           <Text
-            style={{
-              fontSize: 11,
-              color: SUBTEXT,
-              textAlign: "center",
-              marginTop: 16,
-            }}
+            style={{ fontSize: 11, color: SUBTEXT, textAlign: "center", marginTop: 16 }}
           >
             {t("home.copyright")}
           </Text>
