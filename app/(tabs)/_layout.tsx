@@ -1,31 +1,49 @@
 import LanguageSheet from "@/components/LanguageSheet";
+import SettingsSheet from "@/components/SettingsSheet";
 import { NAVBAR_V2_STYLE, NavbarV2Background } from "@/components/NavbarV2";
 import PrivacySheet from "@/components/PrivacySheet";
 import { useColorScheme } from "@/components/useColorScheme";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
+import BottomSheet, { type BottomSheetMethods } from "@devvie/bottom-sheet";
+import { Ionicons } from "@expo/vector-icons";
 
 let _set: ((s: string | null) => void) | null = null;
 export const openSheet = (s: string) => _set?.(s);
 export const closeSheets = () => _set?.(null);
+
+let _showConfirm: ((s: string | null) => void) | null = null;
+export const showServiceConfirm = (s: string) => _showConfirm?.(s);
+export const hideServiceConfirm = () => _showConfirm?.(null);
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
   const [sheet, setSheet] = useState<string | null>(null);
+  const [confirmService, setConfirmService] = useState<string | null>(null);
+  const serviceSheetRef = useRef<BottomSheetMethods>(null);
   useEffect(() => {
     _set = setSheet;
+    _showConfirm = setConfirmService;
   }, []);
+  useEffect(() => {
+    if (confirmService) {
+      serviceSheetRef.current?.open();
+    } else {
+      serviceSheetRef.current?.close();
+    }
+  }, [confirmService]);
 
   const ACTIVE_COLOR = "#FF6B00";
   const INACTIVE_DARK = "#8A8A9A";
-  const INACTIVE_LIGHT = "#6B6B80";
+  const INACTIVE_LIGHT = "#8E8E93";
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -99,22 +117,43 @@ export default function TabLayout() {
             }}
           />
           <Tabs.Screen
-            name="four"
+            name="center"
             options={{
-              title: "Account",
+              title: "Services",
               tabBarIcon: ({ color }) => (
-                <Svg width={30} height={35} viewBox="0 0 32 32">
-                  <Path
-                    d="M14.4 3.2a6.4 6.4 0 1 0 0 12.8 6.4 6.4 0 0 0 0-12.8ZM9.6 9.6a4.8 4.8 0 1 1 9.6 0 4.8 4.8 0 0 1-9.6 0Zm-3.2 8A3.2 3.2 0 0 0 3.2 20.8c0 2.7 1.3 4.7 3.4 6.1C8.7 28.2 11.4 28.8 14.4 28.8h0.1a4 4 0 0 1-0.1-0.8V27.2c-2.8 0-5.2-0.6-6.9-1.7C5.8 24.5 4.8 22.9 4.8 20.8c0-0.9 0.7-1.6 1.6-1.6h8.8a4 4 0 0 1 2.5-1.5A4.5 4.5 0 0 1 17.7 17.6H6.4Zm12.8 0.8v0.8h-0.8a2.4 2.4 0 0 0-2.4 2.4v6.4a2.4 2.4 0 0 0 2.4 2.4h9.6a2.4 2.4 0 0 0 2.4-2.4v-6.4a2.4 2.4 0 0 0-2.4-2.4H27.2v-0.8a2.4 2.4 0 0 0-2.4-2.4h-3.2a2.4 2.4 0 0 0-2.4 2.4Zm2.4-0.8h3.2a0.8 0.8 0 0 1 0.8 0.8v0.8h-4.8v-0.8a0.8 0.8 0 0 1 0.8-0.8Z"
-                    fill={color}
-                  />
-                </Svg>
+                <Ionicons name="headset-outline" size={26} color={color} />
               ),
             }}
           />
         </Tabs>
         <PrivacySheet visible={sheet === "privacy"} onClose={closeSheets} />
         <LanguageSheet visible={sheet === "language"} onClose={closeSheets} />
+        <SettingsSheet visible={sheet === "settings"} onClose={closeSheets} />
+        <BottomSheet
+          ref={serviceSheetRef}
+          height={320}
+          style={{ backgroundColor: "#101928", borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
+          closeOnDragDown
+          closeOnBackdropPress
+          onClose={hideServiceConfirm}
+        >
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 12 }}>
+            <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: "#1F883D20", alignItems: "center", justifyContent: "center" }}>
+              <Ionicons name="checkmark-circle" size={44} color="#1F883D" />
+            </View>
+            <Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>Request Sent</Text>
+            <Text style={{ color: "#A9AEC0", fontSize: 14, textAlign: "center" }}>
+              {confirmService ? `Your ${confirmService.toLowerCase()} service request has been submitted. We'll connect you with a professional shortly.` : "We'll connect you with a professional shortly."}
+            </Text>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={hideServiceConfirm}
+              style={{ marginTop: 8, backgroundColor: "#FF6B00", borderRadius: 14, paddingHorizontal: 32, paddingVertical: 14, width: "100%", alignItems: "center" }}
+            >
+              <Text style={{ color: "#fff", fontSize: 14, fontWeight: "700" }}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );

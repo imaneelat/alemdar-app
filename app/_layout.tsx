@@ -18,10 +18,6 @@ import "react-native-reanimated";
 
 export { ErrorBoundary } from "expo-router";
 
-export const unstable_settings = {
-  initialRouteName: "(tabs)",
-};
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -63,6 +59,7 @@ function RootLayoutNav() {
               value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
             >
               <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
                   name="product-detail"

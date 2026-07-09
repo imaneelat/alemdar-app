@@ -9,6 +9,7 @@ import { HOME_SECTIONS } from "@/lib/section-meta";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { openSheet } from "./_layout";
 import { useRef, useState } from "react";
 import {
   Dimensions,
@@ -511,6 +512,12 @@ export default function HomeScreen() {
               size={22}
               color={ICON_COLOR}
             />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ padding: 6 }}
+            onPress={() => openSheet("settings")}
+          >
+            <Ionicons name="settings-outline" size={22} color={ICON_COLOR} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push("/cart")}
