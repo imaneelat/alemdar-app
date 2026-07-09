@@ -1,14 +1,6 @@
-1. [x] Change social media icons to real icons.
-2. Add theme switcher and light mode for account screen.
-3. [x] Add pull-to-refresh on categories and search
-4. Add notifications screen and APIs.
-5. [x] Delete all subtitles and product counts (category details screen)
-6. [-] Add spinner on search function + send search algorithm to Lamin.
-7. Add safe area to all screens.
-8. Salah: unify the background colors for ID screen and delete the badges.
-9. Close keyboard when swiping.
-10. Fix the filters and add them to the pipeline.
-11. Add splash screen.
-12. No auth; modify account screen.
-13. [x] Add rate limiting.
-14. [x] Home screen: use carousel package.
+[] unify colors across the app
+[] keyboard should close when swiping
+[] lamine: complete the checkout and get the address and number info and save them in db
+[] splash screen should only appear once
+[] make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good
+[] light/dark swticher
