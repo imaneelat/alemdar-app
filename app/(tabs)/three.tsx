@@ -14,7 +14,7 @@ import { FlashList, ListRenderItemInfo } from '@shopify/flash-list';
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useLocale, t } from '@/lib/i18n';
 
-const AMBER = '#FF6B00';
+const AMBER = "#FF6B00";
 
 // Wishlist card 
 

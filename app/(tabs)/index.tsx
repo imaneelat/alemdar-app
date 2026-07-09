@@ -31,7 +31,7 @@ import Carousel, {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const AMBER = "#f5a623";
+const AMBER = "#FF6B00";
 const BANNER_HEIGHT = 200;
 
 //  Banner slidess
@@ -506,13 +506,13 @@ export default function HomeScreen() {
 
         {/* Right: Notifications + Cart */}
         <RNView style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <TouchableOpacity style={{ padding: 6 }}>
-            <Ionicons
-              name="notifications-outline"
-              size={22}
-              color={ICON_COLOR}
-            />
-          </TouchableOpacity>
+         <TouchableOpacity style={{ padding: 6 }} onPress={() => router.push("/notifications")}>
+  <Ionicons
+    name="notifications-outline"
+    size={22}
+    color={ICON_COLOR}
+  />
+</TouchableOpacity>
           <TouchableOpacity
             style={{ padding: 6 }}
             onPress={() => openSheet("settings")}
