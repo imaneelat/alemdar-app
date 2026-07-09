@@ -585,19 +585,7 @@ export default function HomeScreen() {
             {t("home.searchPlaceholder")}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => router.push("/search")}
-          style={{
-            width: 42,
-            height: 42,
-            borderRadius: 10,
-            backgroundColor: SEARCH_BG,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Ionicons name="options-outline" size={20} color={ICON_COLOR} />
-        </TouchableOpacity>
+       
       </RNView>
 
       {/* BODY */}
@@ -687,11 +675,7 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 18, fontWeight: "700", color: TEXT }}>
             {t("home.categories")}
           </Text>
-          <TouchableOpacity>
-            <Text style={{ fontSize: 12, fontWeight: "600", color: AMBER }}>
-              {t("viewAll")}
-            </Text>
-          </TouchableOpacity>
+         
         </RNView>
         <ScrollView
           horizontal
@@ -732,7 +716,7 @@ export default function HomeScreen() {
                   color: TEXT,
                   textAlign: "center",
                 }}
-                numberOfLines={2}
+                numberOfLines={1}
               >
                 {cat.name}
               </Text>
@@ -754,11 +738,7 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 18, fontWeight: "700", color: TEXT }}>
             {t("home.brands")}
           </Text>
-          <TouchableOpacity>
-            <Text style={{ fontSize: 12, fontWeight: "600", color: AMBER }}>
-              {t("viewAll")}
-            </Text>
-          </TouchableOpacity>
+          
         </RNView>
         <ScrollView
           horizontal
