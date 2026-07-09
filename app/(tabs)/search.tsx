@@ -377,6 +377,7 @@ export default function SearchScreen() {
         masonry={!isSearching}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         contentContainerStyle={{ paddingBottom: 24 }}
         refreshing={isSearching && searchRefetching}
         onRefresh={() => {
