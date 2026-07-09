@@ -10,7 +10,11 @@ export const CACHE_MAX_AGE = 1000 * 60 * 60 * 24 * 30;
  * Bump this string whenever the cached data shape changes; it invalidates any
  * previously persisted cache on the next app launch.
  */
-const CACHE_BUSTER = 'v1';
+const CACHE_BUSTER = 'v2';
+
+function isSearchQuery(queryKey: readonly unknown[]): boolean {
+  return queryKey[0] === 'products' && queryKey[1] === 'search';
+}
 
 export function createQueryClient() {
   return new QueryClient({
@@ -42,7 +46,8 @@ export const persistOptions: Omit<PersistQueryClientOptions, 'queryClient'> = {
   maxAge: CACHE_MAX_AGE,
   buster: CACHE_BUSTER,
   dehydrateOptions: {
-    // Only persist successful queries.
-    shouldDehydrateQuery: (query) => query.state.status === 'success',
+    // Only persist successful non-search queries.
+    shouldDehydrateQuery: (query) =>
+      query.state.status === 'success' && !isSearchQuery(query.queryKey),
   },
 };

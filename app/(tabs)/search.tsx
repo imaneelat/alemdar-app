@@ -1,9 +1,12 @@
 import { CachedImage } from "@/components/CachedImage";
+import { ProductCard } from "@/components/ProductCard";
 import { useWishlist } from "@/context/WishlistContext";
 import { useSearchProducts } from "@/hooks/useSearchProducts";
-import { t as i18nT, useLocale } from "@/lib/i18n";
+import { useSectionProducts } from "@/hooks/useSectionProducts";
 import type { UniversalSearchItem } from "@/lib/api-types";
+import { t as i18nT, useLocale } from "@/lib/i18n";
 import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -16,7 +19,6 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
-  FlatList,
   Keyboard,
   ScrollView,
   StatusBar,
@@ -51,8 +53,10 @@ import {
   siJbl,
   siRaspberrypi,
 } from "simple-icons";
+import { HOME_SECTIONS } from "@/lib/section-meta";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const PRODUCTS_PAGE_SIZE = 20;
 
 type ApiProduct = UniversalSearchItem;
 
@@ -191,6 +195,17 @@ export default function SearchScreen() {
   } = useSearchProducts(query);
   const results = (searchData?.data ?? []) as unknown as ApiProduct[];
 
+  // ── "Popular products" feed — powers the Temu-style masonry grid when idle
+  const {
+  data: popularData,
+  isLoading: popularLoading,
+  isFetchingNextPage: popularFetchingNext,
+  hasNextPage: popularHasNext,
+  fetchNextPage: fetchNextPopular,
+} = useSectionProducts(HOME_SECTIONS[0], { limit: PRODUCTS_PAGE_SIZE });
+
+  const popularProducts = popularData?.pages.flatMap((p) => p.data) ?? [];
+
   // ── Live filtering + sorting, applied on top of the raw search results
   const filteredResults = useMemo(() => {
     let list = [...results];
@@ -275,10 +290,16 @@ export default function SearchScreen() {
     [],
   );
 
+  const handleEndReached = () => {
+    if (!isSearching && popularHasNext && !popularFetchingNext) {
+      fetchNextPopular();
+    }
+  };
+
   // ─────────────────────────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
       {/* ── Search Bar ── */}
@@ -347,9 +368,13 @@ export default function SearchScreen() {
       </View>
 
       {/* ── Content ── */}
-      <FlatList
-        data={isSearching ? filteredResults : []}
-        keyExtractor={(item) => String(item.id)}
+      <FlashList
+        data={isSearching ? filteredResults : popularProducts}
+        keyExtractor={(item: any) =>
+          `${item.tableKey ?? item.section}-${item.id}`
+        }
+        numColumns={isSearching ? 1 : 2}
+        masonry={!isSearching}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: 24 }}
@@ -359,6 +384,8 @@ export default function SearchScreen() {
             void refetchSearch();
           }
         }}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.4}
         ListHeaderComponent={
           <Animated.View
             key={isSearching ? "results-header" : "idle-header"}
@@ -366,7 +393,7 @@ export default function SearchScreen() {
             exiting={FadeOut.duration(200)}
           >
             {!isSearching ? (
-              <ScrollView showsVerticalScrollIndicator={false}>
+              <View>
                 {/* Recent Searches */}
                 <View style={{ paddingHorizontal: 16, marginTop: 20 }}>
                   <View
@@ -481,7 +508,33 @@ export default function SearchScreen() {
                     ))}
                   </View>
                 </View>
-              </ScrollView>
+
+                {/* Popular Products — Temu-style masonry grid header */}
+                <View
+                  style={{
+                    paddingHorizontal: 16,
+                    marginTop: 28,
+                    marginBottom: 4,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "700",
+                      color: t.subtext,
+                      letterSpacing: 0.8,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Popular Products
+                  </Text>
+                </View>
+                {popularLoading && (
+                  <View style={{ paddingVertical: 20 }}>
+                    <ActivityIndicator size="small" color={t.accent} />
+                  </View>
+                )}
+              </View>
             ) : (
               <View
                 style={{
@@ -507,7 +560,20 @@ export default function SearchScreen() {
             )}
           </Animated.View>
         }
-        renderItem={({ item }) => {
+        renderItem={({ item }: { item: any }) => {
+          if (!isSearching) {
+            return (
+              <View style={{ paddingHorizontal: 6, paddingVertical: 6 }}>
+                <ProductCard
+                  product={item}
+                  sectionTitle="Popular"
+                  accentColor={t.accent}
+                  fluid
+                />
+              </View>
+            );
+          }
+
           const name = item.title;
           const imageUrl = item.image;
           const wishlisted = isWishlisted(String(item.id));
@@ -591,11 +657,26 @@ export default function SearchScreen() {
             </TouchableOpacity>
           );
         }}
-        ItemSeparatorComponent={() => (
-          <View
-            style={{ height: 1, backgroundColor: t.border, marginLeft: 74 }}
-          />
-        )}
+        ItemSeparatorComponent={
+          isSearching
+            ? () => (
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: t.border,
+                    marginLeft: 74,
+                  }}
+                />
+              )
+            : undefined
+        }
+        ListFooterComponent={
+          !isSearching && popularFetchingNext ? (
+            <View style={{ paddingVertical: 20 }}>
+              <ActivityIndicator size="small" color={t.accent} />
+            </View>
+          ) : null
+        }
         ListEmptyComponent={() =>
           isSearching && searchLoading ? (
             <View style={{ alignItems: "center", marginTop: 80, gap: 12 }}>
@@ -704,92 +785,6 @@ export default function SearchScreen() {
                 >
                   {i18nT("search.more")}
                 </Chip>
-              </View>
-            </ScrollView>
-          </View>
-
-          {/* Brands — no background color, just logo + border */}
-          <View style={{ marginBottom: 24 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 12,
-              }}
-            >
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-              >
-                <Ionicons name="pricetag-outline" size={16} color={t.accent} />
-                <Text
-                  style={{ fontSize: 14, fontWeight: "700", color: t.text }}
-                >
-                  {i18nT("search.brands")}
-                </Text>
-              </View>
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={{ flexDirection: "row", gap: 10 }}>
-                {brands.map((brand) => {
-                  const active = selectedBrands.includes(brand);
-                  return (
-                    <TouchableOpacity
-                      key={brand}
-                      onPress={() => toggleBrand(brand)}
-                      style={{
-                        width: 70,
-                        alignItems: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 70,
-                          height: 70,
-                          borderRadius: 14,
-                          backgroundColor: "transparent",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderWidth: active ? 2 : 1,
-                          borderColor: active ? t.accent : t.border,
-                        }}
-                      >
-                        {active && (
-                          <View
-                            style={{
-                              position: "absolute",
-                              top: 4,
-                              right: 4,
-                              width: 16,
-                              height: 16,
-                              borderRadius: 8,
-                              backgroundColor: t.accent,
-                              alignItems: "center",
-                              justifyContent: "center",
-                            }}
-                          >
-                            <Ionicons name="checkmark" size={10} color="#fff" />
-                          </View>
-                        )}
-                        <BrandLogo brand={brand} size={40} />
-                      </View>
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={{
-                          fontSize: 10,
-                          fontWeight: "600",
-                          color: active ? t.accent : t.text,
-                          textAlign: "center",
-                          marginTop: 4,
-                          width: 70,
-                        }}
-                      >
-                        {brand}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
               </View>
             </ScrollView>
           </View>

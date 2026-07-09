@@ -14,7 +14,7 @@ import { FlashList, ListRenderItemInfo } from '@shopify/flash-list';
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useLocale, t } from '@/lib/i18n';
 
-const AMBER = '#f5a623';
+const AMBER = '#FF6B00';
 
 // Wishlist card 
 
@@ -159,7 +159,7 @@ export default function WishlistScreen() {
           data={items}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
           style={{ backgroundColor: PAGE_BG }}
         />
