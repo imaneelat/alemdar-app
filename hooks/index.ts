@@ -16,6 +16,7 @@ export { useSectionCategories } from './useSectionCategories';
 export { useSimilarProducts } from './useSimilarProducts';
 export { useInvoices, type InvoicesFilters } from './useInvoices';
 export { useInvoice } from './useInvoice';
+export { usePlaceOrder, type PlaceOrderInput, type PlaceOrderResponse } from './usePlaceOrder';
 export { usePrefetchImages } from './usePrefetchImages';
 
 export { queryKeys } from './queryKeys';
