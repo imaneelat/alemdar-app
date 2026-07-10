@@ -7,6 +7,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Text } from '@/components/Themed';
+import { CachedImage } from '@/components/CachedImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -75,8 +76,17 @@ export default function CartScreen() {
               {items.map(item => (
                 <RNView key={`${item.categoryId}-${item.id}`} style={{ backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                   {/* Image */}
-                  <RNView style={{ width: 72, height: 72, borderRadius: 10, backgroundColor: isDark ? '#1a2030' : '#f5f5fa', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Ionicons name="image-outline" size={28} color={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'} />
+                  <RNView style={{ width: 72, height: 72, borderRadius: 10, backgroundColor: isDark ? '#1a2030' : '#f5f5fa', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                    {item.image ? (
+                      <CachedImage
+                        source={{ uri: item.image }}
+                        style={{ width: '100%', height: '100%' }}
+                        contentFit="cover"
+                        recyclingKey={item.id}
+                      />
+                    ) : (
+                      <Ionicons name="image-outline" size={28} color={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'} />
+                    )}
                   </RNView>
 
                   {/* Info */}

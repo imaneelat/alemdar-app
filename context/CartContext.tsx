@@ -7,6 +7,7 @@ export type CartItem = {
   dec: string;
   categoryId: string;
   categoryTitle: string;
+  image?: string;
   quantity: number;
 };
 
@@ -31,7 +32,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const existing = prev.find(i => `${i.categoryId}-${i.id}` === key);
       if (existing) {
         return prev.map(i =>
-          `${i.categoryId}-${i.id}` === key ? { ...i, quantity: i.quantity + 1 } : i
+          `${i.categoryId}-${i.id}` === key
+            ? {
+                ...i,
+                quantity: i.quantity + 1,
+                ...(product.image ? { image: product.image } : {}),
+              }
+            : i
         );
       }
       return [...prev, { ...product, quantity: 1 }];
