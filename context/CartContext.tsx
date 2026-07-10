@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+
+const CART_STORAGE_KEY = 'cart:items';
 
 export type CartItem = {
   id: string;
@@ -23,8 +26,59 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | null>(null);
 
+function isCartItem(value: unknown): value is CartItem {
+  if (!value || typeof value !== 'object') return false;
+  const item = value as CartItem;
+  return (
+    typeof item.id === 'string' &&
+    typeof item.name === 'string' &&
+    typeof item.price === 'string' &&
+    typeof item.dec === 'string' &&
+    typeof item.categoryId === 'string' &&
+    typeof item.categoryTitle === 'string' &&
+    typeof item.quantity === 'number' &&
+    item.quantity > 0 &&
+    (item.image === undefined || typeof item.image === 'string')
+  );
+}
+
+function parseStoredCart(raw: string | null): CartItem[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isCartItem);
+  } catch {
+    return [];
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const stored = await AsyncStorage.getItem(CART_STORAGE_KEY);
+        if (cancelled) return;
+        setItems(parseStoredCart(stored));
+      } finally {
+        if (!cancelled) setHydrated(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    void AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items, hydrated]);
 
   const addToCart = useCallback((product: Omit<CartItem, 'quantity'>) => {
     setItems(prev => {
