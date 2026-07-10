@@ -29,8 +29,6 @@ function getClientIp(request: Request) {
 export default async function middleware(request: Request) {
   const ip = getClientIp(request);
 
-  console.log(`[rate-limit] client ip: ${ip}`);
-
   const { success, limit, remaining, reset } = await ratelimit.limit(ip);
 
   if (!success) {
