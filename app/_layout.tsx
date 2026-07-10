@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/components/useColorScheme";
+import { EasUpdateAlert } from "@/components/updates/EasUpdateAlert";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { LanguageProvider } from "@/lib/i18n";
@@ -60,6 +61,7 @@ function RootLayoutNav() {
         >
           <WishlistProvider>
             <CartProvider>
+              <EasUpdateAlert />
               <ThemeProvider
                 value={{
                   ...navigationTheme,

@@ -3,18 +3,28 @@
     "name": "alemdarapp",
     "slug": "alemdarapp",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "alemdarapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "updates": {
+      "url": "https://u.expo.dev/e55a9ffa-6a84-4040-8411-c925bf972eac"
+    },
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleLocalizations": [
+          "en",
+          "tr"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -40,14 +50,29 @@
         "expo-localization",
         {
           "supportedLocales": {
-            "ios": ["en", "tr"],
-            "android": ["en", "tr"]
+            "ios": [
+              "en",
+              "tr"
+            ],
+            "android": [
+              "en",
+              "tr"
+            ]
           }
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "unstable_useServerMiddleware": true
+      },
+      "eas": {
+        "projectId": "e55a9ffa-6a84-4040-8411-c925bf972eac"
+      }
+    },
+    "owner": "ahmedsalah998"
   }
 }
