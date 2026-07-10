@@ -1,3 +1,4 @@
+import ContactInfoSheet from "@/components/ContactInfoSheet";
 import LanguageSheet from "@/components/LanguageSheet";
 import SettingsSheet from "@/components/SettingsSheet";
 import { NAVBAR_V2_STYLE, NavbarV2Background } from "@/components/NavbarV2";
@@ -128,32 +129,10 @@ export default function TabLayout() {
         </Tabs>
         <PrivacySheet visible={sheet === "privacy"} onClose={closeSheets} />
         <LanguageSheet visible={sheet === "language"} onClose={closeSheets} />
-        <SettingsSheet visible={sheet === "settings"} onClose={closeSheets} />
-        <BottomSheet
-          ref={serviceSheetRef}
-          height={320}
-          style={{ backgroundColor: "#101928", borderTopLeftRadius: 24, borderTopRightRadius: 24 }}
-          closeOnDragDown
-          closeOnBackdropPress
-          onClose={hideServiceConfirm}
-        >
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 24, gap: 12 }}>
-            <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: "#1F883D20", alignItems: "center", justifyContent: "center" }}>
-              <Ionicons name="checkmark-circle" size={44} color="#1F883D" />
-            </View>
-            <Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>Request Sent</Text>
-            <Text style={{ color: "#A9AEC0", fontSize: 14, textAlign: "center" }}>
-              {confirmService ? `Your ${confirmService.toLowerCase()} service request has been submitted. We'll connect you with a professional shortly.` : "We'll connect you with a professional shortly."}
-            </Text>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={hideServiceConfirm}
-              style={{ marginTop: 8, backgroundColor: "#FF6B00", borderRadius: 14, paddingHorizontal: 32, paddingVertical: 14, width: "100%", alignItems: "center" }}
-            >
-              <Text style={{ color: "#fff", fontSize: 14, fontWeight: "700" }}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        </BottomSheet>
+        <ContactInfoSheet
+          visible={sheet === "contactInfo"}
+          onClose={closeSheets}
+        />
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );

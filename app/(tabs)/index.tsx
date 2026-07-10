@@ -4,13 +4,13 @@ import InstagramIcon from "@/assets/icons/instagram.svg";
 import { HomeProductSection } from "@/components/HomeProductSection";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
+import { openSheet } from "./_layout";
 import { t, useLocale } from "@/lib/i18n";
 import { HOME_SECTIONS } from "@/lib/section-meta";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { openSheet } from "./_layout";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   View as RNView,
@@ -374,6 +374,10 @@ export default function HomeScreen() {
   const ICON_COLOR = isDark ? "#ffffff" : "#111111";
   const SEARCH_PH = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
   // const SEARCH_TC = isDark ? "#ffffff" : "#111111";
+
+  useEffect(() => {
+    openSheet("contactInfo");
+  }, []);
 
   const bannerProgress = useSharedValue(0);
   const bannerRef = useRef<ICarouselInstance>(null);
