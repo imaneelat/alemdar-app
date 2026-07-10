@@ -19,6 +19,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.alemdar.app",
       "infoPlist": {
         "CFBundleLocalizations": [
           "en",
@@ -27,6 +28,7 @@
       }
     },
     "android": {
+      "package": "com.alemdar.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
