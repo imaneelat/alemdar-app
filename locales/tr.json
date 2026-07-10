@@ -40,8 +40,11 @@
   },
   "address": {
     "title": "Adres Yönetimi",
+    "name": "Ad Soyad",
     "line": "Adres Satırı",
     "flat": "Daire / Apartman",
+    "city": "Şehir",
+    "postalCode": "Posta kodu",
     "phone": "Telefon",
     "save": "Adresi Kaydet"
   },
@@ -105,6 +108,11 @@
     "delivery": "Teslimat:",
     "freeDelivery": "Lefkoşa'da Ücretsiz",
     "placeOrder": "Sipariş Ver",
+    "placingOrder": "Sipariş veriliyor...",
+    "orderSuccess": "Siparişiniz başarıyla alındı.",
+    "orderFailed": "Sipariş verilemedi. Lütfen tekrar deneyin.",
+    "missingAddress": "Sipariş vermeden önce teslimat adresinizi ve telefon numaranızı ekleyin.",
+    "addAddress": "Adres Ekle",
     "item": "ürün",
     "items": "ürün"
   },

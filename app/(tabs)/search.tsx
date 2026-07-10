@@ -16,6 +16,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { useDebouncedValue } from "use-debounce";
 import {
   ActivityIndicator,
   Dimensions,
@@ -185,14 +186,17 @@ export default function SearchScreen() {
   };
 
   // ── Derived (live API search)
+  const [debouncedQuery] = useDebouncedValue(query, 250);
   const isSearching = query.trim().length > 0;
+  const isDebouncing =
+    isSearching && query.trim() !== debouncedQuery.trim();
   const {
     data: searchData,
     isLoading: searchLoading,
     isRefetching: searchRefetching,
     isError: searchError,
     refetch: refetchSearch,
-  } = useSearchProducts(query);
+  } = useSearchProducts(debouncedQuery);
   const results = (searchData?.data ?? []) as unknown as ApiProduct[];
 
   // ── "Popular products" feed — powers the Temu-style masonry grid when idle
@@ -553,7 +557,7 @@ export default function SearchScreen() {
                   {i18nT("search.resultsTitle")}
                 </Text>
                 <Text style={{ color: t.subtext, fontSize: 13 }}>
-                  {searchLoading
+                  {searchLoading || isDebouncing
                     ? "…"
                     : `${filteredResults.length} ${i18nT("search.results")}`}
                 </Text>
@@ -679,7 +683,7 @@ export default function SearchScreen() {
           ) : null
         }
         ListEmptyComponent={() =>
-          isSearching && searchLoading ? (
+          isSearching && (searchLoading || isDebouncing) ? (
             <View style={{ alignItems: "center", marginTop: 80, gap: 12 }}>
               <ActivityIndicator size="large" color={t.accent} />
               <Text style={{ color: t.subtext, fontSize: 13 }}>
@@ -692,7 +696,7 @@ export default function SearchScreen() {
               <Text style={{ color: t.subtext, fontSize: 15 }}>
                 {searchError
                   ? "Search failed. Try again."
-                  : `${i18nT("search.noResultsFor")} "${query}"`}
+                  : `${i18nT("search.noResultsFor")} "${debouncedQuery}"`}
               </Text>
               <Text style={{ color: t.subtext, fontSize: 13 }}>
                 {i18nT("search.tryDifferent")}

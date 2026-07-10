@@ -80,3 +80,28 @@ export async function apiGet<T>(
 
   return (await res.json()) as T;
 }
+
+export async function apiPostForm<T>(
+  path: string,
+  form: FormData,
+  signal?: AbortSignal,
+): Promise<T> {
+  const res = await fetch(`${BASE_URL}/api${path}`, {
+    method: 'POST',
+    body: form,
+    signal,
+  });
+
+  let body: { error?: string; ok?: boolean } | null = null;
+  try {
+    body = (await res.json()) as { error?: string; ok?: boolean };
+  } catch {
+    // ignore non-JSON error bodies
+  }
+
+  if (!res.ok) {
+    throw new ApiError(body?.error ?? `Request failed with status ${res.status}`, res.status);
+  }
+
+  return body as T;
+}

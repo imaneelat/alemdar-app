@@ -75,6 +75,7 @@ export default function ProductDetail() {
       dec,
       categoryId: section,
       categoryTitle: meta.title,
+      image: image || undefined,
     });
     setAdded(true);
     Animated.sequence([

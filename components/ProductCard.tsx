@@ -66,6 +66,7 @@ function ProductCardBase({ product, sectionTitle, accentColor = AMBER, width = 1
       dec,
       categoryId: product.section,
       categoryTitle: categoryLabel || product.section,
+      image: imageUrl,
     });
   };
 

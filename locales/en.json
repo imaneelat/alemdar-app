@@ -40,8 +40,11 @@
   },
   "address": {
     "title": "Your Address",
+    "name": "Full name",
     "line": "Street address",
     "flat": "Flat / Suite",
+    "city": "City",
+    "postalCode": "Postal code",
     "phone": "Phone number",
     "save": "Save Address"
   },
@@ -105,6 +108,11 @@
     "delivery": "Delivery:",
     "freeDelivery": "Free in Lefkoşa",
     "placeOrder": "Place Order",
+    "placingOrder": "Placing order...",
+    "orderSuccess": "Your order has been placed successfully.",
+    "orderFailed": "Could not place your order. Please try again.",
+    "missingAddress": "Add your delivery address and phone number before placing an order.",
+    "addAddress": "Add Address",
     "item": "item",
     "items": "items"
   },
