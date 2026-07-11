@@ -21,6 +21,7 @@ import "react-native-reanimated";
 export { ErrorBoundary } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 400, fade: true });
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({

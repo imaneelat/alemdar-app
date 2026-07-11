@@ -12,11 +12,6 @@
     "updates": {
       "url": "https://u.expo.dev/e55a9ffa-6a84-4040-8411-c925bf972eac"
     },
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alemdar.app",
@@ -49,6 +44,19 @@
         "expo-router",
         {
           "unstable_useServerMiddleware": true
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000000",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "dark": {
+            "backgroundColor": "#000000",
+            "image": "./assets/images/splash-icon.png"
+          }
         }
       ],
       [
