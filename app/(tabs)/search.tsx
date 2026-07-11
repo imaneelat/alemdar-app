@@ -16,7 +16,7 @@ import {
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useDebouncedValue } from "use-debounce";
+import { useDebounce } from "use-debounce";
 import {
   ActivityIndicator,
   Dimensions,
@@ -186,7 +186,7 @@ export default function SearchScreen() {
   };
 
   // ── Derived (live API search)
-  const [debouncedQuery] = useDebouncedValue(query, 250);
+  const [debouncedQuery] = useDebounce(query, 250);
   const isSearching = query.trim().length > 0;
   const isDebouncing =
     isSearching && query.trim() !== debouncedQuery.trim();

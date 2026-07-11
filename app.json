@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "alemdarapp",
+    "name": "Alemdar",
     "slug": "alemdarapp",
     "version": "1.0.0",
     "runtimeVersion": "1.0.0",
@@ -23,8 +23,11 @@
       "infoPlist": {
         "CFBundleLocalizations": [
           "en",
+          "tr",
+          "en",
           "tr"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
