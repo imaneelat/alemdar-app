@@ -40,7 +40,7 @@
         "image": "latest"
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       },
       "autoIncrement": true
     }

@@ -13,12 +13,10 @@
       "url": "https://u.expo.dev/e55a9ffa-6a84-4040-8411-c925bf972eac"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.alemdar.app",
       "infoPlist": {
         "CFBundleLocalizations": [
-          "en",
-          "tr",
           "en",
           "tr"
         ],
