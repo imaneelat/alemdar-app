@@ -1,3 +1,9 @@
+[] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
+[] salah: fix the light/darkmode in address and other screens in the app
+[] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
+[] lamine: delelte the postal code, let the db and api accept null as we agreed, and switch 'city' to predefind list like website
+[] lamine: handle the app UI/UX if all screen if the db is down ( provide great animation and messages and offline cached products) test it heavily
+[] iman: add /docs/list1/pdf, /docs/list2.pdf to alemdarhizmet : extract all the data from the pdfs, put the data in json, create search bar
 [x] unify colors across the app
 [x] keyboard should close when swiping
 [x] lamine: complete the checkout and get the address and number info and save them in db
@@ -5,5 +11,4 @@
 [x] save the cart information
 [x] add debouncing to the search 250ms
 [x] display the images in the cart
-[] make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good
 [x] light/dark swticher
