@@ -9,7 +9,8 @@
     "start": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "eas-build-post-install": "prisma generate"
   },
   "dependencies": {
     "@devvie/bottom-sheet": "^0.4.4",

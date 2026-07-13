@@ -1,0 +1,8 @@
+strictDepBuilds: false
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - prisma
+allowBuilds:
+  '@prisma/engines': set this to true or false
+  prisma: set this to true or false
