@@ -26,7 +26,6 @@ function buildPlaceOrderForm(input: PlaceOrderInput): FormData {
   form.append("name", input.name);
   form.append("address", input.address);
   form.append("city", input.city);
-  form.append("postalCode", input.postalCode ?? "");
   form.append("total", input.total);
   form.append("discountedTotal", input.discountedTotal);
   form.append("cartItemsFormatted", input.cartItemsFormatted);

@@ -48,7 +48,7 @@ export default function CartScreen() {
       .filter(Boolean)
       .join(", ");
 
-    if (!profile?.phone || !fullAddress) {
+    if (!profile?.phone) {
       Alert.alert(t("cart.missingAddress"), undefined, [
         {
           text: t("cart.addAddress"),
@@ -66,7 +66,6 @@ export default function CartScreen() {
         name: profile.name || "Customer",
         address: fullAddress,
         city: profile.city || "Lefkoşa",
-        postalCode: profile.postalCode,
         total,
         discountedTotal: total,
         cartItemsFormatted: formatCartItemsForOrder(items),

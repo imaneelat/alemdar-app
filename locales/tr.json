@@ -46,6 +46,7 @@
     "city": "Şehir",
     "postalCode": "Posta kodu",
     "phone": "Telefon",
+    "required": "Bu alan zorunludur",
     "save": "Adresi Kaydet"
   },
   "addToCart": "Sepete Ekle",

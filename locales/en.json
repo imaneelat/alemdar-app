@@ -46,6 +46,7 @@
     "city": "City",
     "postalCode": "Postal code",
     "phone": "Phone number",
+    "required": "This field is required",
     "save": "Save Address"
   },
   "addToCart": "Add to Cart",
