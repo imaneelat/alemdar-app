@@ -46,7 +46,11 @@
     "city": "Şehir",
     "postalCode": "Posta kodu",
     "phone": "Telefon",
+    "required": "Bu alan zorunludur",
     "save": "Adresi Kaydet"
+  },
+  "offline": {
+    "banner": "Çevrimdışısınız — kaydedilen içerik gösteriliyor"
   },
   "addToCart": "Sepete Ekle",
   "shopNow": "Alışverişe Başla →",

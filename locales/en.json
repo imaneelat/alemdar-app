@@ -46,7 +46,11 @@
     "city": "City",
     "postalCode": "Postal code",
     "phone": "Phone number",
+    "required": "This field is required",
     "save": "Save Address"
+  },
+  "offline": {
+    "banner": "You're offline — showing saved content"
   },
   "addToCart": "Add to Cart",
   "shopNow": "Shop Now →",
