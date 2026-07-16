@@ -1,8 +1,10 @@
+import { OfflineBanner } from "@/components/OfflineBanner";
 import { useColorScheme } from "@/components/useColorScheme";
 import { EasUpdateAlert } from "@/components/updates/EasUpdateAlert";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { LanguageProvider } from "@/lib/i18n";
+import { setupOnlineManager } from "@/lib/online-manager";
 import { createQueryClient, persistOptions } from "@/lib/query-client";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
@@ -22,6 +24,7 @@ export { ErrorBoundary } from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({ duration: 400, fade: true });
+setupOnlineManager();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -63,6 +66,7 @@ function RootLayoutNav() {
           <WishlistProvider>
             <CartProvider>
               <EasUpdateAlert />
+              <OfflineBanner />
               <ThemeProvider
                 value={{
                   ...navigationTheme,
