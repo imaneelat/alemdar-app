@@ -1,5 +1,5 @@
-import { t, useLocale } from "@/lib/i18n";
 import { useIsOnline } from "@/hooks/useIsOnline";
+import { t, useLocale } from "@/lib/i18n";
 import { Feather } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

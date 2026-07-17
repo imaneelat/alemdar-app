@@ -34,9 +34,18 @@
   "faq": {
     "title": "FAQ",
     "subtitle": "Frequently asked questions",
-    "getStarted": { "question": "How do I get started?", "answer": "Download the app, create an account, and start exploring businesses near you." },
-    "dataSecure": { "question": "Is my data secure?", "answer": "Yes, we use industry-standard encryption to protect your personal information." },
-    "cancelAnytime": { "question": "Can I cancel anytime?", "answer": "Yes, you can cancel your account or subscriptions at any time with no penalty." }
+    "getStarted": {
+      "question": "How do I get started?",
+      "answer": "Download the app, create an account, and start exploring businesses near you."
+    },
+    "dataSecure": {
+      "question": "Is my data secure?",
+      "answer": "Yes, we use industry-standard encryption to protect your personal information."
+    },
+    "cancelAnytime": {
+      "question": "Can I cancel anytime?",
+      "answer": "Yes, you can cancel your account or subscriptions at any time with no penalty."
+    }
   },
   "address": {
     "title": "Your Address",
@@ -50,7 +59,8 @@
     "save": "Save Address"
   },
   "offline": {
-    "banner": "You're offline — showing saved content"
+    "banner": "You're offline",
+    "productUnavailable": "This product isn't available offline yet. Connect to the internet and try again."
   },
   "addToCart": "Add to Cart",
   "shopNow": "Shop Now →",

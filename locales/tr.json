@@ -34,9 +34,18 @@
   "faq": {
     "title": "SSS",
     "subtitle": "Sıkça sorulan sorular",
-    "getStarted": { "question": "Nasıl başlayabilirim?", "answer": "Uygulamayı indirin, hesap oluşturun ve yakınınızdaki işletmeleri keşfetmeye başlayın." },
-    "dataSecure": { "question": "Verilerim güvende mi?", "answer": "Evet, kişisel bilgilerinizi korumak için endüstri standardı şifreleme kullanıyoruz." },
-    "cancelAnytime": { "question": "İstediğim zaman iptal edebilir miyim?", "answer": "Evet, hesabınızı veya aboneliklerinizi istediğiniz zaman cezasız olarak iptal edebilirsiniz." }
+    "getStarted": {
+      "question": "Nasıl başlayabilirim?",
+      "answer": "Uygulamayı indirin, hesap oluşturun ve yakınınızdaki işletmeleri keşfetmeye başlayın."
+    },
+    "dataSecure": {
+      "question": "Verilerim güvende mi?",
+      "answer": "Evet, kişisel bilgilerinizi korumak için endüstri standardı şifreleme kullanıyoruz."
+    },
+    "cancelAnytime": {
+      "question": "İstediğim zaman iptal edebilir miyim?",
+      "answer": "Evet, hesabınızı veya aboneliklerinizi istediğiniz zaman cezasız olarak iptal edebilirsiniz."
+    }
   },
   "address": {
     "title": "Adres Yönetimi",
@@ -50,7 +59,8 @@
     "save": "Adresi Kaydet"
   },
   "offline": {
-    "banner": "Çevrimdışısınız — kaydedilen içerik gösteriliyor"
+    "banner": "Çevrimdışısınız",
+    "productUnavailable": "Bu ürün henüz çevrimdışı kullanılamıyor. İnternete bağlanıp tekrar deneyin."
   },
   "addToCart": "Sepete Ekle",
   "shopNow": "Alışverişe Başla →",
