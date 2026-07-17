@@ -1,5 +1,6 @@
 import LanguageSheet from "@/components/LanguageSheet";
 import SettingsSheet from "@/components/SettingsSheet";
+import OnboardingSheet from "@/components/OnboardingSheet";
 import { NAVBAR_V2_STYLE, NavbarV2Background } from "@/components/NavbarV2";
 import PrivacySheet from "@/components/PrivacySheet";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -13,6 +14,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import BottomSheet, { type BottomSheetMethods } from "@devvie/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const ONBOARDING_KEY = "onboarding_done_v4";// v3 
 
 let _set: ((s: string | null) => void) | null = null;
 export const openSheet = (s: string) => _set?.(s);
@@ -28,11 +32,21 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const [sheet, setSheet] = useState<string | null>(null);
   const [confirmService, setConfirmService] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const serviceSheetRef = useRef<BottomSheetMethods>(null);
+
   useEffect(() => {
     _set = setSheet;
     _showConfirm = setConfirmService;
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      const done = await AsyncStorage.getItem(ONBOARDING_KEY);
+      if (!done) setShowOnboarding(true);
+    })();
+  }, []);
+
   useEffect(() => {
     if (confirmService) {
       serviceSheetRef.current?.open();
@@ -40,6 +54,11 @@ export default function TabLayout() {
       serviceSheetRef.current?.close();
     }
   }, [confirmService]);
+
+  const handleOnboardingClose = async () => {
+    await AsyncStorage.setItem(ONBOARDING_KEY, "true");
+    setShowOnboarding(false);
+  };
 
   const ACTIVE_COLOR = "#FF6B00";
   const INACTIVE_DARK = "#8A8A9A";
@@ -63,7 +82,6 @@ export default function TabLayout() {
             tabBarStyle: {
               ...NAVBAR_V2_STYLE,
               backgroundColor: "transparent",
-              // height: NAVBAR_V2_STYLE.height + insets.bottom,
               paddingBottom: insets.bottom + 48,
             },
             tabBarIconStyle: {
@@ -129,6 +147,7 @@ export default function TabLayout() {
         <PrivacySheet visible={sheet === "privacy"} onClose={closeSheets} />
         <LanguageSheet visible={sheet === "language"} onClose={closeSheets} />
         <SettingsSheet visible={sheet === "settings"} onClose={closeSheets} />
+        <OnboardingSheet visible={showOnboarding} onClose={handleOnboardingClose} />
         <BottomSheet
           ref={serviceSheetRef}
           height={320}
