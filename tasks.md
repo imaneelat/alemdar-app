@@ -1,9 +1,12 @@
 [] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
+[] lamine: remove the brand and make the images, select a couple of brands from the database
+[] lamine: redesign the categories: replace the text and box with real images in box instead
 [x] salah: fix the light/darkmode in address and other screens in the app
 [] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
 [x] lamine: on offline disable products details page
-[] lamine: on back offline show a banner showing the back online
-[] lamine: on offline search should say you are offline
+[x] lamine: on back offline show a banner showing the back online
+[x] lamine: on offline search should say you are offline
+[] lamine: make the navbar blurred
 [x] lamine: delelte the postal code, let the db and api accept null as we agreed, and switch 'city' to predefind list like website
 [x] lamine: handle the app UI/UX if all screen if the db is down ( provide great animation and messages and offline cached products) test it heavily
 [x] iman: add /docs/list1/pdf, /docs/list2.pdf to alemdarhizmet : extract all the data from the pdfs, put the data in json, create search bar

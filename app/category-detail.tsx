@@ -1,4 +1,5 @@
 import { ProductCard } from "@/components/ProductCard";
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { usePrefetchImages } from "@/hooks/usePrefetchImages";
 import { useSectionProducts } from "@/hooks/useSectionProducts";
 import { useLocale } from "@/lib/i18n";
@@ -15,6 +16,7 @@ import {
   useColorScheme,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const PAGE_SIZE = 20;
 
@@ -24,6 +26,7 @@ export default function CategoryDetail() {
   const isDark = colorScheme === "dark";
   const router = useRouter();
   const params = useLocalSearchParams();
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const section = (params.section as string) ?? "main";
   const meta = getSectionMeta(section);
@@ -51,7 +54,10 @@ export default function CategoryDetail() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={[styles.container, { backgroundColor: bg }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: bg }]}
+        edges={offlineBannerVisible ? [] : ["top"]}
+      >
         <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
         {/* Header */}
@@ -127,13 +133,13 @@ export default function CategoryDetail() {
             }
           />
         )}
-      </View>
+      </SafeAreaView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 40 },
+  container: { flex: 1 },
   center: {
     flex: 1,
     alignItems: "center",
@@ -145,7 +151,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 8,
     marginBottom: 8,
-    marginTop: 20,
     paddingHorizontal: 16,
   },
   backButton: { padding: 4, marginRight: 8 },

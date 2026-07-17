@@ -2,6 +2,7 @@ import { CachedImage } from "@/components/CachedImage";
 import { ProductCard } from "@/components/ProductCard";
 import { useWishlist } from "@/context/WishlistContext";
 import { useIsOnline } from "@/hooks/useIsOnline";
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { useSearchProducts } from "@/hooks/useSearchProducts";
 import { useSectionProducts } from "@/hooks/useSectionProducts";
 import type { UniversalSearchItem } from "@/lib/api-types";
@@ -140,6 +141,7 @@ export default function SearchScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const router = useRouter();
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   // ── State
   const [query, setQuery] = useState("");
@@ -309,7 +311,7 @@ export default function SearchScreen() {
   // ─────────────────────────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={offlineBannerVisible ? [] : ["top"]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
       {/* ── Search Bar ── */}
@@ -422,7 +424,7 @@ export default function SearchScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 120 }}
         refreshing={isSearching && searchRefetching}
         onRefresh={() => {
           if (isSearching) {

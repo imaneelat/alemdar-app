@@ -3,6 +3,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
 import { useIsOnline } from "@/hooks/useIsOnline";
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { usePrefetchImages } from "@/hooks/usePrefetchImages";
 import { useProductDetail } from "@/hooks/useProductDetail";
 import { useSimilarProducts } from "@/hooks/useSimilarProducts";
@@ -33,6 +34,7 @@ export default function ProductDetail() {
   const params = useLocalSearchParams();
   const { addToCart } = useCart();
   const isDark = useColorScheme() === "dark";
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const productId = (params.productId as string) ?? "";
   const section = (params.section as string) ?? "main";
@@ -115,7 +117,7 @@ export default function ProductDetail() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: PAGE_BG }}
-      edges={["top", "bottom"]}
+      edges={offlineBannerVisible ? ["bottom"] : ["top", "bottom"]}
     >
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}

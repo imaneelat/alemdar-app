@@ -12,6 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { FlashList, ListRenderItemInfo } from '@shopify/flash-list';
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
+import { useOfflineBannerVisible } from '@/hooks/useOfflineBanner';
 import { useLocale, t } from '@/lib/i18n';
 
 const AMBER = "#FF6B00";
@@ -110,6 +111,7 @@ function EmptyWishlist({ isDark, TEXT, SUBTEXT }: { isDark: boolean; TEXT: strin
 export default function WishlistScreen() {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const PAGE_BG = isDark ? '#0d0d0d' : '#f2f2f7';
   const CARD_BG = isDark ? '#131825' : '#ffffff';
@@ -138,7 +140,7 @@ export default function WishlistScreen() {
   const keyExtractor = useCallback((item: WishlistItem) => item.id, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#0d0d0d' : '#ffffff' }} edges={['top']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#0d0d0d' : '#ffffff' }} edges={offlineBannerVisible ? [] : ['top']}>
 
       {/* HEADER */}
       <RNView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: BORDER }}>

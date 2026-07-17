@@ -1,33 +1,15 @@
-import { useIsOnline } from "@/hooks/useIsOnline";
+import { useOfflineBannerState } from "@/hooks/useOfflineBanner";
 import { t, useLocale } from "@/lib/i18n";
 import { Feather } from "@expo/vector-icons";
-import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const BACK_ONLINE_DISPLAY_MS = 2500;
-
 export function OfflineBanner() {
   useLocale();
-  const isOnline = useIsOnline();
+  const state = useOfflineBannerState();
   const insets = useSafeAreaInsets();
-  const wasOffline = useRef(false);
-  const [showBackOnline, setShowBackOnline] = useState(false);
 
-  useEffect(() => {
-    if (!isOnline) {
-      wasOffline.current = true;
-      setShowBackOnline(false);
-      return;
-    }
-    if (!wasOffline.current) return;
-    wasOffline.current = false;
-    setShowBackOnline(true);
-    const timeout = setTimeout(() => setShowBackOnline(false), BACK_ONLINE_DISPLAY_MS);
-    return () => clearTimeout(timeout);
-  }, [isOnline]);
-
-  if (!isOnline) {
+  if (state === "offline") {
     return (
       <View style={[styles.container, styles.offline, { paddingTop: insets.top }]}>
         <Feather name="wifi-off" size={14} color="#FFFFFF" />
@@ -36,7 +18,7 @@ export function OfflineBanner() {
     );
   }
 
-  if (showBackOnline) {
+  if (state === "backOnline") {
     return (
       <View style={[styles.container, styles.online, { paddingTop: insets.top }]}>
         <Feather name="wifi" size={14} color="#FFFFFF" />
