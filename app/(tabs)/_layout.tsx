@@ -16,7 +16,7 @@ import BottomSheet, { type BottomSheetMethods } from "@devvie/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ONBOARDING_KEY = "onboarding_done_v4";// v3 
+const ONBOARDING_KEY = "onboarding_done_v5";// v5 turn it to v6 
 
 let _set: ((s: string | null) => void) | null = null;
 export const openSheet = (s: string) => _set?.(s);

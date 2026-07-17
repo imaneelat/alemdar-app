@@ -1,4 +1,4 @@
-[] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
+[x] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
 [x] salah: fix the light/darkmode in address and other screens in the app
 [] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
 [x] lamine: delelte the postal code, let the db and api accept null as we agreed, and switch 'city' to predefind list like website
