@@ -61,7 +61,8 @@
   "offline": {
     "banner": "Çevrimdışısınız",
     "backOnline": "Tekrar çevrimiçisiniz",
-    "productUnavailable": "Bu ürün henüz çevrimdışı kullanılamıyor. İnternete bağlanıp tekrar deneyin."
+    "productUnavailable": "Bu ürün henüz çevrimdışı kullanılamıyor. İnternete bağlanıp tekrar deneyin.",
+    "searchUnavailable": "Arama çevrimdışıyken kullanılamıyor. İnternete bağlanıp tekrar deneyin."
   },
   "addToCart": "Sepete Ekle",
   "shopNow": "Alışverişe Başla →",
