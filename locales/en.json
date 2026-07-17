@@ -60,6 +60,7 @@
   },
   "offline": {
     "banner": "You're offline",
+    "backOnline": "You're back online",
     "productUnavailable": "This product isn't available offline yet. Connect to the internet and try again."
   },
   "addToCart": "Add to Cart",

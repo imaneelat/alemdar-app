@@ -2,8 +2,8 @@ import { onlineManager } from "@tanstack/react-query";
 import { AppState, type AppStateStatus } from "react-native";
 import { apiGet } from "./api-client";
 
-const PROBE_INTERVAL_MS = 15000;
-const PROBE_TIMEOUT_MS = 5000;
+const PROBE_INTERVAL_MS = 5000;
+const PROBE_TIMEOUT_MS = 3000;
 
 async function probe(): Promise<boolean> {
   const controller = new AbortController();

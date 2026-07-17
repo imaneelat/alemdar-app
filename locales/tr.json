@@ -60,6 +60,7 @@
   },
   "offline": {
     "banner": "Çevrimdışısınız",
+    "backOnline": "Tekrar çevrimiçisiniz",
     "productUnavailable": "Bu ürün henüz çevrimdışı kullanılamıyor. İnternete bağlanıp tekrar deneyin."
   },
   "addToCart": "Sepete Ekle",
