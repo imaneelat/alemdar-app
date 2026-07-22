@@ -1,3 +1,7 @@
+[] iman: Improve Wishlist UI/UX, Make collections pattern — image grid, shareable link, category. Inspired from pinterest, commit the schema.json for your endpoints and it will be deployed
+[] iman: Every screen has own isDark ? "#fff" : "#000". Seven screens, seven palettes. Make one hook. Call it useColors()
+[] salah: enhance the product id screen, thats where the sale is. Ship three new features
+[] salah: find 2 repeated codes and extract reusable components
 [] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
 [] lamine: remove the brand and make the images, select a couple of brands from the database
 [] lamine: redesign the categories: replace the text and box with real images in box instead
