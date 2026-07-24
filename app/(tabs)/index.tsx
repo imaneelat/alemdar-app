@@ -4,6 +4,7 @@ import InstagramIcon from "@/assets/icons/instagram.svg";
 import { HomeProductSection } from "@/components/HomeProductSection";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { t, useLocale } from "@/lib/i18n";
 import { HOME_SECTIONS } from "@/lib/section-meta";
 import { Ionicons } from "@expo/vector-icons";
@@ -363,6 +364,7 @@ export default function HomeScreen() {
   const { totalItems } = useCart();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const PAGE_BG = isDark ? "#0d0d0d" : "#f2f2f7";
   const HEADER_BG = isDark ? "#0d0d0d" : "#ffffff";
@@ -463,7 +465,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: HEADER_BG }}
-      edges={["top"]}
+      edges={offlineBannerVisible ? [] : ["top"]}
     >
       {/* HEADER */}
       <RNView

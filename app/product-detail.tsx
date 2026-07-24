@@ -2,6 +2,8 @@ import { CachedImage } from "@/components/CachedImage";
 import { ProductCard } from "@/components/ProductCard";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
+import { useIsOnline } from "@/hooks/useIsOnline";
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { usePrefetchImages } from "@/hooks/usePrefetchImages";
 import { useProductDetail } from "@/hooks/useProductDetail";
 import { useSimilarProducts } from "@/hooks/useSimilarProducts";
@@ -9,7 +11,7 @@ import { t, useLocale } from "@/lib/i18n";
 import { resolveImageUrl } from "@/lib/image-url";
 import { splitPrice } from "@/lib/price";
 import { getSectionMeta } from "@/lib/section-meta";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -32,6 +34,7 @@ export default function ProductDetail() {
   const params = useLocalSearchParams();
   const { addToCart } = useCart();
   const isDark = useColorScheme() === "dark";
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const productId = (params.productId as string) ?? "";
   const section = (params.section as string) ?? "main";
@@ -42,8 +45,12 @@ export default function ProductDetail() {
     data: product,
     isLoading: productLoading,
     isError: productError,
+    fetchStatus: productFetchStatus,
     refetch: refetchProduct,
   } = useProductDetail(section, detailId);
+  const isOnline = useIsOnline();
+  const productUnavailableOffline =
+    !product && !isOnline && productFetchStatus === "paused";
   const { data: similar } = useSimilarProducts(section, detailId);
   const relatedProducts = similar?.data ?? [];
   usePrefetchImages(relatedProducts.map((p) => p.image_filename));
@@ -110,7 +117,7 @@ export default function ProductDetail() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: PAGE_BG }}
-      edges={["top", "bottom"]}
+      edges={offlineBannerVisible ? ["bottom"] : ["top", "bottom"]}
     >
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}
@@ -144,7 +151,7 @@ export default function ProductDetail() {
           }}
           numberOfLines={1}
         >
-          {productLoading ? meta.title : name}
+          {productLoading || productUnavailableOffline ? meta.title : name}
         </Text>
         <TouchableOpacity
           onPress={() => router.push("/cart")}
@@ -154,6 +161,29 @@ export default function ProductDetail() {
         </TouchableOpacity>
       </RNView>
 
+      {productUnavailableOffline ? (
+        <RNView
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingHorizontal: 32,
+            gap: 16,
+          }}
+        >
+          <Feather name="wifi-off" size={48} color={SUBTEXT} />
+          <Text style={{ color: TEXT, fontSize: 16, fontWeight: "700", textAlign: "center" }}>
+            {t("offline.productUnavailable")}
+          </Text>
+          <TouchableOpacity
+            onPress={() => refetchProduct()}
+            style={{ backgroundColor: AMBER, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 10 }}
+          >
+            <Text style={{ color: "#000", fontWeight: "800" }}>Retry</Text>
+          </TouchableOpacity>
+        </RNView>
+      ) : (
+      <>
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
         {/* PRODUCT IMAGE */}
         <RNView
@@ -378,6 +408,8 @@ export default function ProductDetail() {
           </Animated.View>
         </RNView>
       </RNView>
+      </>
+      )}
     </SafeAreaView>
   );
 }

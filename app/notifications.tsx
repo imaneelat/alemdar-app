@@ -1,3 +1,4 @@
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
@@ -86,6 +87,7 @@ function NotificationSkeleton({ isDark }: { isDark: boolean }) {
 export default function NotificationsScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const offlineBannerVisible = useOfflineBannerVisible();
   const [notifications, setNotifications] = useState(mockNotifications);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -120,7 +122,7 @@ export default function NotificationsScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bg }} edges={offlineBannerVisible ? [] : ["top"]}>
       {/* Header */}
       <View
         style={{

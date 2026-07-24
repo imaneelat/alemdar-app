@@ -1,11 +1,13 @@
 import { CachedImage } from "@/components/CachedImage";
 import { ProductCard } from "@/components/ProductCard";
 import { useWishlist } from "@/context/WishlistContext";
+import { useIsOnline } from "@/hooks/useIsOnline";
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { useSearchProducts } from "@/hooks/useSearchProducts";
 import { useSectionProducts } from "@/hooks/useSectionProducts";
 import type { UniversalSearchItem } from "@/lib/api-types";
 import { t as i18nT, useLocale } from "@/lib/i18n";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import {
   BottomSheetBackdrop,
@@ -139,6 +141,7 @@ export default function SearchScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const router = useRouter();
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   // ── State
   const [query, setQuery] = useState("");
@@ -198,6 +201,11 @@ export default function SearchScreen() {
     refetch: refetchSearch,
   } = useSearchProducts(debouncedQuery);
   const results = (searchData?.data ?? []) as unknown as ApiProduct[];
+  const isOnline = useIsOnline();
+  // Search never hits the persisted cache (staleTime/gcTime 0), so offline
+  // it can never resolve — show the same offline takeover as product-detail
+  // instead of a misleading "no results" message.
+  const searchUnavailableOffline = isSearching && !isOnline;
 
   // ── "Popular products" feed — powers the Temu-style masonry grid when idle
   const {
@@ -303,7 +311,7 @@ export default function SearchScreen() {
   // ─────────────────────────────────────────────────────────────────────────────
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: t.bg }} edges={offlineBannerVisible ? [] : ["top"]}>
       <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
 
       {/* ── Search Bar ── */}
@@ -372,6 +380,40 @@ export default function SearchScreen() {
       </View>
 
       {/* ── Content ── */}
+      {searchUnavailableOffline ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingHorizontal: 32,
+            gap: 16,
+          }}
+        >
+          <Feather name="wifi-off" size={48} color={t.subtext} />
+          <Text
+            style={{
+              color: t.text,
+              fontSize: 16,
+              fontWeight: "700",
+              textAlign: "center",
+            }}
+          >
+            {i18nT("offline.searchUnavailable")}
+          </Text>
+          <TouchableOpacity
+            onPress={() => refetchSearch()}
+            style={{
+              backgroundColor: t.accent,
+              borderRadius: 10,
+              paddingHorizontal: 18,
+              paddingVertical: 10,
+            }}
+          >
+            <Text style={{ color: "#000", fontWeight: "800" }}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
       <FlashList
         data={isSearching ? filteredResults : popularProducts}
         keyExtractor={(item: any) =>
@@ -382,7 +424,7 @@ export default function SearchScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 120 }}
         refreshing={isSearching && searchRefetching}
         onRefresh={() => {
           if (isSearching) {
@@ -705,6 +747,7 @@ export default function SearchScreen() {
           ) : null
         }
       />
+      )}
 
       {/* ── Filter Bottom Sheet ── */}
       <BottomSheetModal

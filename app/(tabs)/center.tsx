@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/components/useColorScheme"
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner"
 import { useLocale } from "@/lib/i18n"
 import { Ionicons } from "@expo/vector-icons"
 import * as Haptics from "expo-haptics"
@@ -127,6 +128,7 @@ export default function ServiceScreen() {
   const isDark  = scheme === "dark"
   const C       = getColors(isDark)
   const { width } = useWindowDimensions()
+  const offlineBannerVisible = useOfflineBannerVisible()
 
   const [query,        setQuery]        = useState("")
   const [localResults, setLocalResults] = useState<HizmetItem[]>([])
@@ -170,7 +172,7 @@ export default function ServiceScreen() {
   const isSearching = query.trim().length > 0
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={offlineBannerVisible ? [] : ["top"]}>
 
       {/* ── HEADER ── */}
       <View style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4 }}>

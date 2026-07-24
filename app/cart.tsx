@@ -1,6 +1,7 @@
 import { CachedImage } from "@/components/CachedImage";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { usePlaceOrder } from "@/hooks/usePlaceOrder";
 import { formatCartItemsForOrder } from "@/lib/cart-order";
 import { t, useLocale } from "@/lib/i18n";
@@ -35,6 +36,7 @@ export default function CartScreen() {
   const { mutate: placeOrder, isPending: isPlacingOrder } = usePlaceOrder();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const PAGE_BG = isDark ? "#0d0d0d" : "#f2f2f7";
   const CARD_BG = isDark ? "#131825" : "#ffffff";
@@ -86,7 +88,7 @@ export default function CartScreen() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: isDark ? "#0d0d0d" : "#ffffff" }}
-      edges={["top", "bottom"]}
+      edges={offlineBannerVisible ? ["bottom"] : ["top", "bottom"]}
     >
       <StatusBar
         barStyle={isDark ? "light-content" : "dark-content"}

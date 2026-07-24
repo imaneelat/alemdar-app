@@ -1,3 +1,4 @@
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { t, useLocale } from "@/lib/i18n";
 import { KKTC_CITIES } from "@/lib/kktc-cities";
 import {
@@ -37,6 +38,7 @@ export default function AddressEditScreen() {
   useLocale();
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const BG            = isDark ? "#02060E"            : "#f2f2f7";
   const INPUT_BG      = isDark ? "#0B1525"            : "#ffffff";
@@ -109,7 +111,7 @@ export default function AddressEditScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: BG }]} edges={["top", "bottom"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: BG }]} edges={offlineBannerVisible ? ["bottom"] : ["top", "bottom"]}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : undefined}

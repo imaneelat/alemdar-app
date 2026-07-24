@@ -1,12 +1,15 @@
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { t, useLocale } from "@/lib/i18n";
 import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FaqScreen() {
   useLocale();
+  const offlineBannerVisible = useOfflineBannerVisible();
   const [open, setOpen] = useState<string | null>(null);
   const faqs = useMemo(() => [
     { id: "1", question: t("faq.getStarted.question"), answer: t("faq.getStarted.answer"), icon: "help-circle" },
@@ -15,7 +18,7 @@ export default function FaqScreen() {
   ], []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={offlineBannerVisible ? [] : ["top"]}>
       <Pressable onPress={() => router.back()} style={styles.backBtn}>
         <Feather name="chevron-left" size={38} color="#FFFFFF" />
       </Pressable>
@@ -36,12 +39,12 @@ export default function FaqScreen() {
           );
         })}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#02060E", paddingHorizontal: 24, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: "#02060E", paddingHorizontal: 24, paddingTop: 12 },
   backBtn: { marginBottom: 12, width: 44, height: 44, alignItems: "center", justifyContent: "center" },
   title: { color: "#FFFFFF", fontSize: 20, fontWeight: "700", marginBottom: 8 },
   subtitle: { color: "#A9AEC0", fontSize: 12, marginBottom: 24 },

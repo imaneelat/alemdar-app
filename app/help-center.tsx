@@ -1,9 +1,11 @@
+import { useOfflineBannerVisible } from "@/hooks/useOfflineBanner";
 import { t, useLocale } from "@/lib/i18n";
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import React from "react";
 import { Image, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions, useColorScheme } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CONTACT_OPTIONS = [
   { key: "call", labelKey: "help.callCenter", icon: require("@/assets/icons/helpcenter/callcenter.png") },
@@ -18,6 +20,7 @@ export default function HelpCenterScreen() {
   const cardSize = (screenWidth - 48 - 20) / 2;
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
+  const offlineBannerVisible = useOfflineBannerVisible();
 
   const BG         = isDark ? "#02060E"  : "#f2f2f7";
   const CARD_BG    = isDark ? "#101928"  : "#ffffff";
@@ -26,7 +29,10 @@ export default function HelpCenterScreen() {
   const MUTED      = isDark ? "#A9AEC0"  : "#6B7280";
 
   return (
-    <View style={[styles.container, { backgroundColor: BG }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: BG }]}
+      edges={offlineBannerVisible ? [] : ["top"]}
+    >
       <Pressable onPress={() => router.back()} style={styles.backBtn}>
         <Feather name="chevron-left" size={38} color={TEXT} />
       </Pressable>
@@ -47,12 +53,12 @@ export default function HelpCenterScreen() {
         ))}
       </View>
       <Text style={[styles.versionText, { color: MUTED }]}>Version 1.0.0</Text>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 24, paddingTop: 60, alignItems: "center" },
+  container: { flex: 1, paddingHorizontal: 24, paddingTop: 12, alignItems: "center" },
   backBtn: { alignSelf: "flex-start", marginBottom: 12, width: 44, height: 44, alignItems: "center", justifyContent: "center" },
   animationWrap: { width: "100%", alignItems: "center", marginBottom: 14 },
   animation: { width: 280, height: 280 },
