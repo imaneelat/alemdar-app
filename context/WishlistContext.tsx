@@ -10,6 +10,7 @@ export type WishlistItem = {
   sectionId: string;
   sectionTitle: string;
   accentColor: string;
+  image?: string;  // ← ADD THIS LINE
 };
 
 type WishlistContextType = {

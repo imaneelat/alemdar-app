@@ -3,6 +3,7 @@ import {
   TouchableOpacity,
   useColorScheme,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { Text } from '@/components/Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,27 +11,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { FlashList, ListRenderItemInfo } from '@shopify/flash-list';
+import { FlashList } from '@shopify/flash-list';
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useOfflineBannerVisible } from '@/hooks/useOfflineBanner';
 import { useLocale, t } from '@/lib/i18n';
 import { useColors } from '@/hooks/useColors';
+import { CachedImage } from '@/components/CachedImage';
+import { resolveImageUrl } from '@/lib/image-url';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const AMBER = "#FF6B00";
 
-// Wishlist card 
-
+// ─── Pinterest-style Wishlist Card ──────────────────────────────
 type WishlistCardProps = {
   item: WishlistItem;
   onRemove: (item: WishlistItem) => void;
   isDark: boolean;
-  CARD_BG: string;
-  TEXT: string;
-  SUBTEXT: string;
-  BORDER: string;
+  CARD_WIDTH: number;
 };
 
-function WishlistCard({ item, onRemove, isDark, CARD_BG, TEXT, SUBTEXT, BORDER }: WishlistCardProps) {
+function WishlistCard({ item, onRemove, isDark, CARD_WIDTH }: WishlistCardProps) {
   const router = useRouter();
 
   const handleRemove = () => {
@@ -45,110 +45,210 @@ function WishlistCard({ item, onRemove, isDark, CARD_BG, TEXT, SUBTEXT, BORDER }
     );
   };
 
+  const imageUrl = item.image ? resolveImageUrl(item.image) : null;
+
   return (
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        router.push({ pathname: '/product-detail', params: { productId: item.id, section: item.sectionId } });
+        router.push({ 
+          pathname: '/product-detail', 
+          params: { 
+            productId: item.id, 
+            section: item.sectionId 
+          } 
+        });
       }}
-      style={{ backgroundColor: CARD_BG, borderRadius: 14, borderWidth: 1, borderColor: BORDER, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}
+      style={{
+        width: CARD_WIDTH,
+        marginHorizontal: 4,
+        marginBottom: 8,
+        borderRadius: 12,
+        backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: isDark ? '#2a2a2a' : '#e8e8e8',
+      }}
     >
-      {/* Image placeholder */}
-      <RNView style={{ width: 72, height: 72, borderRadius: 10, backgroundColor: isDark ? '#1a2030' : '#f5f5fa', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <Ionicons name="image-outline" size={28} color={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'} />
+      {/* Image */}
+      <RNView
+        style={{
+          width: '100%',
+          aspectRatio: 1,
+          backgroundColor: isDark ? '#242424' : '#f0f0f0',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        {imageUrl ? (
+          <CachedImage
+            source={{ uri: imageUrl }}
+            style={{ width: '100%', height: '100%' }}
+            contentFit="cover"
+            recyclingKey={item.id}
+          />
+        ) : (
+          <Ionicons
+            name="image-outline"
+            size={40}
+            color={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}
+          />
+        )}
       </RNView>
 
       {/* Info */}
-      <RNView style={{ flex: 1 }}>
-        <Text style={{ fontSize: 11, color: item.accentColor, fontWeight: '600', marginBottom: 3 }}>
-          {item.sectionTitle}
-        </Text>
-        <Text numberOfLines={2} style={{ fontSize: 13, fontWeight: '600', color: TEXT, lineHeight: 18, marginBottom: 6 }}>
+      <RNView style={{ padding: 10, gap: 4 }}>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: 13,
+            fontWeight: '600',
+            color: isDark ? '#ffffff' : '#111111',
+          }}
+        >
           {item.name}
         </Text>
-        <RNView style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 4 }}>
-          <Text style={{ fontSize: 16, fontWeight: '800', color: AMBER }}>{item.price}.{item.dec}</Text>
-          <Text style={{ fontSize: 11, color: SUBTEXT, marginBottom: 1 }}>TL</Text>
-          <RNView style={{ marginLeft: 6, flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-            <RNView style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: item.low ? AMBER : '#2ecc71' }} />
-            <Text style={{ fontSize: 10, color: item.low ? AMBER : '#2ecc71', fontWeight: '600' }}>{item.stock}</Text>
-          </RNView>
+
+        <RNView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: '700',
+              color: AMBER,
+            }}
+          >
+            {item.price}.{item.dec} TL
+          </Text>
+
+          {/* Heart - Remove button */}
+          <TouchableOpacity
+            onPress={handleRemove}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={{
+              padding: 4,
+            }}
+          >
+            <Ionicons
+              name="heart"
+              size={18}
+              color="#e3342f"
+            />
+          </TouchableOpacity>
         </RNView>
       </RNView>
-
-      {/* Remove */}
-      <TouchableOpacity onPress={handleRemove} style={{ padding: 6 }}>
-        <Ionicons name="heart" size={22} color="#e3342f" />
-      </TouchableOpacity>
     </TouchableOpacity>
   );
 }
 
-// empty lst
+// ─── Empty State ────────────────────────────────────────────────────
 function EmptyWishlist({ isDark, TEXT, SUBTEXT }: { isDark: boolean; TEXT: string; SUBTEXT: string }) {
   const router = useRouter();
   return (
-    <RNView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-      <RNView style={{ width: 96, height: 96, borderRadius: 48, backgroundColor: isDark ? '#1e2433' : '#f0f0f5', alignItems: 'center', justifyContent: 'center' }}>
+    <RNView style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, paddingHorizontal: 40 }}>
+      <RNView
+        style={{
+          width: 96,
+          height: 96,
+          borderRadius: 48,
+          backgroundColor: isDark ? '#1e2433' : '#f0f0f5',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <Ionicons name="heart-outline" size={44} color={AMBER} />
       </RNView>
-      <Text style={{ fontSize: 20, fontWeight: '700', color: TEXT }}>{t('wishlistPage.empty')}</Text>
-      <Text style={{ fontSize: 14, color: SUBTEXT, textAlign: 'center', paddingHorizontal: 40 }}>
+      <Text style={{ fontSize: 20, fontWeight: '700', color: TEXT, textAlign: 'center' }}>
+        {t('wishlistPage.empty')}
+      </Text>
+      <Text style={{ fontSize: 14, color: SUBTEXT, textAlign: 'center' }}>
         {t('wishlistPage.emptyDesc')}
       </Text>
       <TouchableOpacity
         onPress={() => router.push('/search')}
-        style={{ marginTop: 8, backgroundColor: AMBER, borderRadius: 12, paddingHorizontal: 32, paddingVertical: 13 }}
+        style={{
+          marginTop: 8,
+          backgroundColor: AMBER,
+          borderRadius: 12,
+          paddingHorizontal: 32,
+          paddingVertical: 13,
+        }}
       >
-        <Text style={{ fontSize: 15, fontWeight: '700', color: '#000' }}>{t('wishlistPage.browseItems')}</Text>
+        <Text style={{ fontSize: 15, fontWeight: '700', color: '#000' }}>
+          {t('wishlistPage.browseItems')}
+        </Text>
       </TouchableOpacity>
     </RNView>
   );
 }
 
-//  Wishlist screen 
-
+// ─── MAIN COMPONENT ────────────────────────────────────────────────
 export default function WishlistScreen() {
   const { isDark } = useColors();
   const offlineBannerVisible = useOfflineBannerVisible();
 
-  const PAGE_BG = isDark ? '#0d0d0d' : '#f2f2f7';
-  const CARD_BG = isDark ? '#131825' : '#ffffff';
-  const TEXT    = isDark ? '#ffffff' : '#111111';
+  const TEXT = isDark ? '#ffffff' : '#111111';
   const SUBTEXT = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)';
-  const BORDER  = isDark ? '#1e2433' : '#ebebeb';
+  const BORDER = isDark ? '#2A2A2A' : '#E8E8E8';
+  const BG = isDark ? '#0A0A0A' : '#F5F5F5';
 
   useLocale();
   const { items, toggleWishlist } = useWishlist();
 
+  // ─── Pinterest-style grid layout ──────────────────────────────
+  const columnCount = 2;
+  const gap = 8;
+  const CARD_WIDTH = (SCREEN_WIDTH - 16 - gap * (columnCount - 1)) / columnCount;
+
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<WishlistItem>) => (
+    ({ item }: { item: WishlistItem }) => (
       <WishlistCard
         item={item}
         onRemove={toggleWishlist}
         isDark={isDark}
-        CARD_BG={CARD_BG}
-        TEXT={TEXT}
-        SUBTEXT={SUBTEXT}
-        BORDER={BORDER}
+        CARD_WIDTH={CARD_WIDTH}
       />
     ),
-    [toggleWishlist, isDark, CARD_BG, TEXT, SUBTEXT, BORDER]
+    [toggleWishlist, isDark, CARD_WIDTH]
   );
 
-  const keyExtractor = useCallback((item: WishlistItem) => item.id, []);
+  const keyExtractor = useCallback((item: WishlistItem) => `${item.id}-${item.sectionId}`, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#0d0d0d' : '#ffffff' }} edges={offlineBannerVisible ? [] : ['top']}>
-
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: BG }}
+      edges={offlineBannerVisible ? [] : ['top']}
+    >
       {/* HEADER */}
-      <RNView style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: BORDER }}>
-        <Text style={{ fontSize: 22, fontWeight: '700', color: TEXT }}>
+      <RNView
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+          borderBottomWidth: 1,
+          borderBottomColor: BORDER,
+          backgroundColor: isDark ? '#0A0A0A' : '#F5F5F5',
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: '700',
+            color: TEXT,
+          }}
+        >
           {t('wishlistPage.title')}
         </Text>
         {items.length > 0 && (
-          <Text style={{ fontSize: 13, color: SUBTEXT }}>
+          <Text
+            style={{
+              fontSize: 13,
+              color: SUBTEXT,
+            }}
+          >
             {items.length} {t(items.length !== 1 ? 'wishlistPage.items' : 'wishlistPage.item')}
           </Text>
         )}
@@ -157,13 +257,18 @@ export default function WishlistScreen() {
       {items.length === 0 ? (
         <EmptyWishlist isDark={isDark} TEXT={TEXT} SUBTEXT={SUBTEXT} />
       ) : (
-        <FlashList<WishlistItem>
+        <FlashList
           data={items}
           renderItem={renderItem}
           keyExtractor={keyExtractor}
-          contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
+          numColumns={2}
+          contentContainerStyle={{
+            paddingHorizontal: 12,
+            paddingTop: 8,
+            paddingBottom: 120,
+          }}
           showsVerticalScrollIndicator={false}
-          style={{ backgroundColor: PAGE_BG }}
+          style={{ backgroundColor: BG }}
         />
       )}
     </SafeAreaView>
