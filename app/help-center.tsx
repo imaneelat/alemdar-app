@@ -4,8 +4,10 @@ import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import React from "react";
-import { Image, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions, useColorScheme } from "react-native";
+import { Image, Linking, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useColors } from "@/hooks/useColors";
+
 
 const CONTACT_OPTIONS = [
   { key: "call", labelKey: "help.callCenter", icon: require("@/assets/icons/helpcenter/callcenter.png") },
@@ -18,8 +20,8 @@ export default function HelpCenterScreen() {
   useLocale();
   const { width: screenWidth } = useWindowDimensions();
   const cardSize = (screenWidth - 48 - 20) / 2;
-  const scheme = useColorScheme();
-  const isDark = scheme === "dark";
+
+  const { isDark } = useColors();
   const offlineBannerVisible = useOfflineBannerVisible();
 
   const BG         = isDark ? "#02060E"  : "#f2f2f7";

@@ -30,6 +30,7 @@ import Carousel, {
   Pagination,
 } from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useColors } from "@/hooks/useColors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const AMBER = "#FF6B00";
@@ -362,8 +363,7 @@ export default function HomeScreen() {
   useLocale();
   const router = useRouter();
   const { totalItems } = useCart();
-  const scheme = useColorScheme();
-  const isDark = scheme === "dark";
+  const { isDark } = useColors();
   const offlineBannerVisible = useOfflineBannerVisible();
 
   const PAGE_BG = isDark ? "#0d0d0d" : "#f2f2f7";

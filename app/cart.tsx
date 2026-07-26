@@ -16,9 +16,10 @@ import {
   ScrollView,
   StatusBar,
   TouchableOpacity,
-  useColorScheme,
+  
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useColors } from "@/hooks/useColors";
 
 const AMBER = "#FF6B00";
 
@@ -34,8 +35,8 @@ export default function CartScreen() {
     totalPrice,
   } = useCart();
   const { mutate: placeOrder, isPending: isPlacingOrder } = usePlaceOrder();
-  const scheme = useColorScheme();
-  const isDark = scheme === "dark";
+
+  const { isDark } = useColors();
   const offlineBannerVisible = useOfflineBannerVisible();
 
   const PAGE_BG = isDark ? "#0d0d0d" : "#f2f2f7";
