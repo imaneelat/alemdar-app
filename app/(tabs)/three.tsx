@@ -14,6 +14,7 @@ import { FlashList, ListRenderItemInfo } from '@shopify/flash-list';
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useOfflineBannerVisible } from '@/hooks/useOfflineBanner';
 import { useLocale, t } from '@/lib/i18n';
+import { useColors } from '@/hooks/useColors';
 
 const AMBER = "#FF6B00";
 
@@ -109,8 +110,7 @@ function EmptyWishlist({ isDark, TEXT, SUBTEXT }: { isDark: boolean; TEXT: strin
 //  Wishlist screen 
 
 export default function WishlistScreen() {
-  const scheme = useColorScheme();
-  const isDark = scheme === 'dark';
+  const { isDark } = useColors();
   const offlineBannerVisible = useOfflineBannerVisible();
 
   const PAGE_BG = isDark ? '#0d0d0d' : '#f2f2f7';

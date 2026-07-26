@@ -18,14 +18,14 @@ import {
   useColorScheme,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useColors } from "@/hooks/useColors";
 
 type Props = { visible: boolean; onClose: () => void };
 
 export default function OnboardingSheet({ visible, onClose }: Props) {
   useLocale();
   const insets = useSafeAreaInsets();
-  const scheme = useColorScheme();
-  const isDark = scheme === "dark";
+  const { isDark } = useColors();
 
   const SHEET_BG = isDark ? "#0d0d0d" : "#ffffff";
   const INPUT_BG = isDark ? "#0B1525" : "#f5f5f5";

@@ -16,7 +16,7 @@ import BottomSheet, { type BottomSheetMethods } from "@devvie/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ONBOARDING_KEY = "onboarding_done_v5";// bump it to the next number for the boarding flow to appear v5 to v6 
+const ONBOARDING_KEY = "onboarding_done_v6";// bump it to the next number for the boarding flow to appear v5 to v6 
 
 let _set: ((s: string | null) => void) | null = null;
 export const openSheet = (s: string) => _set?.(s);
@@ -25,6 +25,7 @@ export const closeSheets = () => _set?.(null);
 let _showConfirm: ((s: string | null) => void) | null = null;
 export const showServiceConfirm = (s: string) => _showConfirm?.(s);
 export const hideServiceConfirm = () => _showConfirm?.(null);
+
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
