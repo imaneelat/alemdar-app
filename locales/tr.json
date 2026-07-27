@@ -152,5 +152,37 @@
     "shippingValue": "Lefkoşa'da Aynı Gün",
     "moreFrom": "%{title} kategorisinden daha fazlası",
     "addedToCart": "Sepete eklendi!"
-  }
+  },
+  "service": {
+  "requestTitle": "Hizmet Talebi",
+  "fullName": "Ad Soyad",
+  "fullNamePlaceholder": "örn. Ahmet Yılmaz",
+  "phone": "Telefon Numarası",
+  "phonePlaceholder": "+90 5XX XXX XX XX",
+  "email": "E-posta (isteğe bağlı)",
+  "emailPlaceholder": "siz@eposta.com",
+  "location": "Konum",
+  "locationPlaceholder": "Sokak, ilçe, şehir...",
+  "describe": "Sorununuzu Açıklayın",
+  "describePlaceholder": "Sorunu ayrıntılı olarak açıklayın...",
+  "photos": "Fotoğraf Yükle (isteğe bağlı)",
+  "addPhotos": "Fotoğraf Ekle",
+  "preferredDate": "Tercih Edilen Tarih",
+  "datePlaceholder": "GG/AA/YYYY",
+  "preferredTime": "Tercih Edilen Saat",
+  "timePlaceholder": "SS:DD",
+  "submit": "Talebi Gönder",
+  "submitting": "Gönderiliyor...",
+  "successTitle": "Talep Gönderildi!",
+  "successMessage": "%{service} talebiniz iletildi.",
+  "missingFields": "Eksik Alanlar",
+  "missingFieldsDesc": "Lütfen Ad, Telefon, Konum ve Açıklama alanlarını doldurun.",
+  "comingSoon": "Yakında",
+  "comingSoonDesc": "Fotoğraf yükleme özelliği tam sürümde kullanılabilecek.",
+  "searchPlaceholder": "Meslek veya sektör ara...",
+  "noResultsFor": "Sonuç bulunamadı:",
+  "resultsFound": "sonuç bulundu",
+  "resultsFoundPlural": "sonuç bulundu",
+  "noProfessionsFor": "Bulunamadı:"
+}
 }
