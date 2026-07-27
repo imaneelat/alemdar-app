@@ -152,5 +152,37 @@
     "shippingValue": "Same-day in Lefkoşa",
     "moreFrom": "More from %{title}",
     "addedToCart": "Added to cart!"
-  }
+  },
+  "service": {
+  "requestTitle": "Service Request",
+  "fullName": "Full Name",
+  "fullNamePlaceholder": "e.g. John Smith",
+  "phone": "Phone Number",
+  "phonePlaceholder": "+90 5XX XXX XX XX",
+  "email": "Email (optional)",
+  "emailPlaceholder": "you@email.com",
+  "location": "Location",
+  "locationPlaceholder": "Street, district, city...",
+  "describe": "Describe Your Problem",
+  "describePlaceholder": "Describe the issue in detail...",
+  "photos": "Upload Photos (optional)",
+  "addPhotos": "Add Photos",
+  "preferredDate": "Preferred Date",
+  "datePlaceholder": "DD/MM/YYYY",
+  "preferredTime": "Preferred Time",
+  "timePlaceholder": "HH:MM",
+  "submit": "Submit Request",
+  "submitting": "Sending...",
+  "successTitle": "Request Sent!",
+  "successMessage": "Your %{service} request has been submitted.",
+  "missingFields": "Missing Fields",
+  "missingFieldsDesc": "Please fill in Name, Phone, Location and Description.",
+  "comingSoon": "Coming Soon",
+  "comingSoonDesc": "Photo upload will be available in the full build.",
+  "searchPlaceholder": "Search professions or trade sectors...",
+  "noResultsFor": "No results for",
+  "resultsFound": "result found",
+  "resultsFoundPlural": "results found",
+  "noProfessionsFor": "No professions found for"
+}
 }
