@@ -124,7 +124,7 @@ export default function SearchScreen() {
   const snapPoints    = useMemo(() => ["88%"], []);
 
   const t: Record<string, string> = {
-    bg:               isDark ? "#0A0A0A"               : "#F5F5F5",
+    bg:               isDark ? "#0A0A0A"               : "#FFFFFF",
     border:           isDark ? "#2A2A2A"               : "#E8E8E8",
     text:             isDark ? "#FFFFFF"               : "#111111",
     subtext:          "#888888",

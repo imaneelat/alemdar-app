@@ -366,13 +366,13 @@ export default function HomeScreen() {
   const { isDark } = useColors();
   const offlineBannerVisible = useOfflineBannerVisible();
 
-  const PAGE_BG = isDark ? "#0d0d0d" : "#f2f2f7";
+  const PAGE_BG = isDark ? "#0d0d0d" : "#ffffff" ;
   const HEADER_BG = isDark ? "#0d0d0d" : "#ffffff";
   const CARD_BG = isDark ? "#131825" : "#ffffff";
   const TEXT = isDark ? "#ffffff" : "#111111";
   const SUBTEXT = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.4)";
   const BORDER = isDark ? "#1e2433" : "#ebebeb";
-  const SEARCH_BG = isDark ? "#0B1525" : "#f0f0f5";
+  const SEARCH_BG = isDark ? "#0B1525" : "#ffffff";
   const ICON_COLOR = isDark ? "#ffffff" : "#111111";
   const SEARCH_PH = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
   // const SEARCH_TC = isDark ? "#ffffff" : "#111111";
@@ -475,15 +475,14 @@ export default function HomeScreen() {
           alignItems: "center",
           backgroundColor: HEADER_BG,
           paddingHorizontal: 16,
-          paddingTop: 4,
+          paddingTop: 8,
           paddingBottom: 10,
           zIndex: 999,
         }}
       >
         <RNView>
           <Text
-            style={{
-              fontSize: 22,
+            style={{fontSize: 24,
               fontWeight: "700",
               color: TEXT,
               letterSpacing: 0.3,
@@ -491,6 +490,7 @@ export default function HomeScreen() {
           >
             Alemdar <Text style={{ color: AMBER }}>Teknik</Text>
           </Text>
+
           <RNView
             style={{
               flexDirection: "row",
@@ -500,7 +500,7 @@ export default function HomeScreen() {
             }}
           >
             <Ionicons name="location-sharp" size={14} color={AMBER} />
-            <Text style={{ fontSize: 10, color: SUBTEXT }}>
+            <Text style={{ fontSize: 11, color: SUBTEXT }}>
               {t("home.location")}
             </Text>
           </RNView>
@@ -564,19 +564,21 @@ export default function HomeScreen() {
           paddingBottom: 14,
         }}
       >
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => router.push("/search")}
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: SEARCH_BG,
-            borderRadius: 10,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-          }}
-        >
+       <TouchableOpacity
+   activeOpacity={0.7}
+  onPress={() => router.push("/search")}
+  style={{
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: SEARCH_BG,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    height: 48,
+    borderWidth: 1,
+    borderColor: BORDER,
+  }}
+>
           <Ionicons
             name="search"
             size={16}
