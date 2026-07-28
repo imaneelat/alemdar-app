@@ -309,9 +309,10 @@ function FilterPills({ categories, selected, onSelect, isDark }: FilterPillsProp
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{
         paddingHorizontal: 16,
-        gap: 8,
+        gap: 7,
         paddingVertical: 10,
         alignItems: 'center',
+        paddingTop: 3,
       }}
     >
       {['All', ...categories].map((cat) => {
@@ -391,7 +392,7 @@ export default function WishlistScreen() {
   const TEXT    = isDark ? '#ffffff'                : '#111111';
   const SUBTEXT = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)';
   const BORDER  = isDark ? '#2A2A2A'                : '#E8E8E8';
-  const BG      = isDark ? '#0A0A0A'                : '#ffffff' ;
+  const BG      = isDark ? '#0A0A0A'                : '#ffffff';
 
   const { items, toggleWishlist } = useWishlist();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');

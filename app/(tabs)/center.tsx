@@ -27,14 +27,14 @@ import { showServiceConfirm } from "./_layout"
 import hizmetData from "@/constants/hizmet-data.json"
 
 const getColors = (isDark: boolean) => ({
-  bg:     isDark ? "#02060E" : "#FFFFFF",
-  panel:  isDark ? "#101928" : "#F5F5F5",
+  bg:     isDark ? '#0A0A0A'  : "#FFFFFF",
+  panel:  isDark ? '#0A0A0A' : "#F5F5F5",
   border: isDark ? "#26344C" : "#E8E8E8",
   text:   isDark ? "#FFFFFF" : "#111111",
   muted:  isDark ? "#A9AEC0" : "#6B6B80",
-  input:  isDark ? "#101928" : "#FFFFFF",
+  input:  isDark ? '#0A0A0A'  : "#FFFFFF",
   orange: "#FF6B00",
-  sheet:  isDark ? "#0D1520" : "#FFFFFF",
+  sheet:  isDark ? '#0A0A0A'  : "#FFFFFF",
 })
 
 type Service = {

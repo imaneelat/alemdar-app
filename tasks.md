@@ -6,7 +6,7 @@
 [] lamine: remove the brand and make the images, select a couple of brands from the database
 [] lamine: redesign the categories: replace the text and box with real images in box instead
 [x] salah: fix the light/darkmode in address and other screens in the app
-[] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
+[x] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
 [x] lamine: on offline disable products details page
 [x] lamine: on back offline show a banner showing the back online
 [x] lamine: on offline search should say you are offline
