@@ -1,0 +1,218 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Alemdar Wishlist API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/wishlist": {
+      "get": {
+        "summary": "Get all wishlist items",
+        "responses": {
+          "200": {
+            "description": "List of wishlist items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/WishlistItem" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add item to wishlist",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productId"],
+                "properties": {
+                  "productId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Item added" }
+        }
+      }
+    },
+    "/wishlist/{id}": {
+      "delete": {
+        "summary": "Remove item from wishlist",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Item removed" }
+        }
+      }
+    },
+    "/collections": {
+      "get": {
+        "summary": "Get all collections",
+        "responses": {
+          "200": {
+            "description": "List of collections",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Collection" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a collection",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "category": { "type": "string" },
+                  "coverImage": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Collection created" }
+        }
+      }
+    },
+    "/collections/{id}": {
+      "get": {
+        "summary": "Get a single collection with its items",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Collection detail",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CollectionDetail" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/collections/{id}/items": {
+      "post": {
+        "summary": "Add item to a collection",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["productId"],
+                "properties": {
+                  "productId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Item added to collection" }
+        }
+      }
+    },
+    "/collections/{id}/items/{itemId}": {
+      "delete": {
+        "summary": "Remove item from a collection",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "itemId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "204": { "description": "Item removed from collection" }
+        }
+      }
+    },
+    "/collections/{id}/share": {
+      "get": {
+        "summary": "Get a shareable link for a collection",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shareable link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WishlistItem": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "string" },
+          "productId":   { "type": "string" },
+          "name":        { "type": "string" },
+          "price":       { "type": "number" },
+          "image":       { "type": "string" },
+          "category":    { "type": "string" },
+          "addedAt":     { "type": "string", "format": "date-time" }
+        }
+      },
+      "Collection": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "string" },
+          "name":        { "type": "string" },
+          "category":    { "type": "string" },
+          "coverImage":  { "type": "string" },
+          "itemCount":   { "type": "integer" },
+          "createdAt":   { "type": "string", "format": "date-time" }
+        }
+      },
+      "CollectionDetail": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "string" },
+          "name":        { "type": "string" },
+          "category":    { "type": "string" },
+          "coverImage":  { "type": "string" },
+          "shareUrl":    { "type": "string" },
+          "createdAt":   { "type": "string", "format": "date-time" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/WishlistItem" }
+          }
+        }
+      }
+    }
+  }
+}

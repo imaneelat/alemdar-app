@@ -573,7 +573,7 @@ export default function WishlistScreen() {
           renderItem={renderItem}
           keyExtractor={keyExtractor}
           numColumns={2}
-          estimatedItemSize={220}
+         
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingHorizontal: 5,

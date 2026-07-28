@@ -25,17 +25,8 @@ import Animated, { FadeInDown } from "react-native-reanimated"
 import { FlashList } from "@shopify/flash-list"
 import { showServiceConfirm } from "./_layout"
 import hizmetData from "@/constants/hizmet-data.json"
-
-const getColors = (isDark: boolean) => ({
-  bg:     isDark ? "#02060E" : "#FFFFFF",
-  panel:  isDark ? "#101928" : "#F5F5F5",
-  border: isDark ? "#26344C" : "#E8E8E8",
-  text:   isDark ? "#FFFFFF" : "#111111",
-  muted:  isDark ? "#A9AEC0" : "#6B6B80",
-  input:  isDark ? "#101928" : "#F0F0F5",
-  orange: "#FF6B00",
-  sheet:  isDark ? "#0D1520" : "#FFFFFF",
-})
+import { getColors } from "@/constants/Colors"
+import { IconInput } from "@/components/IconInput"
 
 type Service = {
   id: string
@@ -129,7 +120,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export default function ServiceScreen() {
-  useLocale() // re-renders screen when language changes
+  useLocale()
   const scheme  = useColorScheme()
   const isDark  = scheme === "dark"
   const C       = getColors(isDark)
@@ -141,7 +132,6 @@ export default function ServiceScreen() {
   const [loading,      setLoading]      = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // ── Form state ────────────────────────────────────────────────
   const [formVisible,     setFormVisible]     = useState(false)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [name,            setName]            = useState("")
@@ -153,7 +143,6 @@ export default function ServiceScreen() {
   const [preferredTime,   setPreferredTime]   = useState("")
   const [submitting,      setSubmitting]      = useState(false)
 
-  // ── Search logic ──────────────────────────────────────────────
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     const trimmed = query.trim()
@@ -261,7 +250,6 @@ export default function ServiceScreen() {
           keyExtractor={item => `${item.list}-${item.code}`}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
-          estimatedItemSize={88}
           contentContainerStyle={{ paddingBottom: 110, paddingTop: 8 }}
           ListHeaderComponent={
             !loading ? (
@@ -409,22 +397,15 @@ export default function ServiceScreen() {
               />
             </Field>
 
+            {/* ── Uses IconInput component ── */}
             <Field label={t("service.location") + " *"}>
-              <View style={{
-                flexDirection: "row", alignItems: "center",
-                backgroundColor: C.input, borderRadius: 10,
-                borderWidth: 1, borderColor: C.border,
-                paddingHorizontal: 14,
-              }}>
-                <Ionicons name="location-outline" size={16} color={C.muted} style={{ marginRight: 8 }} />
-                <TextInput
-                  style={{ flex: 1, fontSize: 14, color: C.text, paddingVertical: 12 }}
-                  placeholder={t("service.locationPlaceholder")}
-                  placeholderTextColor={C.muted}
-                  value={location}
-                  onChangeText={setLocation}
-                />
-              </View>
+              <IconInput
+                icon="location-outline"
+                placeholder={t("service.locationPlaceholder")}
+                value={location}
+                onChangeText={setLocation}
+                colors={C}
+              />
             </Field>
 
             <Field label={t("service.describe") + " *"}>
@@ -439,47 +420,30 @@ export default function ServiceScreen() {
               />
             </Field>
 
-            {/* Date & Time */}
+            {/* ── Date & Time uses IconInput component ── */}
             <View style={{ flexDirection: "row", gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Field label={t("service.preferredDate")}>
-                  <View style={{
-                    flexDirection: "row", alignItems: "center",
-                    backgroundColor: C.input, borderRadius: 10,
-                    borderWidth: 1, borderColor: C.border,
-                    paddingHorizontal: 14,
-                  }}>
-                    <Ionicons name="calendar-outline" size={14} color={C.muted} style={{ marginRight: 6 }} />
-                    <TextInput
-                      style={{ flex: 1, fontSize: 13, color: C.text, paddingVertical: 12 }}
-                      placeholder={t("service.datePlaceholder")}
-                      placeholderTextColor={C.muted}
-                      value={preferredDate}
-                      onChangeText={setPreferredDate}
-                      keyboardType="numeric"
-                    />
-                  </View>
+                  <IconInput
+                    icon="calendar-outline"
+                    placeholder={t("service.datePlaceholder")}
+                    value={preferredDate}
+                    onChangeText={setPreferredDate}
+                    keyboardType="numeric"
+                    colors={C}
+                  />
                 </Field>
               </View>
-
               <View style={{ flex: 1 }}>
                 <Field label={t("service.preferredTime")}>
-                  <View style={{
-                    flexDirection: "row", alignItems: "center",
-                    backgroundColor: C.input, borderRadius: 10,
-                    borderWidth: 1, borderColor: C.border,
-                    paddingHorizontal: 14,
-                  }}>
-                    <Ionicons name="time-outline" size={14} color={C.muted} style={{ marginRight: 6 }} />
-                    <TextInput
-                      style={{ flex: 1, fontSize: 13, color: C.text, paddingVertical: 12 }}
-                      placeholder={t("service.timePlaceholder")}
-                      placeholderTextColor={C.muted}
-                      value={preferredTime}
-                      onChangeText={setPreferredTime}
-                      keyboardType="numeric"
-                    />
-                  </View>
+                  <IconInput
+                    icon="time-outline"
+                    placeholder={t("service.timePlaceholder")}
+                    value={preferredTime}
+                    onChangeText={setPreferredTime}
+                    keyboardType="numeric"
+                    colors={C}
+                  />
                 </Field>
               </View>
             </View>
