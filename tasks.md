@@ -1,16 +1,20 @@
+[] iman: "you are offline" is triggring offline while app has internet, and even the products stop loading while the app have internet , use netinfo package and fix this using expo docs and review the code very carefully. This will require a new build cuz netinfo is native package (Text me once you ready)
+[] iman: wishlist is losing saved items once app is restart. persist it and save wishlish locally
+[] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
+[] salah : merge the new category icons that in branch lamine/chore/category-icons into master. 
+
+[] lamine: redesign the categories: replace the text and box with real images in box instead
+[] lamine: remove the brand and make the images, select a couple of brands from the database
+[] lamine: make the navbar blurred
 [x] iman: Improve Wishlist UI/UX, Make collections pattern — image grid, shareable link, category. Inspired from pinterest, commit the schema.json for your endpoints and it will be deployed
 [x] iman: Every screen has own isDark ? "#fff" : "#000". Seven screens, seven palettes. Make one hook. Call it useColors()
 [x] salah: enhance the product id screen, thats where the sale is. Ship three new features
 [x] salah: find 2 repeated codes and extract reusable components
 [x] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
-[] lamine: remove the brand and make the images, select a couple of brands from the database
-[] lamine: redesign the categories: replace the text and box with real images in box instead
 [x] salah: fix the light/darkmode in address and other screens in the app
-[] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
 [x] lamine: on offline disable products details page
 [x] lamine: on back offline show a banner showing the back online
 [x] lamine: on offline search should say you are offline
-[] lamine: make the navbar blurred
 [x] lamine: delelte the postal code, let the db and api accept null as we agreed, and switch 'city' to predefind list like website
 [x] lamine: handle the app UI/UX if all screen if the db is down ( provide great animation and messages and offline cached products) test it heavily
 [x] iman: add /docs/list1/pdf, /docs/list2.pdf to alemdarhizmet : extract all the data from the pdfs, put the data in json, create search bar
