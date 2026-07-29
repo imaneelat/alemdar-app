@@ -17,8 +17,10 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
+import { AppState } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "react-native-reanimated";
+import { updateStockWidget } from "@/lib/widget-updater";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -55,6 +57,14 @@ function RootLayoutNav() {
   const isDark = colorScheme === "dark";
   const appBackground = isDark ? "#0d0d0d" : "#ffffff";
   const navigationTheme = isDark ? DarkTheme : DefaultTheme;
+
+  useEffect(() => {
+    updateStockWidget()
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') updateStockWidget()
+    })
+    return () => sub.remove()
+  }, [])
 
   return (
     <SafeAreaProvider style={{ flex: 1, backgroundColor: appBackground }}>

@@ -71,6 +71,28 @@
             ]
           }
         }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "StockQuickWidget",
+              "displayName": "Alemdar Stock",
+              "description": "Quick access to Alemdar products",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "systemLarge",
+                  "systemExtraLarge"
+                ]
+              }
+            }
+          ]
+        }
       ]
     ],
     "experiments": {
