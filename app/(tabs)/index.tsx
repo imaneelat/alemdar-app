@@ -1,6 +1,7 @@
 import FacebookIcon from "@/assets/icons/facebook.svg";
 import GoogleMapIcon from "@/assets/icons/google_map.svg";
 import InstagramIcon from "@/assets/icons/instagram.svg";
+import { CachedImage } from "@/components/CachedImage";
 import { HomeProductSection } from "@/components/HomeProductSection";
 import { Text } from "@/components/Themed";
 import { useCart } from "@/context/CartContext";
@@ -10,7 +11,6 @@ import { HOME_SECTIONS } from "@/lib/section-meta";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { openSheet } from "./_layout";
 import { useRef, useState } from "react";
 import {
   Dimensions,
@@ -30,7 +30,7 @@ import Carousel, {
   Pagination,
 } from "react-native-reanimated-carousel";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColors } from "@/hooks/useColors";
+import { openSheet } from "./_layout";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const AMBER = "#FF6B00";
@@ -77,102 +77,114 @@ const categories = [
   {
     id: "1",
     name: "Solar",
-    icon: "sunny-outline",
-    color: "#f5a623",
     section: "solardb",
+    icon: require("@/assets/solar.png"),
   },
   {
     id: "2",
     name: "Arduino",
-    icon: "hardware-chip-outline",
-    color: "#00979d",
     section: "arduino",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "3",
     name: "Sound",
-    icon: "musical-notes-outline",
-    color: "#a855f7",
     section: "sound",
+    icon: require("@/assets/sound.png"),
   },
   {
     id: "4",
     name: "Batteries",
-    icon: "battery-charging-outline",
-    color: "#e3342f",
     section: "batteries",
+    icon: require("@/assets/batteries.png"),
   },
   {
     id: "5",
     name: "Chargers",
-    icon: "phone-portrait-outline",
-    color: "#3b82f6",
     section: "chargers",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "6",
     name: "Adapters",
-    icon: "swap-horizontal-outline",
-    color: "#f5a623",
     section: "adapters",
+    icon: require("@/assets/adapters.png"),
   },
   {
     id: "7",
     name: "Lamps",
-    icon: "bulb-outline",
-    color: "#fbbf24",
     section: "lamps",
+    icon: require("@/assets/lamp.png"),
   },
   {
     id: "8",
     name: "Mexxsun",
-    icon: "leaf-outline",
-    color: "#10b981",
     section: "mexxsun",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "9",
     name: "Filaments",
-    icon: "layers-outline",
-    color: "#ec4899",
     section: "filaments",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "10",
     name: "TV Remotes",
-    icon: "tv-outline",
-    color: "#6366f1",
     section: "tv_remotes",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "11",
     name: "Fans",
-    icon: "thermometer-outline",
-    color: "#06b6d4",
     section: "fans",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "12",
     name: "Electric",
-    icon: "construct-outline",
-    color: "#f97316",
     section: "electric",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "13",
     name: "Screwdrivers",
-    icon: "settings-outline",
-    color: "#78716c",
     section: "scrawesdriver",
+    icon: require("@/assets/arduino.png"),
   },
   {
     id: "14",
     name: "Spray Gum",
-    icon: "color-fill-outline",
-    color: "#84cc16",
     section: "spray_gum",
+    icon: require("@/assets/arduino.png"),
   },
 ];
+
+// ─── CATEGORY TILE — a custom illustration standing in for the category
+function CategoryTile({
+  icon,
+  name,
+  onPress,
+}: {
+  icon: number;
+  name: string;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.85}
+      accessibilityLabel={name}
+      accessibilityRole="button"
+    >
+      <CachedImage
+        source={icon}
+        style={{ width: 72, height: 72 }}
+        contentFit="contain"
+      />
+    </TouchableOpacity>
+  );
+}
 
 // brandes
 const brands = [
@@ -363,16 +375,17 @@ export default function HomeScreen() {
   useLocale();
   const router = useRouter();
   const { totalItems } = useCart();
-  const { isDark } = useColors();
+  const scheme = useColorScheme();
+  const isDark = scheme === "dark";
   const offlineBannerVisible = useOfflineBannerVisible();
 
-  const PAGE_BG = isDark ? "#0d0d0d" : "#ffffff" ;
+  const PAGE_BG = isDark ? "#0d0d0d" : "#f2f2f7";
   const HEADER_BG = isDark ? "#0d0d0d" : "#ffffff";
   const CARD_BG = isDark ? "#131825" : "#ffffff";
   const TEXT = isDark ? "#ffffff" : "#111111";
   const SUBTEXT = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.4)";
   const BORDER = isDark ? "#1e2433" : "#ebebeb";
-  const SEARCH_BG = isDark ? "#0B1525" : "#ffffff";
+  const SEARCH_BG = isDark ? "#0B1525" : "#f0f0f5";
   const ICON_COLOR = isDark ? "#ffffff" : "#111111";
   const SEARCH_PH = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)";
   // const SEARCH_TC = isDark ? "#ffffff" : "#111111";
@@ -475,14 +488,15 @@ export default function HomeScreen() {
           alignItems: "center",
           backgroundColor: HEADER_BG,
           paddingHorizontal: 16,
-          paddingTop: 8,
+          paddingTop: 4,
           paddingBottom: 10,
           zIndex: 999,
         }}
       >
         <RNView>
           <Text
-            style={{fontSize: 24,
+            style={{
+              fontSize: 22,
               fontWeight: "700",
               color: TEXT,
               letterSpacing: 0.3,
@@ -490,7 +504,6 @@ export default function HomeScreen() {
           >
             Alemdar <Text style={{ color: AMBER }}>Teknik</Text>
           </Text>
-
           <RNView
             style={{
               flexDirection: "row",
@@ -500,7 +513,7 @@ export default function HomeScreen() {
             }}
           >
             <Ionicons name="location-sharp" size={14} color={AMBER} />
-            <Text style={{ fontSize: 11, color: SUBTEXT }}>
+            <Text style={{ fontSize: 10, color: SUBTEXT }}>
               {t("home.location")}
             </Text>
           </RNView>
@@ -508,13 +521,16 @@ export default function HomeScreen() {
 
         {/* Right: Notifications + Cart */}
         <RNView style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-         <TouchableOpacity style={{ padding: 6 }} onPress={() => router.push("/notifications")}>
-  <Ionicons
-    name="notifications-outline"
-    size={22}
-    color={ICON_COLOR}
-  />
-</TouchableOpacity>
+          <TouchableOpacity
+            style={{ padding: 6 }}
+            onPress={() => router.push("/notifications")}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={22}
+              color={ICON_COLOR}
+            />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ padding: 6 }}
             onPress={() => openSheet("settings")}
@@ -564,21 +580,19 @@ export default function HomeScreen() {
           paddingBottom: 14,
         }}
       >
-       <TouchableOpacity
-   activeOpacity={0.7}
-  onPress={() => router.push("/search")}
-  style={{
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: SEARCH_BG,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    height: 48,
-    borderWidth: 1,
-    borderColor: BORDER,
-  }}
->
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => router.push("/search")}
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: SEARCH_BG,
+            borderRadius: 10,
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+          }}
+        >
           <Ionicons
             name="search"
             size={16}
@@ -589,7 +603,6 @@ export default function HomeScreen() {
             {t("home.searchPlaceholder")}
           </Text>
         </TouchableOpacity>
-       
       </RNView>
 
       {/* BODY */}
@@ -679,53 +692,30 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 18, fontWeight: "700", color: TEXT }}>
             {t("home.categories")}
           </Text>
-         
         </RNView>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, gap: 16 }}
         >
-          {categories.map((cat) => (
-            <TouchableOpacity
-              key={cat.id}
-              style={{ alignItems: "center", width: 62 }}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                router.push({
-                  pathname: "/category-detail",
-                  params: { section: cat.section },
-                });
-              }}
-            >
-              <RNView
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: 16,
-                  backgroundColor: CARD_BG,
-                  borderWidth: 1,
-                  borderColor: BORDER,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 7,
-                }}
-              >
-                <Ionicons name={cat.icon as any} size={22} color={cat.color} />
-              </RNView>
-              <Text
-                style={{
-                  fontSize: 10,
-                  fontWeight: "600",
-                  color: TEXT,
-                  textAlign: "center",
-                }}
-                numberOfLines={1}
-              >
-                {cat.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {categories.map((cat) => {
+            const onPress = () => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push({
+                pathname: "/category-detail",
+                params: { section: cat.section },
+              });
+            };
+
+            return (
+              <CategoryTile
+                key={cat.id}
+                icon={cat.icon}
+                name={cat.name}
+                onPress={onPress}
+              />
+            );
+          })}
         </ScrollView>
 
         {/* BRANDS */}
@@ -742,7 +732,6 @@ export default function HomeScreen() {
           <Text style={{ fontSize: 18, fontWeight: "700", color: TEXT }}>
             {t("home.brands")}
           </Text>
-          
         </RNView>
         <ScrollView
           horizontal

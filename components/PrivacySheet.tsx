@@ -2,14 +2,14 @@ import BottomSheet, { ANIMATIONS, CUSTOM_BACKDROP_POSITIONS, type BottomSheetMet
 import { useRef, useEffect } from 'react';
 import { ScrollView, Text, View, StyleSheet, useColorScheme } from 'react-native';
 import { t, useLocale } from '@/lib/i18n';
-import { useColors } from '@/hooks/useColors';
 
 type Props = { visible: boolean; onClose: () => void };
 
 export default function PrivacySheet({ visible, onClose }: Props) {
   useLocale();
   const ref = useRef<BottomSheetMethods>(null);
- const { isDark } = useColors();
+  const scheme = useColorScheme();
+  const isDark = scheme === 'dark';
 
   const SHEET_BG = isDark ? '#101928' : '#ffffff';
   const TEXT     = isDark ? '#FFFFFF' : '#111111';
@@ -30,15 +30,7 @@ export default function PrivacySheet({ visible, onClose }: Props) {
       closeOnBackdropPress
       closeOnDragDown
       hideDragHandle={false}
-      dragHandleStyle=
-      {{ width: 40, 
-        height: 5,
-         borderRadius: 3,
-          backgroundColor: HANDLE, 
-          alignSelf: 'center',
-           marginTop: 10
-
-       }}
+      dragHandleStyle={{ width: 40, height: 5, borderRadius: 3, backgroundColor: HANDLE, alignSelf: 'center', marginTop: 10 }}
       disableDragHandlePanning={false}
       disableBodyPanning={false}
       android_backdropMaskRippleColor="#26344C"

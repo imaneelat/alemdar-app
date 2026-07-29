@@ -1,15 +1,15 @@
 import BottomSheet, { ANIMATIONS, CUSTOM_BACKDROP_POSITIONS, type BottomSheetMethods } from '@devvie/bottom-sheet';
 import { useRef, useEffect, useState } from 'react';
-import { Pressable, Text, View, StyleSheet } from 'react-native';
+import { Pressable, Text, View, StyleSheet, useColorScheme } from 'react-native';
 import { setLocale } from '@/lib/i18n';
-import { useColors } from '@/hooks/useColors';
 
 type Props = { visible: boolean; onClose: () => void };
 
 export default function LanguageSheet({ visible, onClose }: Props) {
   const ref = useRef<BottomSheetMethods>(null);
   const [lang, setLang] = useState('en');
- const { isDark } = useColors();
+  const scheme = useColorScheme();
+  const isDark = scheme === 'dark';
 
   const SHEET_BG = isDark ? '#101928' : '#ffffff';
   const TEXT     = isDark ? '#FFFFFF' : '#111111';

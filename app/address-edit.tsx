@@ -21,13 +21,13 @@ import {
   Text,
   TextInput,
   View,
+  useColorScheme,
 } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { z } from "zod";
-import { useColors } from "@/hooks/useColors";
 
 const addressFormSchema = deliveryProfileSchema.pick({
   name: true,
@@ -36,7 +36,8 @@ const addressFormSchema = deliveryProfileSchema.pick({
 
 export default function AddressEditScreen() {
   useLocale();
-  const { isDark } = useColors();
+  const scheme = useColorScheme();
+  const isDark = scheme === "dark";
   const offlineBannerVisible = useOfflineBannerVisible();
 
   const BG            = isDark ? "#02060E"            : "#f2f2f7";

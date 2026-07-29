@@ -1,4 +1,3 @@
-minimumReleaseAge: 0
 strictDepBuilds: false
 onlyBuiltDependencies:
   - '@prisma/client'
