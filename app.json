@@ -2,7 +2,7 @@
   "expo": {
     "name": "Alemdar",
     "slug": "alemdarapp",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -16,10 +16,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.alemdar.app",
       "infoPlist": {
-        "CFBundleLocalizations": [
-          "en",
-          "tr"
-        ],
+        "CFBundleLocalizations": ["en", "tr"],
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -61,14 +58,8 @@
         "expo-localization",
         {
           "supportedLocales": {
-            "ios": [
-              "en",
-              "tr"
-            ],
-            "android": [
-              "en",
-              "tr"
-            ]
+            "ios": ["en", "tr"],
+            "android": ["en", "tr"]
           }
         }
       ]

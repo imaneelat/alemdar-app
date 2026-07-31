@@ -8,8 +8,10 @@ dist/
 .vercel
 web-build/
 expo-env.d.ts
-
-# Native
+.pnpm-lock.yaml
+.package-lock.json
+#
+ Native
 .kotlin/
 *.orig.*
 *.jks

@@ -1,0 +1,4 @@
+pnpm exec lint-staged &&
+npx expo-doctor &&
+npx expo install --check &&
+pnpm exec tsc --noEmit

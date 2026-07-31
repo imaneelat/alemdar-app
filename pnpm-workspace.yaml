@@ -1,8 +1,11 @@
 strictDepBuilds: false
+
 onlyBuiltDependencies:
-  - '@prisma/client'
-  - '@prisma/engines'
+  - "@prisma/client"
+  - "@prisma/engines"
   - prisma
+  - unrs-resolver
+
 allowBuilds:
-  '@prisma/engines': false
+  "@prisma/engines": false
   prisma: false

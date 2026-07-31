@@ -1,0 +1,17 @@
+if ! pnpm exec commitlint --edit "$1" >/dev/null 2>&1; then
+  MESSAGE=$(head -n 1 "$1")
+
+  echo ""
+  echo "❌ Invalid commit message: \"$MESSAGE\""
+  echo ""
+  echo "Examples:"
+  echo "  fix: resolve login crash"
+  echo "  feat(auth): add Google login"
+  echo "  chore: update dependencies"
+  echo ""
+  echo "Allowed types:"
+  echo "  feat, fix, refactor, perf, test, docs, build, ci, chore, revert"
+  echo ""
+  echo "Please rewrite the commit message and try again."
+  exit 1
+fi

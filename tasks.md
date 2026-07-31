@@ -1,8 +1,10 @@
-[] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
-[] lamine: remove the brand and make the images, select a couple of brands from the database
-[] lamine: redesign the categories: replace the text and box with real images in box instead
+[] X : Explore the codebase, clean it from duplications + extract shared component + doc the app
+[x] save the cart information
+[x] lamine: remove the brand and make the images, select a couple of brands from the database
+[x] lamine: redesign the categories: replace the text and box with real images in box instead
+[x] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
+[x] salah: make a onboarding flow, once the user downlaod the app and arrive at homescreen we trigger buttomsheet welcoming, and force him to put his address and phone so we save them once and for good as we agreed last time
 [x] salah: fix the light/darkmode in address and other screens in the app
-[] salah : fix all the inconsistant colors bg in screens, let it all white , all dark , no gray with white..etc
 [x] lamine: on offline disable products details page
 [x] lamine: on back offline show a banner showing the back online
 [x] lamine: on offline search should say you are offline
@@ -14,7 +16,6 @@
 [x] keyboard should close when swiping
 [x] lamine: complete the checkout and get the address and number info and save them in db
 [x] splash screen should only appear once
-[x] save the cart information
 [x] add debouncing to the search 250ms
 [x] display the images in the cart
 [x] light/dark swticher
